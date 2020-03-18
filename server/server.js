@@ -1,6 +1,7 @@
-var express = require("express");
+const express = require("express");
+const cors = require('cors');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
-var cors = require('cors');
+
 
 const oktaJwtVerifier = new OktaJwtVerifier({
     issuer: 'https://${yourOktaDomain}/oauth2/default',
@@ -9,6 +10,7 @@ const oktaJwtVerifier = new OktaJwtVerifier({
         aud: 'api://default',
     },
 });
+
 
 function authenticationRequired(req, res, next) {
     const authHeader = req.headers.authorization || '';
@@ -34,9 +36,7 @@ function authenticationRequired(req, res, next) {
 
 const app = express();
 app.use(cors());
-
-const port = 8080;
-app.listen(port);
+app.listen(8080);
 
 app.post("/register", function (req, res) {
     // TODO: Check that req.body is what we want it to be
