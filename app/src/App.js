@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import AboutUs from './aboutUs.js';
 import FindOffer from './findOffer.js';
 import Auth from './Auth.js';
-import { makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { Toolbar, AppBar, Typography, Button } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
   },
-  appBar:{
+  appBar: {
     boxShadow: 'none',
   },
   title: {
@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
   },
   tab: {
     color: 'black',
-    "&:hover":{
+    "&:hover": {
       backgroundColor: 'transparent',
       color: 'grey',
       textDecoration: 'underline',
@@ -35,7 +35,7 @@ function App() {
   const [page, setPage] = useState(0);
   var childpage;
 
-  switch(page) {
+  switch (page) {
     case ABOUT_US:
       childpage = (<AboutUs></AboutUs>);
       console.log('about us');
@@ -49,7 +49,7 @@ function App() {
       console.log('auth');
       break;
     default:
-      childpage=(null);
+      childpage = (null);
   }
 
   return (
@@ -57,26 +57,26 @@ function App() {
       <AppBar className={classes.appBar} position="fixed" color="primary">
         <Toolbar>
           <Typography variant="h5" className={classes.title}>
-              Project Student Relief
+            Project Student Relief
           </Typography>
           <Button
             className={classes.tab}
             onClick={() => setPage(0)}>
-              About Us
+            About Us
           </Button>
           <Button
             className={classes.tab}
             onClick={() => setPage(1)}>
-              Find & Offer
+            Find & Offer
           </Button>
           <Button
             className={classes.tab}
             onClick={() => setPage(2)}>
-              Sign In
+            Sign In
           </Button>
         </Toolbar>
       </AppBar>
-      <div className={classes.appBarHeight}/>
+      <div className={classes.appBarHeight} />
       {childpage}
     </div>
   );
