@@ -4,10 +4,14 @@ import Listing from './Listing.js';
 import { Grid, Button } from '@material-ui/core'
 
 class findOffer extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            listings: [],
+        }
+    }
     render() {
-        return (
-            var listings = [];
-            for Eac 
+        return (            
             <div>
                 <Grid container spacing={3}>
                     <Grid item sm={12} md={3}>
