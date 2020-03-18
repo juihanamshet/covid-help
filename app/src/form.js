@@ -19,7 +19,15 @@ const SignupForm = () => {
       housing: '',
     },
     onSubmit: values => {
-      alert(JSON.stringify(values, null, 2));
+      alert(JSON.stringify(values));
+      fetch('localhost:8080/register', {
+        method: 'POST',
+        body: JSON.stringify(values)
+      }).then(function (response) {
+        // TODO: Df do we do here?
+        return response.json();
+      })
+      // TODO: fetch to express app
     },
   });
   return (
