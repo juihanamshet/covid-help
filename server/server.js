@@ -1,11 +1,42 @@
-var express = require("express");
+const express = require("express");
+const cors = require('cors');
+const OktaJwtVerifier = require('@okta/jwt-verifier');
+
+
+const oktaJwtVerifier = new OktaJwtVerifier({
+    issuer: 'https://${yourOktaDomain}/oauth2/default',
+    clientId: '{clientId}',
+    assertClaims: {
+        aud: 'api://default',
+    },
+});
+
+
+function authenticationRequired(req, res, next) {
+    const authHeader = req.headers.authorization || '';
+    const match = authHeader.match(/Bearer (.+)/);
+
+    if (!match) {
+        return res.status(401).end();
+    }
+
+    const accessToken = match[1];
+    const expectedAudience = 'api://default';
+
+    return oktaJwtVerifier.verifyAccessToken(accessToken, expectedAudience)
+        .then((jwt) => {
+            req.jwt = jwt;
+            next();
+        })
+        .catch((err) => {
+            res.status(401).send(err.message);
+        });
+}
 
 
 const app = express();
-
-app.use(express.urlencoded());
-const port = 8080;
-app.listen(port);
+app.use(cors());
+app.listen(8080);
 
 app.post("/register", function (req, res) {
     // TODO: Check that req.body is what we want it to be
