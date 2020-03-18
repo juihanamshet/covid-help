@@ -1,12 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
-import SignupForm from './form';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { brown, grey} from '@material-ui/core/colors';
 import * as serviceWorker from './serviceWorker';
 
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+            main: brown[50]
+        },
+        secondary: {
+            main: grey[300]
+        }
+    },
+});
 // ReactDOM.render(<App />, document.getElementById('root'));
-ReactDOM.render(<SignupForm />, document.getElementById('root'));
+ReactDOM.render(<MuiThemeProvider theme={theme}><App /></MuiThemeProvider>, document.getElementById('root'));
 
 
 // If you want your app to work offline and load faster, you can change
