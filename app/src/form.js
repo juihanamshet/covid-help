@@ -1,5 +1,7 @@
 import React from 'react';
-import { useFormik } from 'formik';
+import { Field, useFormik } from 'formik';
+import "./styles.css";
+
 
 const SignupForm = () => {
   // Notice that we have to initialize ALL of fields with values. These
@@ -10,7 +12,11 @@ const SignupForm = () => {
     initialValues: {
       firstName: '',
       lastName: '',
-      email: '',
+      univEmail: '',
+      pswd: '',
+      prefEmail: '',
+      phoneNumber: '',
+      housing: '',
     },
     onSubmit: values => {
       alert(JSON.stringify(values, null, 2));
@@ -34,14 +40,44 @@ const SignupForm = () => {
         onChange={formik.handleChange}
         value={formik.values.lastName}
       />
-      <label htmlFor="email">Email Address</label>
+      <label htmlFor="univEmail">University Email</label>
       <input
-        id="email"
-        name="email"
+        id="univEmail"
+        name="univEmail"
         type="email"
         onChange={formik.handleChange}
-        value={formik.values.email}
+        value={formik.values.univEmail}
       />
+      <label htmlFor="pswd">Create Password</label>
+      <input
+        id="pswd"
+        name="pswd"
+        type="password"
+        onChange={formik.handleChange}
+        value={formik.values.pswd}
+      />
+      <label htmlFor="prefEmail">Preferred Email Address</label>
+      <input
+        id="prefEmail"
+        name="prefEmail"
+        type="email"
+        onChange={formik.handleChange}
+        value={formik.values.prefEmail}
+      />
+      <label htmlFor="phoneNumber">Phone Number</label>
+      <input
+        id="phoneNumber"
+        name="phoneNumber"
+        type="number"
+        onChange={formik.handleChange}
+        value={formik.values.phoneNumber}
+      />
+      <label htmlFor="housing">Housing</label>
+      <select htmlFor="dropdown" name="housing" value=''>
+          <option value="" label="Select an option"/>
+          <option value="provider" label="I am offering housing"/>
+          <option value="receiver" label="I am in need of housing"/>
+      </select>
       <button type="submit">Submit</button>
     </form>
   );
