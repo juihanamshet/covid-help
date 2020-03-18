@@ -51,3 +51,8 @@ app.post("/register", function (req, res) {
     // TODO: move to next page
     res.end('Success');
 })
+
+
+app.get("/getOffers", authenticationRequired, function (req, res, next) {
+
+})
