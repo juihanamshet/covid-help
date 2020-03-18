@@ -12,7 +12,7 @@ const SignupForm = () => {
     initialValues: {
       firstName: '',
       lastName: '',
-      univEmail: '',
+      orgEmail: '',
       pswd: '',
       prefEmail: '',
       phoneNumber: '',
@@ -73,15 +73,15 @@ const SignupForm = () => {
         value={formik.values.phoneNumber}
       />
       <label htmlFor="housing">Housing</label>
-      <select 
-        htmlFor="dropdown" 
-        name="housing" 
-        value={formik.values.housing} 
+      <select
+        htmlFor="dropdown"
+        name="housing"
+        value={formik.values.housing}
         onChange={formik.handleChange}
         onBlur={formik.onBlur}>
-          <option value="" label="Select an option"/>
-          <option value="provider" label="I am offering housing"/>
-          <option value="receiver" label="I am in need of housing"/>
+        <option value="" label="Select an option" />
+        <option value="provider" label="I am offering housing" />
+        <option value="receiver" label="I am in need of housing" />
       </select>
       <button type="submit">Submit</button>
     </form>
