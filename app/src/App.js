@@ -16,10 +16,10 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   tab: {
-    color: 'black',
+    color: 'white',
     "&:hover":{
       backgroundColor: 'transparent',
-      color: 'grey',
+      color: '#eceff1',
       textDecoration: 'underline',
     }
   }

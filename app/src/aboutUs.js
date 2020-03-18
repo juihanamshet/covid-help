@@ -85,7 +85,7 @@ class aboutUs extends Component {
                                 <br/>
                             </CardContent>
                             <CardActions>
-                            <Button variant="outlined"> Say No More, I'm In!</Button>
+                            <Button color="primary" variant="contained"> Say No More, I'm In!</Button>
                             </CardActions>
                         </Card>
                     </Grid>
@@ -99,12 +99,12 @@ class aboutUs extends Component {
                             <CardActions className={classes.cardActions}>
                                 <Grid alignContent='center' container spacing={3}>
                                     <Grid item xs={12} sm={6}>
-                                    <Button variant="outlined">
+                                    <Button color="primary" variant="outlined">
                                         I am looking for housing
                                     </Button>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
-                                        <Button variant="outlined">
+                                        <Button color="primary" variant="outlined">
                                             I am offering housing
                                         </Button>
                                     </Grid>
