@@ -16,6 +16,9 @@ const Auth = () => {
             baseUrl: process.env.REACT_APP_BASEURL,
             clientId,
             redirectUri,
+            features: {
+                registration: true
+            },
             // logo: '../public/logo192.png',
             i18n: {
                 en: {
