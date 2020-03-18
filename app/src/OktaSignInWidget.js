@@ -1,5 +1,3 @@
-// src/OktaSignInWidget.js
-
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import OktaSignIn from '@okta/okta-signin-widget';
