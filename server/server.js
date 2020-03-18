@@ -3,14 +3,14 @@ const cors = require('cors');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 var sqltools = require("./sql.js");
 
-
-const oktaJwtVerifier = new OktaJwtVerifier({
-    issuer: 'https://${yourOktaDomain}/oauth2/default',
-    clientId: '{clientId}',
-    assertClaims: {
-        aud: 'api://default',
-    },
-});
+// TODO: Get this done
+// const oktaJwtVerifier = new OktaJwtVerifier({
+//     issuer: 'https://${yourOktaDomain}/oauth2/default',
+//     clientId: '{clientId}',
+//     assertClaims: {
+//         aud: 'api://default',
+//     },
+// });
 
 
 function authenticationRequired(req, res, next) {
@@ -54,7 +54,7 @@ app.post("/register", function (req, res) {
 })
 
 
-app.get("/getOffers", authenticationRequired, function (req, res, next) {
+app.get("/getOffers", /*authenticationRequired,*/ function (req, res, next) {
     // TODO: get just the university specific offers. don't include disabled accounts
     // const data = sqltools.getOffers(req.school)
     data = [
