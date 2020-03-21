@@ -1,18 +1,19 @@
 import React from 'react';
+import './index.css';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import App from './App';
+
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import { brown, grey} from '@material-ui/core/colors';
+import { amber, blue} from '@material-ui/core/colors';
 import * as serviceWorker from './serviceWorker';
 
 const theme = createMuiTheme({
     palette: {
-        primary: {
-            main: brown[50]
-        },
-        secondary: {
-            main: grey[300]
-        }
+        primary: blue,
+        secondary: amber
     },
 });
 // ReactDOM.render(<App />, document.getElementById('root'));

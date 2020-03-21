@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import AboutUs from './aboutUs.js';
-import FindOffer from './findOffer.js';
+import AboutUs from './About/AboutUs.js';
+import FindOffer from './FindOffer/FindOffer.js';
 import Auth from './Auth.js';
 import { makeStyles } from '@material-ui/core/styles';
 import { Toolbar, AppBar, Typography, Button } from '@material-ui/core';
@@ -16,14 +16,13 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   tab: {
-    color: 'black',
-    "&:hover": {
+    color: 'white',
+    "&:hover":{
       backgroundColor: 'transparent',
-      color: 'grey',
+      color: '#eceff1',
       textDecoration: 'underline',
     }
-  },
-  appBarHeight: theme.mixins.toolbar
+  }
 }));
 
 const ABOUT_US = 0;
@@ -37,7 +36,7 @@ function App() {
 
   switch (page) {
     case ABOUT_US:
-      childpage = (<AboutUs></AboutUs>);
+      childpage = (<AboutUs goToSignUp={setPage()}></AboutUs>);
       console.log('about us');
       break;
     case FIND_OFFER:
@@ -54,7 +53,7 @@ function App() {
 
   return (
     <div className={classes.root}>
-      <AppBar className={classes.appBar} position="fixed" color="primary">
+      <AppBar className={classes.appBar} position="sticky" color="primary">
         <Toolbar>
           <Typography variant="h5" className={classes.title}>
             Project Student Relief
@@ -62,7 +61,7 @@ function App() {
           <Button
             className={classes.tab}
             onClick={() => setPage(0)}>
-            About Us
+              About
           </Button>
           <Button
             className={classes.tab}
@@ -76,7 +75,6 @@ function App() {
           </Button>
         </Toolbar>
       </AppBar>
-      <div className={classes.appBarHeight} />
       {childpage}
     </div>
   );
