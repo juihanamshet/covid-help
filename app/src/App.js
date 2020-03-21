@@ -36,7 +36,7 @@ function App() {
 
   switch (page) {
     case ABOUT_US:
-      childpage = (<AboutUs goToSignUp={setPage()}></AboutUs>);
+      childpage = (<AboutUs></AboutUs>);
       console.log('about us');
       break;
     case FIND_OFFER:
