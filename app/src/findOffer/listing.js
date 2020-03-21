@@ -7,7 +7,6 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles(theme => ({
   base:{
@@ -22,6 +21,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+// props: onClick, 
 function Listing(props) {
   const classes = useStyles();
 
@@ -34,7 +34,7 @@ function Listing(props) {
   return (
     <div className={classes.base}>
       <Card className={classes.root}>
-        <CardActionArea>
+        <CardActionArea onClick={props.onClick(true)}>
           <CardMedia
             className={classes.media}
             image={require("../img/location_not_found-claraMacDonell.png")}
@@ -53,7 +53,7 @@ function Listing(props) {
           <Button size="small" color="primary">
             Contact
           </Button>
-          <Button size="small" color="primary">
+          <Button size="small" color="primary" onClick={props.onClick(true)}>
             Learn More
           </Button>
         </CardActions>

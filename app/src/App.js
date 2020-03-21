@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import AboutUs from './aboutUs.js';
-import FindOffer from './findOffer/findOffer.js';
+import AboutUs from './About/AboutUs.js';
+import FindOffer from './FindOffer/FindOffer.js';
 import Auth from './Auth.js';
 import { makeStyles } from '@material-ui/core/styles';
 import { Toolbar, AppBar, Typography, Button } from '@material-ui/core';
@@ -36,7 +36,7 @@ function App() {
 
   switch (page) {
     case ABOUT_US:
-      childpage = (<AboutUs></AboutUs>);
+      childpage = (<AboutUs goToSignUp={setPage()}></AboutUs>);
       console.log('about us');
       break;
     case FIND_OFFER:
