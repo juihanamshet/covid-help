@@ -56,49 +56,7 @@ app.post("/register", function (req, res) {
 
 app.get("/getOffers", /*authenticationRequired,*/ function (req, res, next) {
     // TODO: get just the university specific offers. don't include disabled accounts
-    // const data = sqltools.getOffers(req.school)
-    data = [
-        {
-            "firstName": "testy",
-            "lastName": "mcTesterSon",
-            "prefEmail": "testy@gmail.com",
-            "phoneNumber": "5551231234",
-            "addressLineOne": "99 Fake St",
-            "addressLineTwo": "Apt 4",
-            "city": "Wilderson Ranch Road",
-            "state": "AL",
-            "zipcode": "12312",
-            "facebook": "facebook.com/markzuckerberg",
-            "linkedin": "linkedin.com/satyanadella",
-            "instagram": "instagram.com/markzuckerberg",
-            "housingRules": "Don't make a mess\ndon't eat\n\tdon't use the bathroom",
-            "lgbtqp": "1",
-            "accessibilityFriendly": "1",
-            "preferredContact": "phone",
-            "transFriendly": "1",
-            "accessibilityInfo": "Love it"
-        },
-        {
-            "firstName": "testy2",
-            "lastName": "mcTesterSon",
-            "prefEmail": "testy2@gmail.com",
-            "phoneNumber": "911",
-            "addressLineOne": "22 Fake St",
-            "addressLineTwo": "Apt 4",
-            "city": "Wilderson Ranch Road",
-            "state": "AL",
-            "zipcode": "12312",
-            "facebook": "facebook.com/markzuckerberg",
-            "linkedin": "linkedin.com/satyanadella",
-            "instagram": "instagram.com/markzuckerberg",
-            "housingRules": "Don't make a mess\ndon't eat\n\tdon't use the bathroom",
-            "lgbtqp": "0",
-            "accessibilityFriendly": "0",
-            "preferredContact": "email",
-            "transFriendly": "0",
-            "accessibilityInfo": "n/a"
-        }
-    ]
-
-    res.send(data)
+    sqltools.getSchoolListings("NYU", (sqlResult, status) => {
+        res.json(sqlResult);
+    })
 })

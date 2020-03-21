@@ -1,18 +1,21 @@
 var Connection = require('tedious').Connection;
+require('dotenv').config()
 
 var config = {
-    server: 'your_server.database.windows.net',  //TODO: update me
+    server: 'covid19mutualaid.database.windows.net',  //TODO: update me
     authentication: {
         type: 'default',
         options: {
-            userName: 'your_username', //TODO: update me
-            password: 'your_password'  //TODO: update me
+            userName: process.env.DB_USER, //TODO: update me
+            password: process.env.DB_PASS  //TODO: update me
         }
     },
     options: {
         // If you are on Microsoft Azure, you need encryption:
         encrypt: true,
-        database: 'your_database'  //TODO: update me
+        database: 'covid19mutualaid',  //TODO: update me
+        rowCollectionOnRequestCompletion: true,
+        useColumnNames: true,
     }
 };
 
@@ -28,23 +31,42 @@ var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES;
 
 
-function getOffers(school) {
+function getSchoolListings(school, callback) {
     // get data from SQL DB
-    request = new Request("SELECT firstName, lastName, prefEmail, phoneNumber, addressLineOne, addressLineTwo, city, state, zipcode, facebook, linkedin, instagram, housingRules, lgbtqp, accessibilityFriendly, preferredContact, transFriendly, accessibilityInfo FROM UserTable WHERE school = @School AND disabledAcct = 0;", function (err) {
+    // to add into sql statement: school=@School
+    var listingData = []
+
+    request = new Request("SELECT * FROM dbo.userTable JOIN dbo.listingTable ON (userTable.userID = listingTable.userID)", function (err, rowCount) {
         if (err) {
             console.log(err);
         }
+        else {
+            if (rowCount > 0) {
+                callback(listingData, 200)
+            }
+        }
     });
     request.addParameter('School', TYPES.VarChar, school);
-    var result = "";
+    // var result = "";
     request.on('row', function (columns) {
-        // TODO: return this
+        listing = {}
+        for (var name in columns) {
+            listing[name] = columns[name].value
+        }
+        listingData.push(listing)
+
     });
 
     request.on('done', function (rowCount, more) {
-        console.log(rowCount + ' rows returned');
+        console.log("Done")
+
     });
     connection.execSql(request);
+
 }
 
-module.exports = { getOffers }
+function getUserListings(user) {
+
+}
+
+module.exports = { getSchoolListings }
