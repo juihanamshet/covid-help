@@ -55,31 +55,6 @@ const App = () => {
     <div className={classes.root}>
       <Router>
         <AllAppRoutes></AllAppRoutes>
-        {/* <Security {...config}>
-          <AppBar className={classes.appBar} position="sticky" color="primary">
-            <Toolbar>
-              <Typography variant="h5" className={classes.title}>
-                Project Student Relief
-              </Typography>
-              <Link
-                className={classes.tab}
-                to="/">
-                About
-              </Link>
-              <Link
-                className={classes.tab}
-                to="offers">
-                Find & Offer
-              </Link>
-              {loginButton}
-            </Toolbar>
-          </AppBar>
-          <Route path='/' exact={true} component={AboutUs} />
-          <SecureRoute path='/offers' exact={true} component={FindOffer} />
-          <Route path='/login' exact={true} component={Auth} />
-          <Route path='/implicit/callback' component={LoginCallback} />
-          {/* {childpage} */}
-        {/* </Security> */}
       </Router>
     </div >
   );

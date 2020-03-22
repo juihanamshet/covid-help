@@ -2,6 +2,7 @@ import { Security, LoginCallback, SecureRoute, useOktaAuth } from '@okta/okta-re
 import { Toolbar, AppBar, Typography, Button } from '@material-ui/core';
 import AboutUs from './About/AboutUs.js';
 import FindOffer from './FindOffer/FindOffer.js';
+import Logout from './Logout'
 import Auth from './Auth.js';
 import React, { useState } from 'react';
 import { useHistory, Link, BrowserRouter as Router, Route } from 'react-router-dom';
@@ -57,6 +58,7 @@ const AllAppRoutes = () => {
             <Route path='/' exact={true} component={AboutUs} />
             <SecureRoute path='/offers' exact={true} component={FindOffer} />
             <Route path='/login' exact={true} component={Auth} />
+            <SecureRoute path='/logout' exact={true} component={Logout} />
             <Route path='/implicit/callback' component={LoginCallback} />
         </Security >
     )
