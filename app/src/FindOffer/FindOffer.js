@@ -29,8 +29,7 @@ class FindOffer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            listings: [],
-            
+            listings: ['Test1'],
             drawerOpen: false,
             find: true,
         }
