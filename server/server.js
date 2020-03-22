@@ -44,7 +44,7 @@ app.post("/register", function (req, res) {
     // TODO: Need to really test this insert statement lmfao
     var user = req.body;
 
-    var query = connection.query('INSERT INTO UserTable(firstName, lastName, orgEmail, pswd, prefEmail, phoneNumber, addressLineOne, addressLineTwo, city, state, zipcode, facebook, Linkedin, Instagram, providerBool, requester, offerHousing, housingRules, lgbtqp, accessibilityFriendly, preferredContact, disabledAcct, transFriendly, accessibilityInfo) VALUES ?', user, function (err, result) {
+    connection.query('INSERT INTO UserTable(firstName, lastName, orgEmail, pswd, prefEmail, phoneNumber, addressLineOne, addressLineTwo, city, state, zipcode, facebook, Linkedin, Instagram, providerBool, requester, offerHousing, housingRules, lgbtqp, accessibilityFriendly, preferredContact, disabledAcct, transFriendly, accessibilityInfo) VALUES ?', user, function (err, result) {
         if (err) {
             console.log(err);
         }
@@ -54,7 +54,7 @@ app.post("/register", function (req, res) {
 })
 
 
-app.get("/getOffers", /*authenticationRequired,*/ function (req, res, next) {
+app.get("/getListings", /*authenticationRequired,*/ function (req, res, next) {
     // TODO: get just the university specific offers. don't include disabled accounts
     sqltools.getSchoolListings("NYU", (sqlResult, status) => {
         res.json(sqlResult);

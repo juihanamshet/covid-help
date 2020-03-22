@@ -15,7 +15,11 @@ const Auth = () => {
              */
             baseUrl: process.env.REACT_APP_BASEURL,
             clientId,
-            redirectUri,
+            redirectUri: "http://localhost:3000/",
+            getAccessToken: true,
+
+            // Return an ID token from the authorization server
+            getIdToken: true,
             features: {
                 registration: true
             },
