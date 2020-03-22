@@ -36,7 +36,7 @@ function getSchoolListings(school, callback) {
     // to add into sql statement: school=@School
     var listingData = []
 
-    request = new Request("SELECT listingID, zipCode, prefEmail, housingRules FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) WHERE disabledAcct = 0", function (err, rowCount) {
+    request = new Request("SELECT listingID, listingName, zipCode, prefEmail, housingRules, grad_year  FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) AND org='duke' WHERE disabledAcct = 0", function (err, rowCount) {
         if (err) {
             console.log(err);
         }
