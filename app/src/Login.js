@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import OktaSignInWidget from './OktaSignInWidget';
-import { withAuth } from '@okta/okta-react';
+import { withOktaAuth } from '@okta/okta-react';
 
-export default withAuth(class Login extends Component {
+export default withOktaAuth(class Login extends Component {
     constructor(props) {
         super(props);
         this.onSuccess = this.onSuccess.bind(this);
@@ -42,7 +42,11 @@ export default withAuth(class Login extends Component {
     }
 
     render() {
-        if (this.state.authenticated === null) return null;
+        alert(this.props.authState.isAuthenticated)
+        if (this.props.authState.isPending) {
+            return <div>Loading...</div>;
+        }
+
         return this.state.authenticated ?
             <Redirect to={{ pathname: '/' }} /> :
             <OktaSignInWidget

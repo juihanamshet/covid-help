@@ -1,11 +1,19 @@
 import React, { useEffect } from 'react';
 import * as OktaSignIn from '@okta/okta-signin-widget';
 import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
+import { useOktaAuth } from '@okta/okta-react';
+import { Redirect } from 'react-router-dom';
+
 
 import config from './config';
 
 const Auth = () => {
+    const { authState, authService } = useOktaAuth();
+
+
     useEffect(() => {
+
+
         const { pkce, issuer, clientId, redirectUri, scopes } = config.oidc;
         const widget = new OktaSignIn({
             /**
@@ -15,7 +23,7 @@ const Auth = () => {
              */
             baseUrl: process.env.REACT_APP_BASEURL,
             clientId,
-            redirectUri: "http://localhost:3000/",
+            redirectUri: "http://localhost:3000/implicit/callback/",
             getAccessToken: true,
 
             // Return an ID token from the authorization server
@@ -50,6 +58,11 @@ const Auth = () => {
             },
         );
     }, []);
+
+    if (authState.isAuthenticated) {
+        authService.logout("/")
+        // return (<Redirect to="/offers"></Redirect>)
+    }
 
     return (
         <div>
