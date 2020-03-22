@@ -5,6 +5,8 @@ import ListingDetails from './ListingDetails.js';
 import { withStyles } from '@material-ui/styles';
 import Button from 'react-bootstrap/Button';
 import { Grid, Typography, SwipeableDrawer } from '@material-ui/core'
+import NavBar from '../NavBar.js'
+
 
 const styles = theme => ({
     root: {
@@ -60,16 +62,17 @@ class FindOffer extends Component {
         }
 
         /* LOGIC FOR ACTIVE PAGE */
-        
+
         // for offer page
         var offerIsActive = this.state.find ? '' : 'linkIsActive';
         var listingButton = this.state.find ? '' : (<div className={classes.sidebar}><Button id='addListing' variant="link">+ Add Listing&nbsp;&nbsp;</Button></div>);
 
         // for find page
         var findIsActive = this.state.find ? 'linkIsActive' : '';
-        
+
         return (
             <div className={classes.root}>
+                <NavBar></NavBar>
                 <style type="text/css">
                     {`
                     .btn-link {

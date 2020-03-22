@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import AboutUs from './About/AboutUs.js';
 import FindOffer from './FindOffer/FindOffer.js';
 import Auth from './Auth.js';
+import AllAppRoutes from './AllAppRoutes'
 import { makeStyles } from '@material-ui/core/styles';
 import { Toolbar, AppBar, Typography, Button } from '@material-ui/core';
-import { Link, BrowserRouter as Router, Route } from 'react-router-dom';
+import { useHistory, Link, BrowserRouter as Router, Route } from 'react-router-dom';
 import { Security, LoginCallback, SecureRoute, useOktaAuth } from '@okta/okta-react';
 
 const useStyles = makeStyles(theme => ({
@@ -36,6 +37,7 @@ const config = {
 };
 
 const App = () => {
+
   const classes = useStyles();
 
   // const { authState } = useOktaAuth;
@@ -52,7 +54,8 @@ const App = () => {
   return (
     <div className={classes.root}>
       <Router>
-        <Security {...config}>
+        <AllAppRoutes></AllAppRoutes>
+        {/* <Security {...config}>
           <AppBar className={classes.appBar} position="sticky" color="primary">
             <Toolbar>
               <Typography variant="h5" className={classes.title}>
@@ -76,10 +79,8 @@ const App = () => {
           <Route path='/login' exact={true} component={Auth} />
           <Route path='/implicit/callback' component={LoginCallback} />
           {/* {childpage} */}
-        </Security>
+        {/* </Security> */}
       </Router>
-
-
     </div >
   );
 }
