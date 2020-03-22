@@ -14,8 +14,6 @@ const Auth = () => {
 
 
     useEffect(() => {
-
-
         const { pkce, issuer, clientId, redirectUri, scopes } = config.oidc;
         const widget = new OktaSignIn({
             /**
@@ -62,8 +60,8 @@ const Auth = () => {
     }, []);
 
     if (authState.isAuthenticated) {
-        authService.logout("/")
-        // return (<Redirect to="/offers"></Redirect>)
+        // authService.logout("/")
+        return (<Redirect to="/offers"></Redirect>)
     }
 
     return (
