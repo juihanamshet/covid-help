@@ -33,6 +33,9 @@ function ListingDetails(props) {
                 <Marker anchor={coor} payload={4}></Marker>
             </Map>
             <div className={classes.spacer}></div>
+            <div>
+                
+            </div>
         </div>
     )
 }
