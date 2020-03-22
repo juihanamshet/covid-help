@@ -36,7 +36,7 @@ function getSchoolListings(school, callback) {
     // to add into sql statement: school=@School
     var listingData = []
 
-    request = new Request("SELECT * FROM dbo.userTable JOIN dbo.listingTable ON (userTable.userID = listingTable.userID)", function (err, rowCount) {
+    request = new Request("SELECT listingID, zipCode, prefEmail, housingRules  FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) WHERE disabledAcct = 0", function (err, rowCount) {
         if (err) {
             console.log(err);
         }
@@ -54,15 +54,12 @@ function getSchoolListings(school, callback) {
             listing[name] = columns[name].value
         }
         listingData.push(listing)
-
     });
 
     request.on('done', function (rowCount, more) {
         console.log("Done")
-
     });
     connection.execSql(request);
-
 }
 
 function getUserListings(user) {
