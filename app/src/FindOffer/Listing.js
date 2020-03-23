@@ -7,6 +7,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
+import ButtonBase from '@material-ui/core/ButtonBase'
 
 const useStyles = makeStyles(theme => ({
   base:{
@@ -28,8 +30,10 @@ function Listing(props) {
   var listingName = "default"
   listingName = props.listingName;
 
-  var listingDetail = "For details about this listing, click 'Learn More'";
-  listingDetail = props.listingDetail;
+  var listingDetail = "default";
+  listingDetail = props.listingLocation;
+
+  var mailTo = "mailto:" + props.listingEmail;
 
   return (
     <div className={classes.base}>
@@ -45,14 +49,16 @@ function Listing(props) {
               {listingName}
             </Typography>
             <Typography variant="body2" color="textSecondary" component="p">
-              {props.listingDetail}
+              {listingDetail}
             </Typography>
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button size="small" color="primary">
-            Contact
-          </Button>
+          <ButtonBase>
+            <Link target="_blank" href={mailTo} size="small" color="primary">
+              Contact
+            </Link>
+          </ButtonBase>
           <Button size="small" color="primary" onClick={props.onClick(true)}>
             Learn More
           </Button>

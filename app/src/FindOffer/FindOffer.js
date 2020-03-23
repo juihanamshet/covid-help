@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import Listing from './Listing.js';
 import ListingDetails from './ListingDetails.js';
 
@@ -7,6 +8,8 @@ import Button from 'react-bootstrap/Button';
 import { Grid, Typography, SwipeableDrawer } from '@material-ui/core'
 import NavBar from '../NavBar.js'
 
+
+const BASE_URL = 'http://localhost:8080'
 
 const styles = theme => ({
     root: {
@@ -31,11 +34,25 @@ class FindOffer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            listings: ['Test1'],
+            listings: [{}],
             drawerOpen: false,
             find: true,
         }
     };
+
+    async componentDidMount() {
+        var config = {
+            headers: {'Access-Control-Allow-Origin': '*'}
+        };
+        var self = this;
+        axios.get(BASE_URL + '/getListings', [config])
+            .then(function (response) {
+                self.setState({listings: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
 
     toggleDrawer = (open) => e => {
         var currState = this.state.drawerOpen;
@@ -51,14 +68,13 @@ class FindOffer extends Component {
 
         var tempListings = [];
         this.state.listings.forEach(listing => {
-            tempListings.push(<Listing onClick={this.toggleDrawer} listingName={listing} listingDetail={listing}></Listing>);
+            var name = listing.listingName !== null ? listing.listingName : "Unnamed Listing"
+            var location = listing.city + ", " + listing.state + " (" + listing.zipCode + ")";
+            tempListings.push(<Listing key={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.toggleDrawer}></Listing>);
         });
 
         if (tempListings.length < 1) {
-            console.log("no listings")
             tempListings.push(<Typography variant="subtitle1" color="error"> No Current Listings</Typography>)
-        } else {
-            console.log(tempListings.length)
         }
 
         /* LOGIC FOR ACTIVE PAGE */
