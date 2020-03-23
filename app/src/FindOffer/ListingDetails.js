@@ -4,7 +4,6 @@ import { Grid, Typography, Card, Avatar, Link } from '@material-ui/core';
 
 import Map from 'pigeon-maps';
 import Marker from 'pigeon-marker';
-import { grey } from '@material-ui/core/colors';
 
 //temp import
 import jordad from '../img/jordad.png';
