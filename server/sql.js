@@ -69,7 +69,7 @@ function getUserListings(user) {
 function getListing(callback) {
     var listingData = []
 
-    request = new Request(" SELECT *  FROM listingTable WHERE listingTable.listingID = 1;", function (err, rowCount) {
+    request = new Request(" SELECT *  FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) WHERE listingTable.listingID = 1;", function (err, rowCount) {
         if (err) {
             console.log(err);
         }
