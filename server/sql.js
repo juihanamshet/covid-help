@@ -66,4 +66,32 @@ function getUserListings(user) {
 
 }
 
-module.exports = { getSchoolListings }
+function getListing(callback) {
+    var listingData = []
+
+    request = new Request(" SELECT *  FROM listingTable WHERE listingTable.listingID = 1;", function (err, rowCount) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            if (rowCount > 0) {
+                callback(listingData, 200)
+            }
+        }
+    });
+    // var result = "";
+    request.on('row', function (columns) {
+        listing = {}
+        for (var name in columns) {
+            listing[name] = columns[name].value
+        }
+        listingData.push(listing)
+    });
+
+    request.on('done', function (rowCount, more) {
+        console.log("Done")
+    });
+    connection.execSql(request);
+}
+
+module.exports = { getSchoolListings, getListing }

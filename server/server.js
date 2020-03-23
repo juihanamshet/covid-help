@@ -60,3 +60,10 @@ app.get("/getListings", /*authenticationRequired,*/ function (req, res, next) {
         res.json(sqlResult);
     })
 })
+
+app.get("/getListing", /*authenticationRequired,*/ function (req, res, next) {
+    // TODO: get just the university specific offers. don't include disabled accounts
+    sqltools.getListing((sqlResult, status) => {
+        res.json(sqlResult);
+    })
+})
