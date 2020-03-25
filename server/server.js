@@ -1,16 +1,25 @@
 const express = require("express");
+const axios = require('axios');
 const cors = require('cors');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 var sqltools = require("./sql.js");
+const okta = require('@okta/okta-sdk-nodejs');
+require('dotenv').config()
+
+
+const client = new okta.Client({
+    orgUrl: 'https://dev-937142.okta.com/',
+    token: process.env.OKTA_TOKEN    // Obtained from Developer Dashboard
+});
 
 // TODO: Get this done
-// const oktaJwtVerifier = new OktaJwtVerifier({
-//     issuer: 'https://${yourOktaDomain}/oauth2/default',
-//     clientId: '{clientId}',
-//     assertClaims: {
-//         aud: 'api://default',
-//     },
-// });
+const oktaJwtVerifier = new OktaJwtVerifier({
+    issuer: 'https://dev-937142.okta.com/oauth2/default',
+    clientId: '0oa45qus51SlHZNDA4x6',
+    assertClaims: {
+        aud: 'api://default',
+    },
+});
 
 
 function authenticationRequired(req, res, next) {
@@ -53,15 +62,25 @@ app.post("/register", function (req, res) {
     res.end('Success');
 })
 
+function extractSchool(email) {
+    const school = email.substring(email.lastIndexOf("@") + 1, email.lastIndexOf(".edu"))
+    return school
+}
 
-app.get("/getListings", /*authenticationRequired,*/ function (req, res, next) {
+app.get("/getListings", authenticationRequired, function (req, res, next) {
+    const userEmail = req.jwt.claims.sub
+    const userSchool = extractSchool(userEmail);
+
     // TODO: get just the university specific offers. don't include disabled accounts
-    sqltools.getSchoolListings("NYU", (sqlResult, status) => {
+    sqltools.getSchoolListings(userSchool, (sqlResult, status) => {
         res.json(sqlResult);
     })
 })
 
-app.get("/getListing", /*authenticationRequired,*/ function (req, res, next) {
+app.get("/getListing", authenticationRequired, function (req, res, next) {
+    const userEmail = 'sj2546+test2@nyu.edu'; //req.jwt.claims.sub;
+    const userSchool = extractSchool(userEmail);
+
     // TODO: get just the university specific offers. don't include disabled accounts
     sqltools.getListing((sqlResult, status) => {
         res.json(sqlResult);

@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/styles';
 import Button from 'react-bootstrap/Button';
 import { Grid, Typography, SwipeableDrawer } from '@material-ui/core'
 import NavBar from '../NavBar.js'
-
+import { withOktaAuth } from '@okta/okta-react';
 
 const BASE_URL = 'http://localhost:8080'
 
@@ -37,17 +37,22 @@ class FindOffer extends Component {
             listings: [{}],
             drawerOpen: false,
             find: true,
+            userInfo: null
         }
     };
 
     async componentDidMount() {
+        const accessToken = this.props.authState.accessToken;
         var config = {
-            headers: {'Access-Control-Allow-Origin': '*'}
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+            }
         };
         var self = this;
-        axios.get(BASE_URL + '/getListings', [config])
+        axios.get(BASE_URL + '/getListings', config)
             .then(function (response) {
-                self.setState({listings: response.data})
+                self.setState({ listings: response.data })
             })
             .catch(function (error) {
                 console.log(error);
@@ -151,4 +156,4 @@ class FindOffer extends Component {
     }
 }
 
-export default withStyles(styles)(FindOffer);
+export default withOktaAuth(withStyles(styles)(FindOffer));
