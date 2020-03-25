@@ -43,7 +43,6 @@ class FindOffer extends Component {
 
     async componentDidMount() {
         const accessToken = this.props.authState.accessToken;
-
         var config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
