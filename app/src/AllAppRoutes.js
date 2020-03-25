@@ -32,18 +32,10 @@ const AllAppRoutes = () => {
     }));
     const classes = useStyles();
 
-
-
-    const loginButton = <Link className={classes.tab} to="/login">Log In</Link>;
-    // authState.isAuthenticated ?
-    //     <Link className={classes.tab} to="/login">Log In</Link> :
-    //     <Link className={classes.tab} to="/logout">Log Out</Link>;
     const history = useHistory();
     const onAuthRequired = () => {
         history.push('/login');
     };
-
-
 
     const config = {
         issuer: 'https://dev-937142.okta.com/oauth2/default',
