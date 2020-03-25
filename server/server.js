@@ -7,15 +7,15 @@ const okta = require('@okta/okta-sdk-nodejs');
 require('dotenv').config()
 
 
-const client = new okta.Client({
-    orgUrl: 'https://dev-937142.okta.com/',
-    token: process.env.OKTA_TOKEN    // Obtained from Developer Dashboard
-});
+// const client = new okta.Client({
+//     orgUrl: process.env.OKTA_BASE_URL + '/',
+//     token: process.env.OKTA_TOKEN
+// });
 
-// TODO: Get this done
+
 const oktaJwtVerifier = new OktaJwtVerifier({
-    issuer: 'https://dev-937142.okta.com/oauth2/default',
-    clientId: '0oa45qus51SlHZNDA4x6',
+    issuer: process.env.OKTA_BASE_URL + '/oauth2/default',
+    clientId: process.env.OKTA_CLIENT_ID,
     assertClaims: {
         aud: 'api://default',
     },
@@ -78,7 +78,7 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
 })
 
 app.get("/getListing", authenticationRequired, function (req, res, next) {
-    const userEmail = 'sj2546+test2@nyu.edu'; //req.jwt.claims.sub;
+    const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
 
     // TODO: get just the university specific offers. don't include disabled accounts
