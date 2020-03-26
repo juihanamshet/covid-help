@@ -68,21 +68,30 @@ function extractSchool(email) {
 }
 
 app.get("/getListings", authenticationRequired, function (req, res, next) {
-    const userEmail = req.jwt.claims.sub
+    const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
 
-    // TODO: get just the university specific offers. don't include disabled accounts
     sqltools.getSchoolListings(userSchool, (sqlResult, status) => {
-        res.json(sqlResult);
+        if (status === 200) {
+            res.json(sqlResult);
+        } else {
+            res.statusCode = 500;
+            res.send("Internal Server Error");
+        }
     })
 })
 
 app.get("/getListing", authenticationRequired, function (req, res, next) {
+    const listingID = req.query.listingID;
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
 
-    // TODO: get just the university specific offers. don't include disabled accounts
-    sqltools.getListing((sqlResult, status) => {
-        res.json(sqlResult);
+    sqltools.getListing(userEmail, listingID, userSchool, (sqlResult, status) => {
+        if (status === 200) {
+            res.json(sqlResult);
+        } else {
+            res.statusCode = 500;
+            res.send("Internal Server Error");
+        }
     })
 })
