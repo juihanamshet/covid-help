@@ -14,7 +14,6 @@ var config = {
         // If you are on Microsoft Azure, you need encryption:
         encrypt: true,
         database: 'covid19mutualaid',  //TODO: update me
-        rowCollectionOnRequestCompletion: true,
         useColumnNames: true,
     }
 };

@@ -48,7 +48,7 @@ const NavBar = () => {
                     className={classes.title}
                     to="/">
                     <Typography className={classes.titleText} variant="h5" >
-                        Project Student Relief
+                    🏡 Project Student Relief
                     </Typography>
                 </Link>
                 <Link

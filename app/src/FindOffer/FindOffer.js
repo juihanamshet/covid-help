@@ -37,7 +37,8 @@ class FindOffer extends Component {
             drawerOpen: false,
             findListings: [],
             offerListings: [],
-            currListing: [],
+            // we want curr listing to hold the various components of getListing
+            currListing: {},
             currListingID: -1
         }
     };
@@ -65,6 +66,7 @@ class FindOffer extends Component {
     }
 
     getCurrentListing = async(listingId) => {
+        alert("tester");
         const accessToken = this.props.authState.accessToken;
         var config = {
             params: {
@@ -78,13 +80,15 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListing', config)
             .then(function (response) {
-                console.log(response.data);
+                self.setState({ currListing : response.data[0] });
+                console.log(self.state.currListing);
             })
             .catch(function (error) {
                 console.log(error);
         });
 
         this.toggleDrawer(true);
+        // console.log(toggle)
     }
 
     toggleDrawer = (open) => e => {
