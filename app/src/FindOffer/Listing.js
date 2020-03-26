@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -25,6 +25,8 @@ const useStyles = makeStyles(theme => ({
 
 // props: onClick, 
 function Listing(props) {
+  const [id, setId] = useState(props.key);
+
   const classes = useStyles();
 
   var listingName = "default"
@@ -59,7 +61,7 @@ function Listing(props) {
               Contact
             </Link>
           </ButtonBase>
-          <Button size="small" color="primary" onClick={props.onClick(true)}>
+          <Button size="small" color="primary" onClick={props.onClick(id)}>
             Learn More
           </Button>
         </CardActions>

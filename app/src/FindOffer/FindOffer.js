@@ -12,8 +12,7 @@ import { withOktaAuth } from '@okta/okta-react';
 const BASE_URL = 'http://localhost:8080'
 
 const styles = theme => ({
-    root: {
-        margin: 15,
+    root: { 
     },
     sidebar: {
         position: 'relative',
@@ -34,10 +33,12 @@ class FindOffer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            listings: [{}],
-            drawerOpen: false,
             find: true,
-            userInfo: null
+            drawerOpen: false,
+            findListings: [],
+            offerListings: [],
+            currListing: [],
+            currListingID: -1
         }
     };
 
@@ -52,44 +53,72 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListings', config)
             .then(function (response) {
-                console.log(response.data);
-                self.setState({ listings: response.data });
+                if(self.state.find){
+                    self.setState({ findListings: response.data });
+                }else{
+                    self.setState({ offerListings: response.data });
+                }
             })
             .catch(function (error) {
                 console.log(error);
             });
     }
 
+    getCurrentListing = async(listingId) => {
+        const accessToken = this.props.authState.accessToken;
+        var config = {
+            params: {
+                listingID: listingId
+            },
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+            }
+        };
+        var self = this;
+        axios.get(BASE_URL + '/getListing', config)
+            .then(function (response) {
+                console.log(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+        });
+
+        this.toggleDrawer(true);
+    }
+
     toggleDrawer = (open) => e => {
-        var currState = this.state.drawerOpen;
         if (e && e.type === 'keydown' && (e.key === 'Tab' || e.key === 'Shift')) {
             return;
         }
-        this.setState({ drawerOpen: open })
+        this.setState({ drawerOpen: open });
     };
 
     render() {
         // for styling
         const { classes } = this.props;
 
-        var tempListings = [];
-        this.state.listings.forEach(listing => {
+        // if on find tab we'll set listings to be this.state.findListings
+        var listings = this.state.find ? this.state.findListings : this.state.offerListings;
+        
+        var currListings = [];
+        listings.forEach(listing => {
             var name = listing.listingName !== null ? listing.listingName : "Unnamed Listing"
             var location = listing.city + ", " + listing.state + " (" + listing.zipCode + ")";
-            tempListings.push(<Listing key={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.toggleDrawer}></Listing>);
+            currListings.push(<Listing key={listing.listingID} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
         });
 
-        if (tempListings.length < 1) {
-            tempListings.push(<Typography variant="subtitle1" color="error"> No Current Listings</Typography>)
+        if (currListings.length < 1) {
+            currListings.push(<Typography key='default' variant="subtitle1" color="error"> No Current Listings</Typography>)
         }
 
         /* LOGIC FOR ACTIVE PAGE */
 
-        // for offer page
+        // styling and components for offer page
         var offerIsActive = this.state.find ? '' : 'linkIsActive';
         var listingButton = this.state.find ? '' : (<div className={classes.sidebar}><Button id='addListing' variant="link">+ Add Listing&nbsp;&nbsp;</Button></div>);
 
-        // for find page
+        // styling for find page
         var findIsActive = this.state.find ? 'linkIsActive' : '';
 
         return (
@@ -138,7 +167,7 @@ class FindOffer extends Component {
                     </Grid>
                     <Grid item xs={12}>
                         <div className={classes.sidebar}>
-                            {tempListings}
+                            {currListings}
                         </div>
                     </Grid>
                     <Grid item lg={12}>
@@ -150,7 +179,15 @@ class FindOffer extends Component {
                     open={this.state.drawerOpen}
                     onClose={this.toggleDrawer(false)}
                     onOpen={this.toggleDrawer(true)}>
-                    <ListingDetails coordinates={[37.338207, -121.886330]}></ListingDetails>
+                    <ListingDetails
+                        coordinates={[37.338207, -121.886330]}
+                        // listingTitle={}
+                        // location={}
+                        // livingSitch={}
+                        // houseRules={}
+                        // details={}
+                    >
+                    </ListingDetails>
                 </SwipeableDrawer>
             </div>
         )
