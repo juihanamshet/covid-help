@@ -14,7 +14,6 @@ var config = {
         // If you are on Microsoft Azure, you need encryption:
         encrypt: true,
         database: 'covid19mutualaid',  //TODO: update me
-        rowCollectionOnRequestCompletion: true,
         useColumnNames: true,
     }
 };
@@ -36,7 +35,7 @@ function getSchoolListings(school, callback) {
     // to add into sql statement: school=@School
     var listingData = []
 
-    request = new Request("SELECT listingID, userID, listingName, zipCode, prefEmail, grad_year, city, state  FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) AND org=@School WHERE disabledAcct = 0", function (err, rowCount) {
+    request = new Request("SELECT listingID, userTable.userID, listingName, zipCode, prefEmail, grad_year, city, state  FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) AND org=@School WHERE disabledAcct = 0", function (err, rowCount) {
         if (err) {
             console.log(err);
         }

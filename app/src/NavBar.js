@@ -18,11 +18,19 @@ const NavBar = () => {
         },
         title: {
             flexGrow: 1,
+            "&:hover": {
+                color: '#eceff1',
+                textDecoration: 'none',
+            }
+        },
+        titleText:{
+            color: 'white',
         },
         tab: {
             color: 'white',
+            paddingRight: 15,
+            fontWeight: 500,
             "&:hover": {
-                backgroundColor: 'transparent',
                 color: '#eceff1',
                 textDecoration: 'underline',
             }
@@ -36,13 +44,17 @@ const NavBar = () => {
     return (
         <AppBar className={classes.appBar} position="sticky" color="primary">
             <Toolbar>
-                <Typography variant="h5" className={classes.title}>
-                    Project Student Relief
-              </Typography>
+                <Link
+                    className={classes.title}
+                    to="/">
+                    <Typography className={classes.titleText} variant="h5" >
+                    🏡 Project Student Relief
+                    </Typography>
+                </Link>
                 <Link
                     className={classes.tab}
                     to="/">
-                    About
+                    About Us
               </Link>
                 <Link
                     className={classes.tab}
