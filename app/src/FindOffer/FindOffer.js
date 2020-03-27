@@ -56,6 +56,7 @@ class FindOffer extends Component {
             .then(function (response) {
                 if(self.state.find){
                     self.setState({ findListings: response.data });
+                    console.log(self.state.findListings);
                 }else{
                     self.setState({ offerListings: response.data });
                 }
@@ -66,7 +67,6 @@ class FindOffer extends Component {
     }
 
     getCurrentListing = async(listingId) => {
-        alert("tester");
         const accessToken = this.props.authState.accessToken;
         var config = {
             params: {
@@ -80,15 +80,13 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListing', config)
             .then(function (response) {
-                self.setState({ currListing : response.data[0] });
+                self.setState({ currListing : response.data[0],
+                                drawerOpen: true });
                 console.log(self.state.currListing);
             })
             .catch(function (error) {
                 console.log(error);
         });
-
-        this.toggleDrawer(true);
-        // console.log(toggle)
     }
 
     toggleDrawer = (open) => e => {
@@ -109,7 +107,7 @@ class FindOffer extends Component {
         listings.forEach(listing => {
             var name = listing.listingName !== null ? listing.listingName : "Unnamed Listing"
             var location = listing.city + ", " + listing.state + " (" + listing.zipCode + ")";
-            currListings.push(<Listing key={listing.listingID} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
+            currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
         });
 
         if (currListings.length < 1) {
@@ -185,11 +183,19 @@ class FindOffer extends Component {
                     onOpen={this.toggleDrawer(true)}>
                     <ListingDetails
                         coordinates={[37.338207, -121.886330]}
-                        // listingTitle={}
-                        // location={}
-                        // livingSitch={}
-                        // houseRules={}
-                        // details={}
+                        listingTitle={this.state.currListing.listingName}
+                        location={this.state.currListing.neighborhood + ", " + this.state.currListing.city + ", " + this.state.currListing.state + " (" + this.state.currListing.zipCode + ")"}
+                        lgbtqpFriendly={this.state.currListing.lgbtqpFriendly}
+                        accessibilityFriendly={this.state.currListing.accessibilityFriendly}
+                        livingSitch={this.state.currListing.livingSituation}
+                        houseRules={this.state.currListing.housingRules}
+                        access={this.state.currListing.accessbilityInfo}
+
+                        ownerName={this.state.currListing.firstName}
+                        org={this.state.currListing.org}
+                        gradYear={this.state.currListing.grad_year}
+                        preferredContactMethod={this.state.currListing.preferredContactMethod}
+                        contacts={{'Email': this.state.currListing.prefEmail, 'Email 2': this.state.currListing.orgEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
                     >
                     </ListingDetails>
                 </SwipeableDrawer>

@@ -1,11 +1,7 @@
-import React, { useState } from 'react';
-import AboutUs from './About/AboutUs.js';
-import FindOffer from './FindOffer/FindOffer.js';
-import Auth from './Auth.js';
+import React from 'react';
 import AllAppRoutes from './AllAppRoutes'
 import { makeStyles } from '@material-ui/core/styles';
-import { Toolbar, AppBar, Typography, Button } from '@material-ui/core';
-import { useHistory, Link, BrowserRouter as Router, Route } from 'react-router-dom';
+import { Link, BrowserRouter as Router } from 'react-router-dom';
 import { Security, LoginCallback, SecureRoute, useOktaAuth } from '@okta/okta-react';
 
 const useStyles = makeStyles(theme => ({

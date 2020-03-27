@@ -31,7 +31,7 @@ function getSchoolListings(school, callback) {
     var result = []
     var code = 200;
 
-    request = new Request("SELECT listingID, userTable.userID, listingName, zipCode, prefEmail, grad_year, city, state  FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) AND org=@School WHERE disabledAcct = 0", function (err, rowCount) {
+    request = new Request("SELECT listingID, userTable.userID, listingName, zipCode, prefEmail, grad_year, city, state, lgbtqpFriendly, accessibilityFriendly  FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) AND org='duke' WHERE disabledAcct = 0", function (err, rowCount) {
         if (err) {
             console.error(err);
             result = "Internal Server Error"
