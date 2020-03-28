@@ -78,11 +78,12 @@ function getSchoolListings(email, school, callback) {
     var code = 200;
 
     sqlQuery =
-        "SELECT listingID, userTable.userID, listingName, \
-        zipCode, prefEmail, grad_year, city, state  \
+        "SELECT listingID, userTable.userID, \
+        listingName, zipCode, prefEmail, grad_year, \
+        city,lgbtqpFriendly, accessibilityFriendly, state\
         FROM listingTable JOIN userTable \
         ON (listingTable.userID = userTable.userID) \
-        WHERE disabledAcct = 0 AND orgEmail != @Email AND org=@School";
+        WHERE disabledAcct = 0 AND orgEmail!=@Email AND org=@School";
 
     request = new Request(sqlQuery, function (err, rowCount) {
 
