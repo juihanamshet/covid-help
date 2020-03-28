@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Typography, Card, Avatar, Link, Button } from '@material-ui/core';
+import { Grid, Typography, Card, Avatar, Link, Button, IconButton } from '@material-ui/core';
+import { MailOutline, Facebook, LinkedIn, Instagram } from '@material-ui/icons';
 
 import Map from 'pigeon-maps';
 import Marker from 'pigeon-marker';
@@ -10,6 +11,8 @@ import jordad from '../img/jordad.png';
 
 const MAPTILER_ACCESS_TOKEN = 'prxcBM7GNRKVr9ucT9no';
 const MAP_ID = '9ddbdaa1-4ce7-48c2-a288-d73cddca9aac';
+const GREETINGS = ["Hey!", "Hello!", "Bonjour!", "Howdy!", "Nice to meet you!"]
+const MEDIA_ICONS = {Email: <MailOutline></MailOutline>, Facebook: <Facebook></Facebook>, LinkedIn: <LinkedIn></LinkedIn>, Instagram: <Instagram></Instagram>}
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -29,8 +32,12 @@ const useStyles = makeStyles(theme => ({
     },
     fieldInfo: {
         color: '#595959',
+    },
+    viewProfile: {
+        "&:hover": {
+            textDecoration: "underline!important"
+        }
     }
-
 }));
 
 // props: listingTitle, coordinates, location, livingSitch, houseRules, details (additional details), ownerName, ownerAvatar, ownerDeets
@@ -48,19 +55,17 @@ function ListingDetails(props) {
     var lgbtqpFriendly = props.lgbtqpFriendly ? "Yes" : "No";
 
     // form a default bio if the user is unavailable
-    var basicGreeting = ["Hey!", "Hello!", "Bonjour!", "Howdy!", "Nice to meet you!"]
-    var aboutMeDefault = basicGreeting[Math.floor(Math.random() * 5)] + " I'm " + props.org + " " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you."
+    var school = props.org.replace(/^\w/, c => c.toUpperCase());
+    var aboutMeDefault = GREETINGS[Math.floor(Math.random() * 5)] + " I'm " + school + " " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
     // TODO: once user has personalBio, provide option to switch between the two
     var aboutMe = aboutMeDefault;
 
     // set up list of buttons that can be used for contact
     var buttonList = [];
     var contacts = Object.entries(props.contacts);
-    console.log(contacts);
     contacts.forEach(function (contact) {
-        console.log(contact);
         if(contact[1] !== null){
-            buttonList.push(<Button variant="outlined" color="primary" display='inline'>{contact[0]}</Button>);
+            buttonList.push(<IconButton color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
         }
     });
     // avatar profile photos
@@ -71,7 +76,7 @@ function ListingDetails(props) {
                 <Marker anchor={coor} payload={4}></Marker>
             </Map>
             <div className={classes.titleDiv} style={{color:'grey'}}>
-                <Typography align="center" variant="h4"> Listing Details </Typography>
+                <Typography color="primary" align="center" variant="h4"> Listing Details </Typography>
             </div>
             <div className={classes.titleDiv}>
                 <Typography align="center" variant="h5">
@@ -148,10 +153,10 @@ function ListingDetails(props) {
                             <div>
                                 <Typography variant="inherit">
                                     {aboutMe}
-                                </Typography>
-                                <Link href="#" color="primary">
-                                    <Typography variant="inherit">&nbsp;Learn More</Typography>
-                                </Link>
+                                    <Link className={classes.viewProfile} style={{color: "#2196f3"}} onClick={() => props.ownerDialogOnClick()}>
+                                        View Profile
+                                    </Link>
+                                </Typography>    
                             </div>
                         </div>
                         </Grid>

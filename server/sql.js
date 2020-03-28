@@ -39,6 +39,7 @@ function getSchoolListings(email, school, callback) {
         WHERE disabledAcct = 0 AND orgEmail != @Email AND org=@School";
 
     request = new Request(sqlQuery, function (err, rowCount) {
+
         if (err) {
             console.error(err);
             result = "Internal Server Error"
