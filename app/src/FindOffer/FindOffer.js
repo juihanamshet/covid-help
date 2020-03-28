@@ -54,6 +54,7 @@ class FindOffer extends Component {
     }
 
     async componentDidMount() {
+        console.log("compomentMounted");
         const accessToken = this.props.authState.accessToken;
         var config = {
             headers: {
@@ -69,6 +70,42 @@ class FindOffer extends Component {
                 }else{
                     self.setState({ offerListings: response.data });
                 }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    getListings = async() => {
+        const accessToken = this.props.authState.accessToken;
+        var config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+            }
+        };
+        var self = this;
+        axios.get(BASE_URL + '/getListings', config)
+            .then(function (response) {
+                self.setState({ findListings: response.data, find: true });
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    getUserListings = async() => {
+        const accessToken = this.props.authState.accessToken;
+        var config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+            }
+        };
+        var self = this;
+        axios.get(BASE_URL + '/getUsersListings', config)
+            .then(function (response) {
+                self.setState({ offerListings: response.data, find: false});
             })
             .catch(function (error) {
                 console.log(error);
@@ -91,7 +128,6 @@ class FindOffer extends Component {
             .then(function (response) {
                 self.setState({ currListing : response.data[0],
                                 drawerOpen: true });
-                console.log(self.state.currListing);
             })
             .catch(function (error) {
                 console.log(error);
@@ -106,6 +142,7 @@ class FindOffer extends Component {
     };
 
     render() {
+        console.log("render");
         // for styling
         const { classes } = this.props;
 
@@ -115,7 +152,7 @@ class FindOffer extends Component {
         var currListings = [];
         listings.forEach(listing => {
             var name = listing.listingName !== null ? listing.listingName : "Unnamed Listing"
-            var location = listing.city + ", " + listing.state + " (" + listing.zipCode + ")";
+            var location = listing.city + ", " + listing.state + " " + listing.zipCode;
             currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
         });
 
@@ -168,11 +205,11 @@ class FindOffer extends Component {
                     <Grid item xs={12}>
                         <div className={classes.sidebar}>
                             <div className={classes.sidebarChild}>
-                                <Button id={findIsActive} variant="link" size="lg" onClick={(e) => this.setState({ find: true })}>Find</Button>
+                                <Button id={findIsActive} variant="link" size="lg" onClick={(e) => this.getListings()}>Find</Button>
                             </div>
                             <div className={classes.spacer}></div>
                             <div className={classes.sidebarChild}>
-                                <Button id={offerIsActive} variant="link" size="lg" onClick={(e) => this.setState({ find: false })}>Offer</Button>
+                                <Button id={offerIsActive} variant="link" size="lg" onClick={(e) => this.getUserListings()}>Offer</Button>
                             </div>
                         </div>
                     </Grid>
@@ -192,8 +229,8 @@ class FindOffer extends Component {
                     onOpen={this.toggleDrawer(true)}>
                     <ListingDetails
                         // info for the housing
-                        key={this.state.currListing.listingID}
-                        coordinates={[37.338207, -121.886330]}
+                        key={this.state.currListing.listingID + Math.random()}
+                        zipcode={this.state.currListing.zipCode}
                         listingTitle={this.state.currListing.listingName}
                         location={this.state.currListing.neighborhood + ", " + this.state.currListing.city + ", " + this.state.currListing.state + " (" + this.state.currListing.zipCode + ")"}
                         lgbtqpFriendly={this.state.currListing.lgbtqpFriendly}
@@ -222,9 +259,9 @@ class FindOffer extends Component {
                     name={this.state.currListing.firstName + " " + this.state.currListing.lastName}
                     gradYear={this.state.currListing.grad_year}
                     gender={this.state.currListing.gender}
-                    //pronouns
+                    //pronouns={this.state.currListing.pronouns}
                     ethnicity={this.state.currListing.ethnicity}
-                    //bio
+                    //bio={this.state.currListing.bio}
                     socialMedia={{'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
                 >
                 </OwnerDialog>

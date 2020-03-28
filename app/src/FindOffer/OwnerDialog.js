@@ -35,10 +35,12 @@ function OwnerDialog(props) {
     const classes = useStyles();
 
     var buttonList = [];
+    var keyCount = 0;
     var contacts = Object.entries(props.socialMedia);
     contacts.forEach(function (contact) {
         if(contact[1] !== null){
-            buttonList.push(<IconButton color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
+            buttonList.push(<IconButton key={keyCount} color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
+            keyCount++;
         }
     });
     var pronouns = (props.pronouns === null || props.pronouns === undefined) ? 'N/A' : props.pronouns;

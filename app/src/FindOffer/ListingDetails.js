@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Typography, Card, Avatar, Link, Button, IconButton } from '@material-ui/core';
 import { MailOutline, Facebook, LinkedIn, Instagram } from '@material-ui/icons';
+import {  StaticGoogleMap as Map, Marker } from 'react-static-google-map';
 
-import Map from 'pigeon-maps';
-import Marker from 'pigeon-marker';
+// import Map from 'pigeon-maps';
+// import Marker from 'pigeon-marker';
 
 //temp import
 import jordad from '../img/jordad.png';
@@ -46,11 +47,6 @@ function ListingDetails(props) {
 
     const [coor, setCoor] = useState(props.coordinates);
 
-
-    function mapTilerProvider(x, y, z, dpr) {
-        return `https://api.maptiler.com/maps/${MAP_ID}/256/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png?key=${MAPTILER_ACCESS_TOKEN}`
-    }
-
     var accessibilityFriendly = props.accessibilityFriendly ? "Yes" : "No";
     var lgbtqpFriendly = props.lgbtqpFriendly ? "Yes" : "No";
 
@@ -62,18 +58,22 @@ function ListingDetails(props) {
 
     // set up list of buttons that can be used for contact
     var buttonList = [];
+    var keyCount = 0;
     var contacts = Object.entries(props.contacts);
     contacts.forEach(function (contact) {
-        if(contact[1] !== null){
-            buttonList.push(<IconButton color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
+        // if the social media url isn't null or undefined
+        if(contact[1] !== null || contact[1] !== undefined){
+            // key creation
+            buttonList.push(<IconButton key={keyCount} color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
+            keyCount++;
         }
     });
     // avatar profile photos
 
     return (
         <div className={classes.root}>
-            <Map mouseEvents={true} touchEvents={false} center={coor} zoom={12} width={500} height={300}>
-                <Marker anchor={coor} payload={4}></Marker>
+            <Map center={props.zipcode} zoom={13} size="500x300" apiKey="AIzaSyAV09jD3Q3W28UXfaBQAfdP8n9rn8A0kHY">
+                <Marker location={props.zipcode}></Marker>
             </Map>
             <div className={classes.titleDiv} style={{color:'grey'}}>
                 <Typography color="primary" align="center" variant="h4"> Listing Details </Typography>
