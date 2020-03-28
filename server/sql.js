@@ -52,7 +52,7 @@ function getUserID(email, callback) {
 
     request.on('requestCompleted', function () {
         console.log("/getUserID SQL DB Returned Successfully");
-        connnection.close();
+        connection.close();
         callback(result, code)
     });
 

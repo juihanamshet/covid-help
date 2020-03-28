@@ -50,24 +50,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.listen(8080);
 
-app.post("/register", function (req, res) {
-    // TODO: Check that req.body is what we want it to be
-    // TODO: Need to really test this insert statement lmfao
-    var user = req.body;
-
-    connection.query('INSERT INTO UserTable(firstName, lastName, orgEmail, pswd, prefEmail, phoneNumber, addressLineOne, addressLineTwo, city, state, zipcode, facebook, Linkedin, Instagram, providerBool, requester, offerHousing, housingRules, lgbtqp, accessibilityFriendly, preferredContact, disabledAcct, transFriendly, accessibilityInfo) VALUES ?', user, function (err, result) {
-        if (err) {
-            console.log(err);
-        }
-    });
-    // TODO: move to next page
-    res.end('Success');
-})
 
 function extractSchool(email) {
     const school = email.substring(email.lastIndexOf("@") + 1, email.lastIndexOf(".edu"))
     return school
 }
+
 
 app.get("/getListings", authenticationRequired, function (req, res, next) {
     console.log('/getListings called')
