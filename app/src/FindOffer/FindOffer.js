@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Listing from './Listing.js';
 import ListingDetails from './ListingDetails.js';
+import OwnerDialog from './OwnerDialog.js';
 
 import { withStyles } from '@material-ui/styles';
 import Button from 'react-bootstrap/Button';
@@ -39,9 +40,20 @@ class FindOffer extends Component {
             offerListings: [],
             // we want curr listing to hold the various components of getListing
             currListing: {},
-            currListingID: -1
+            currListingID: -1,
+            ownerDialogOpen: false,
         }
     };
+
+    openOwnerDialog = () => {
+        this.setState({ ownerDialogOpen: true });
+        console.log('set ownerDialogOpen to: ' + this.state.ownerDialogOpen);
+    }
+
+    closeOwnerDialog = () => {
+        this.setState({ ownerDialogOpen: false });
+        console.log('set ownerDialogOpen to: ' + this.state.ownerDialogOpen)
+    }
 
     async componentDidMount() {
         const accessToken = this.props.authState.accessToken;
@@ -56,7 +68,6 @@ class FindOffer extends Component {
             .then(function (response) {
                 if(self.state.find){
                     self.setState({ findListings: response.data });
-                    console.log(self.state.findListings);
                 }else{
                     self.setState({ offerListings: response.data });
                 }
@@ -82,7 +93,6 @@ class FindOffer extends Component {
             .then(function (response) {
                 self.setState({ currListing : response.data[0],
                                 drawerOpen: true });
-                console.log(self.state.currListing);
             })
             .catch(function (error) {
                 console.log(error);
@@ -182,6 +192,8 @@ class FindOffer extends Component {
                     onClose={this.toggleDrawer(false)}
                     onOpen={this.toggleDrawer(true)}>
                     <ListingDetails
+                        // info for the housing
+                        key={this.state.currListing.listingID}
                         coordinates={[37.338207, -121.886330]}
                         listingTitle={this.state.currListing.listingName}
                         location={this.state.currListing.neighborhood + ", " + this.state.currListing.city + ", " + this.state.currListing.state + " (" + this.state.currListing.zipCode + ")"}
@@ -191,14 +203,26 @@ class FindOffer extends Component {
                         houseRules={this.state.currListing.housingRules}
                         access={this.state.currListing.accessbilityInfo}
 
-                        ownerName={this.state.currListing.firstName}
+                        // info for the owner
+                        ownerName={this.state.currListing.firstName + " " + this.state.currListing.lastName}
                         org={this.state.currListing.org}
                         gradYear={this.state.currListing.grad_year}
                         preferredContactMethod={this.state.currListing.preferredContactMethod}
-                        contacts={{'Email': this.state.currListing.prefEmail, 'Email 2': this.state.currListing.orgEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
+                        
+                        // contact info
+                        contacts={{'Email': this.state.currListing.prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
+
+                        //learn more about owner button
+                        ownerDialogOnClick={this.openOwnerDialog}
                     >
                     </ListingDetails>
                 </SwipeableDrawer>
+                <OwnerDialog
+                    open={this.state.ownerDialogOpen}
+                    handleClose={this.closeOwnerDialog}
+                    name = {this.state.currListing.firstName + " " + this.state.currListing.lastName}
+                >
+                </OwnerDialog>
             </div>
         )
     }
