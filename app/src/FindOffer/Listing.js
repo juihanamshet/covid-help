@@ -7,11 +7,10 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import ButtonBase from '@material-ui/core/ButtonBase'
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles(theme => ({
-  base:{
+  base: {
     margin: 15,
   },
   root: {
@@ -35,7 +34,8 @@ function Listing(props) {
   var listingDetail = "default";
   listingDetail = props.listingLocation;
 
-  var mailTo = "mailto:" + props.listingEmail;
+  var lgbtqpFriendly = props.lgbtqpFriendly ? "🏳️‍🌈" : "";
+  var accessFriendly = props.accessibilityFriendly ? "♿" : "";
 
   return (
     <div className={classes.base}>
@@ -47,20 +47,29 @@ function Listing(props) {
             title="Location Not Found"
           />
           <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              {listingName}
-            </Typography>
+            <Grid
+              container
+              justify="space-between">
+              <Grid item>
+                <Typography align='right' display='inline' gutterBottom variant="h5">
+                  {listingName}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography align='right' display='inline' variant="h6">
+                  {lgbtqpFriendly + " " + accessFriendly}
+                </Typography >
+              </Grid>
+            </Grid>
             <Typography variant="body2" color="textSecondary" component="p">
               {listingDetail}
             </Typography>
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <ButtonBase>
-            <Link target="_blank" href={mailTo} size="small" color="primary">
-              Contact
-            </Link>
-          </ButtonBase>
+          <Button component="a" target="_blank" href={`mailto:${props.listingEmail}`} size="small" color="primary">
+            Contact
+          </Button>
           <Button size="small" color="primary" onClick={() => props.onClick(id)}>
             Learn More
           </Button>
