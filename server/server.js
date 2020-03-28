@@ -114,7 +114,7 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
 
 app.post("/createListing", function (req, res, next) {
     const userEmail = "sj2546@nyu.edu" //req.jwt.claims.sub;
-    const listingInfo = req.body;
+    const listingInfo = req.body.listingInfo;
 
     sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
         if (status === 200) {
