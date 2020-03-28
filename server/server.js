@@ -131,8 +131,8 @@ app.post("/createListing", authenticationRequired, function (req, res, next) {
 })
 
 
-app.post("/createUser", /*authenticationRequired,*/ async function (req, res, next) {
-    const userEmail = "mk374@duke.edu" //req.jwt.claims.sub;
+app.post("/createUser", authenticationRequired, async function (req, res, next) {
+    const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
     const userInfo = req.body.userInfo;
 
