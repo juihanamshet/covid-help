@@ -4,6 +4,7 @@ const cors = require('cors');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 var sqltools = require("./sql.js");
 const okta = require('@okta/okta-sdk-nodejs');
+let bodyParser = require('body-parser');
 require('dotenv').config()
 
 
@@ -46,6 +47,7 @@ function authenticationRequired(req, res, next) {
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
 app.listen(8080);
 
 app.post("/register", function (req, res) {
@@ -103,6 +105,20 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     sqltools.getListing(userEmail, listingID, userSchool, (sqlResult, status) => {
         if (status === 200) {
             res.json(sqlResult);
+        } else {
+            res.statusCode = 500;
+            res.send("Internal Server Error");
+        }
+    })
+})
+
+app.post("/createListing", function (req, res, next) {
+    const userEmail = "sj2546@nyu.edu" //req.jwt.claims.sub;
+    const listingInfo = req.body;
+
+    sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
+        if (status === 200) {
+            res.json(status);
         } else {
             res.statusCode = 500;
             res.send("Internal Server Error");
