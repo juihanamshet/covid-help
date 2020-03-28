@@ -90,6 +90,7 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
 app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
+    console.log("/getUsersListings: Getting Personal Listings for\n\t User: " + userEmail + "\n\tSchool: " + userSchool);
 
     sqltools.getUsersListings(userEmail, userSchool, (sqlResult, status) => {
         if (status === 200) {
@@ -105,6 +106,7 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     const listingID = req.query.listingID;
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
+    console.log("/getListing: Getting - \n\tListing: " + listingID + "\n\tUser: " + userEmail + "\n\tSchool: " + userSchool)
 
     sqltools.getListing(userEmail, listingID, userSchool, (sqlResult, status) => {
         if (status === 200) {
@@ -119,6 +121,7 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
 app.post("/createListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const listingInfo = req.body.listingInfo;
+    console.log("/createListing: Creating Listing for " + userEmail)
 
     sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
         if (status === 200) {
@@ -135,11 +138,12 @@ app.post("/createUser", authenticationRequired, async function (req, res, next) 
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
     const userInfo = req.body.userInfo;
-
     userInfo['org'] = userSchool;
+    console.log("/createUser called for User: " + userEmail);
 
     await client.getUser(userEmail)
         .then(user => {
+            console.log("/createUser: Retrieved Okta User Info")
             userInfo['firstName'] = user.profile.firstName
             userInfo['lastName'] = user.profile.lastName
             userInfo['phoneNumber'] = user.profile.mobilePhone
