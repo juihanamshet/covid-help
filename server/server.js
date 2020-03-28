@@ -8,10 +8,10 @@ let bodyParser = require('body-parser');
 require('dotenv').config()
 
 
-// const client = new okta.Client({
-//     orgUrl: process.env.OKTA_BASE_URL + '/',
-//     token: process.env.OKTA_TOKEN
-// });
+const client = new okta.Client({
+    orgUrl: process.env.OKTA_BASE_URL + '/',
+    token: process.env.OKTA_TOKEN
+});
 
 
 const oktaJwtVerifier = new OktaJwtVerifier({
@@ -121,6 +121,32 @@ app.post("/createListing", authenticationRequired, function (req, res, next) {
     const listingInfo = req.body.listingInfo;
 
     sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
+        if (status === 200) {
+            res.json(status);
+        } else {
+            res.statusCode = 500;
+            res.send("Internal Server Error");
+        }
+    })
+})
+
+
+app.post("/createUser", /*authenticationRequired,*/ async function (req, res, next) {
+    const userEmail = "mk374@duke.edu" //req.jwt.claims.sub;
+    const userSchool = extractSchool(userEmail);
+    const userInfo = req.body.userInfo;
+
+    userInfo['org'] = userSchool;
+
+    await client.getUser(userEmail)
+        .then(user => {
+            userInfo['firstName'] = user.profile.firstName
+            userInfo['lastName'] = user.profile.lastName
+            userInfo['phoneNumber'] = user.profile.mobilePhone
+            userInfo['orgEmail'] = user.profile.email
+        });
+
+    sqltools.createUser(userInfo, (sqlResult, status) => {
         if (status === 200) {
             res.json(status);
         } else {
