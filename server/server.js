@@ -71,7 +71,21 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
 
-    sqltools.getSchoolListings(userSchool, (sqlResult, status) => {
+    sqltools.getSchoolListings(userEmail, userSchool, (sqlResult, status) => {
+        if (status === 200) {
+            res.json(sqlResult);
+        } else {
+            res.statusCode = 500;
+            res.send("Internal Server Error");
+        }
+    })
+})
+
+app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
+    const userEmail = req.jwt.claims.sub;
+    const userSchool = extractSchool(userEmail);
+
+    sqltools.getUsersListings(userEmail, userSchool, (sqlResult, status) => {
         if (status === 200) {
             res.json(sqlResult);
         } else {

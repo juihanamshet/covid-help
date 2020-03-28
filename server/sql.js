@@ -27,11 +27,18 @@ connection.on('connect', function (err) {
 });
 
 
-function getSchoolListings(school, callback) {
+function getSchoolListings(email, school, callback) {
     var result = []
     var code = 200;
 
-    request = new Request("SELECT listingID, userTable.userID, listingName, zipCode, prefEmail, grad_year, city, state, lgbtqpFriendly, accessibilityFriendly  FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) AND org='duke' WHERE disabledAcct = 0", function (err, rowCount) {
+    sqlQuery =
+        "SELECT listingID, userTable.userID, listingName, \
+        zipCode, prefEmail, grad_year, city, state  \
+        FROM listingTable JOIN userTable \
+        ON (listingTable.userID = userTable.userID) \
+        WHERE disabledAcct = 0 AND orgEmail != @Email AND org=@School";
+
+    request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
             console.error(err);
             result = "Internal Server Error"
@@ -39,6 +46,51 @@ function getSchoolListings(school, callback) {
         }
     });
     request.addParameter('School', TYPES.VarChar, school);
+    request.addParameter('Email', TYPES.VarChar, email);
+
+
+    request.on('row', function (columns) {
+        listing = {}
+        for (var name in columns) {
+            listing[name] = columns[name].value
+        }
+        result.push(listing)
+    });
+
+    request.on('requestCompleted', function () {
+        callback(result, code)
+    });
+
+    request.on('error', (err) => {
+        console.error(err);
+        listingData = "Internal Server Error"
+        code = 500;
+    })
+
+    connection.execSql(request);
+}
+
+function getUsersListings(email, school, callback) {
+    var result = []
+    var code = 200;
+
+    sqlQuery =
+        "SELECT listingID, userTable.userID, listingName, \
+        zipCode, prefEmail, grad_year, city, state  \
+        FROM listingTable JOIN userTable \
+        ON (listingTable.userID = userTable.userID) \
+        WHERE disabledAcct = 0 AND orgEmail=@Email AND org=@School";
+
+    request = new Request(sqlQuery, function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+    });
+    request.addParameter('School', TYPES.VarChar, school);
+    request.addParameter('Email', TYPES.VarChar, email);
+
 
     request.on('row', function (columns) {
         listing = {}
@@ -66,7 +118,13 @@ function getListing(email, listing, school, callback) {
     var result = []
     var code = 200;
 
-    request = new Request(" SELECT * FROM listingTable JOIN userTable on (listingTable.userID = userTable.userID) WHERE listingTable.listingID = @ListingID AND org=@School;", function (err, rowCount) {
+    sqlQuery =
+        "SELECT * \
+        FROM listingTable JOIN userTable \
+        ON (listingTable.userID = userTable.userID) \
+        WHERE listingTable.listingID = @ListingID AND org=@School;"
+
+    request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
             console.error(err);
             result = "Internal Server Error"
@@ -103,4 +161,4 @@ function getListing(email, listing, school, callback) {
     connection.execSql(request);
 }
 
-module.exports = { getSchoolListings, getListing }
+module.exports = { getSchoolListings, getUsersListings, getListing }
