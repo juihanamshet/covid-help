@@ -47,12 +47,10 @@ class FindOffer extends Component {
 
     openOwnerDialog = () => {
         this.setState({ ownerDialogOpen: true });
-        console.log('set ownerDialogOpen to: ' + this.state.ownerDialogOpen);
     }
 
     closeOwnerDialog = () => {
         this.setState({ ownerDialogOpen: false });
-        console.log('set ownerDialogOpen to: ' + this.state.ownerDialogOpen)
     }
 
     async componentDidMount() {
@@ -93,6 +91,7 @@ class FindOffer extends Component {
             .then(function (response) {
                 self.setState({ currListing : response.data[0],
                                 drawerOpen: true });
+                console.log(self.state.currListing);
             })
             .catch(function (error) {
                 console.log(error);
@@ -220,7 +219,13 @@ class FindOffer extends Component {
                 <OwnerDialog
                     open={this.state.ownerDialogOpen}
                     handleClose={this.closeOwnerDialog}
-                    name = {this.state.currListing.firstName + " " + this.state.currListing.lastName}
+                    name={this.state.currListing.firstName + " " + this.state.currListing.lastName}
+                    gradYear={this.state.currListing.grad_year}
+                    gender={this.state.currListing.gender}
+                    //pronouns
+                    ethnicity={this.state.currListing.ethnicity}
+                    //bio
+                    socialMedia={{'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
                 >
                 </OwnerDialog>
             </div>

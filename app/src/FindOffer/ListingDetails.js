@@ -32,8 +32,12 @@ const useStyles = makeStyles(theme => ({
     },
     fieldInfo: {
         color: '#595959',
+    },
+    viewProfile: {
+        "&:hover": {
+            textDecoration: "underline!important"
+        }
     }
-
 }));
 
 // props: listingTitle, coordinates, location, livingSitch, houseRules, details (additional details), ownerName, ownerAvatar, ownerDeets
@@ -52,7 +56,7 @@ function ListingDetails(props) {
 
     // form a default bio if the user is unavailable
     var school = props.org.replace(/^\w/, c => c.toUpperCase());
-    var aboutMeDefault = GREETINGS[Math.floor(Math.random() * 5)] + " I'm " + school + " " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you."
+    var aboutMeDefault = GREETINGS[Math.floor(Math.random() * 5)] + " I'm " + school + " " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
     // TODO: once user has personalBio, provide option to switch between the two
     var aboutMe = aboutMeDefault;
 
@@ -72,7 +76,7 @@ function ListingDetails(props) {
                 <Marker anchor={coor} payload={4}></Marker>
             </Map>
             <div className={classes.titleDiv} style={{color:'grey'}}>
-                <Typography align="center" variant="h4"> Listing Details </Typography>
+                <Typography color="primary" align="center" variant="h4"> Listing Details </Typography>
             </div>
             <div className={classes.titleDiv}>
                 <Typography align="center" variant="h5">
@@ -149,10 +153,10 @@ function ListingDetails(props) {
                             <div>
                                 <Typography variant="inherit">
                                     {aboutMe}
-                                </Typography>
-                                <Link component="button" onClick={() => props.ownerDialogOnClick()} color="primary">
-                                    <Typography variant="inherit">&nbsp;Learn More</Typography>
-                                </Link>
+                                    <Link className={classes.viewProfile} style={{color: "#2196f3"}} onClick={() => props.ownerDialogOnClick()}>
+                                        View Profile
+                                    </Link>
+                                </Typography>    
                             </div>
                         </div>
                         </Grid>
