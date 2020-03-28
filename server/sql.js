@@ -20,11 +20,8 @@ var config = {
     }
 };
 
+var connection;
 
-var connection;// = new Connection(config);
-// connection.on('connect', function (err) {
-//     console.log("Connected");
-// });
 
 function getUserID(email, callback) {
     connection = new Connection(config);
@@ -54,6 +51,7 @@ function getUserID(email, callback) {
     });
 
     request.on('requestCompleted', function () {
+        console.log("/getUserID SQL DB Returned Successfully");
         connnection.close();
         callback(result, code)
     });
@@ -65,7 +63,7 @@ function getUserID(email, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/getUserID SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
@@ -107,6 +105,7 @@ function getSchoolListings(email, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        console.log("/getListings SQL DB Returned Successfully");
         connection.close();
         callback(result, code)
     });
@@ -119,10 +118,11 @@ function getSchoolListings(email, school, callback) {
 
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/getListings SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
+
 
 function getUsersListings(email, school, callback) {
     connection = new Connection(config);
@@ -158,6 +158,7 @@ function getUsersListings(email, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        console.log("/getUsersListings SQL DB Returned Successfully");
         connection.close();
         callback(result, code)
     });
@@ -169,10 +170,11 @@ function getUsersListings(email, school, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/getUsersListings SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
+
 
 function getListing(email, listing, school, callback) {
     connection = new Connection(config);
@@ -210,6 +212,7 @@ function getListing(email, listing, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        console.log("/getListing SQL Returned");
         connection.close();
         callback(result, code)
     });
@@ -221,10 +224,11 @@ function getListing(email, listing, school, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/getListing SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
+
 
 function createListing(listingInfo, callback) {
     connection = new Connection(config);
@@ -256,6 +260,7 @@ function createListing(listingInfo, callback) {
 
 
     request.on('requestCompleted', function () {
+        console.log("/createListing Listing Inserted into DB")
         connection.close();
         callback("Success", code)
     });
@@ -267,10 +272,11 @@ function createListing(listingInfo, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/createListing SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
+
 
 function createListingHandler(email, listingInfo, callback) {
     status = 200
@@ -292,6 +298,7 @@ function createListingHandler(email, listingInfo, callback) {
         }
     })
 }
+
 
 function createUser(userInfo, callback) {
     connection = new Connection(config);
@@ -331,6 +338,7 @@ function createUser(userInfo, callback) {
     request.addParameter('GradYear', TYPES.VarChar, userInfo.grad_year);
 
     request.on('requestCompleted', function () {
+        console.log("/createUser User Inserted into DB");
         connection.close();
         callback("Success", code)
     });
@@ -342,7 +350,7 @@ function createUser(userInfo, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/createUser SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
