@@ -116,7 +116,7 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     })
 })
 
-app.post("/createListing", function (req, res, next) {
+app.post("/createListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const listingInfo = req.body.listingInfo;
 
