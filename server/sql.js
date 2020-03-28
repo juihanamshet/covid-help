@@ -21,12 +21,14 @@ var config = {
 };
 
 
-var connection = new Connection(config);
-connection.on('connect', function (err) {
-    console.log("Connected");
-});
+var connection;// = new Connection(config);
+// connection.on('connect', function (err) {
+//     console.log("Connected");
+// });
 
 function getUserID(email, callback) {
+    connection = new Connection(config);
+
     var result = "";
     var code = 200
 
@@ -52,6 +54,7 @@ function getUserID(email, callback) {
     });
 
     request.on('requestCompleted', function () {
+        connnection.close();
         callback(result, code)
     });
 
@@ -61,11 +64,16 @@ function getUserID(email, callback) {
         code = 500;
     })
 
-    connection.execSql(request);
+    connection.on('connect', function (err) {
+        console.log("Connected Successfully");
+        connection.execSql(request);
+    });
 }
 
 
 function getSchoolListings(email, school, callback) {
+    connection = new Connection(config);
+
     var result = []
     var code = 200;
 
@@ -84,6 +92,7 @@ function getSchoolListings(email, school, callback) {
             code = 500;
         }
     });
+
     request.addParameter('School', TYPES.VarChar, school);
     request.addParameter('Email', TYPES.VarChar, email);
 
@@ -97,6 +106,7 @@ function getSchoolListings(email, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        connection.close();
         callback(result, code)
     });
 
@@ -106,16 +116,22 @@ function getSchoolListings(email, school, callback) {
         code = 500;
     })
 
-    connection.execSql(request);
+
+    connection.on('connect', function (err) {
+        console.log("Connected Successfully");
+        connection.execSql(request);
+    });
 }
 
 function getUsersListings(email, school, callback) {
+    connection = new Connection(config);
     var result = []
     var code = 200;
 
     sqlQuery =
-        "SELECT listingID, userTable.userID, listingName, \
-        zipCode, prefEmail, grad_year, city, state  \
+        "SELECT listingID, userTable.userID, \
+        listingName, zipCode, prefEmail, grad_year, \
+        city,lgbtqpFriendly, accessibilityFriendly, state\
         FROM listingTable JOIN userTable \
         ON (listingTable.userID = userTable.userID) \
         WHERE disabledAcct = 0 AND orgEmail=@Email AND org=@School";
@@ -127,6 +143,7 @@ function getUsersListings(email, school, callback) {
             code = 500;
         }
     });
+
     request.addParameter('School', TYPES.VarChar, school);
     request.addParameter('Email', TYPES.VarChar, email);
 
@@ -140,6 +157,7 @@ function getUsersListings(email, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        connection.close();
         callback(result, code)
     });
 
@@ -149,10 +167,14 @@ function getUsersListings(email, school, callback) {
         code = 500;
     })
 
-    connection.execSql(request);
+    connection.on('connect', function (err) {
+        console.log("Connected Successfully");
+        connection.execSql(request);
+    });
 }
 
 function getListing(email, listing, school, callback) {
+    connection = new Connection(config);
     var result = []
     var code = 200;
 
@@ -187,6 +209,7 @@ function getListing(email, listing, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        connection.close();
         callback(result, code)
     });
 
@@ -196,10 +219,14 @@ function getListing(email, listing, school, callback) {
         code = 500;
     })
 
-    connection.execSql(request);
+    connection.on('connect', function (err) {
+        console.log("Connected Successfully");
+        connection.execSql(request);
+    });
 }
 
 function createListing(listingInfo, callback) {
+    connection = new Connection(config);
     code = 200;
 
     sqlQuery =
@@ -228,6 +255,7 @@ function createListing(listingInfo, callback) {
 
 
     request.on('requestCompleted', function () {
+        connection.close();
         callback("Success", code)
     });
 
@@ -237,7 +265,10 @@ function createListing(listingInfo, callback) {
         code = 500;
     })
 
-    connection.execSql(request);
+    connection.on('connect', function (err) {
+        console.log("Connected Successfully");
+        connection.execSql(request);
+    });
 }
 
 function createListingHandler(email, listingInfo, callback) {

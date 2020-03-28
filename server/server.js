@@ -70,11 +70,15 @@ function extractSchool(email) {
 }
 
 app.get("/getListings", authenticationRequired, function (req, res, next) {
+    console.log('/getListings called')
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
+    console.log('/getListings: getting Listings for\n\t User: ' + userEmail + '\n\tSchool: ' + userSchool);
 
     sqltools.getSchoolListings(userEmail, userSchool, (sqlResult, status) => {
         if (status === 200) {
+            resultSize = Object.keys(sqlResult).length
+            console.log("/getListings: Successfully Returned Listings with Size: " + resultSize);
             res.json(sqlResult);
         } else {
             res.statusCode = 500;
@@ -112,8 +116,8 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     })
 })
 
-app.post("/createListing", function (req, res, next) {
-    const userEmail = "sj2546@nyu.edu" //req.jwt.claims.sub;
+app.post("/createListing", authenticationRequired, function (req, res, next) {
+    const userEmail = req.jwt.claims.sub;
     const listingInfo = req.body.listingInfo;
 
     sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
