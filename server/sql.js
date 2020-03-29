@@ -235,8 +235,16 @@ function createListing(listingInfo, callback) {
     code = 200;
 
     sqlQuery =
-        "INSERT INTO listingTable (userID, addressLineOne, addressLineTwo, city, state, zipCode, neighborhood, housingRules, accessbilityInfo, listingName, livingSituation)\
-        VALUES(@UserID, @AddressLineOne, @AddressLineTwo, @City, @State, @ZipCode, @Neighborhood, @HousingRules, @AccessInfo, @ListingName, @LivingSituation);"
+        "INSERT INTO listingTable \
+            (userID, addressLineOne, addressLineTwo, \
+            city, state, zipCode, neighborhood, housingRules, \
+            lgbtqpFriendly, accessibilityFriendly, \
+            accessbilityInfo, listingName, livingSituation)\
+        VALUES(\
+            @UserID, @AddressLineOne, @AddressLineTwo, @City, \
+            @State, @ZipCode, @Neighborhood, @HousingRules, \
+            @LGBTQPFRD, @ACCESSFRD, @AccessInfo, @ListingName, \
+            @LivingSituation);"
 
     request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
@@ -254,6 +262,8 @@ function createListing(listingInfo, callback) {
     request.addParameter('ZipCode', TYPES.Int, listingInfo.zipCode);
     request.addParameter('Neighborhood', TYPES.VarChar, listingInfo.neighborhood);
     request.addParameter('HousingRules', TYPES.VarChar, listingInfo.housingRules);
+    request.addParameter('LGBTQPFRD', TYPES.Bit, userInfo.lgbtqpFriendly);
+    request.addParameter('ACCESSFRD', TYPES.Bit, userInfo.accessibilityFriendly);
     request.addParameter('AccessInfo', TYPES.VarChar, listingInfo.accessibilityInfo);
     request.addParameter('ListingName', TYPES.VarChar, listingInfo.listingName);
     request.addParameter('LivingSituation', TYPES.VarChar, listingInfo.livingSituation);
@@ -307,10 +317,10 @@ function createUser(userInfo, callback) {
     sqlQuery =
         "INSERT INTO userTable \
             (firstName, lastName, orgEmail, prefEmail, phoneNumber, \
-            Facebook, LinkedIn, Instagram, lgbtqpFriendly, accessibilityFriendly, \
-            preferredContactMethod, disabledAcct, org, gender, ethnicity, grad_year)\
+            Facebook, LinkedIn, Instagram, preferredContactMethod, \
+            disabledAcct, org, gender, ethnicity, grad_year)\
         VALUES(@FirstName, @LastName, @OrgEmail, @PrefEmail, @Phone, @FacebookLink, \
-            @LinkedInLink, @InstagramLink, @LGBTQPFRD, @ACCESSFRD, @PrefContact, 0, \
+            @LinkedInLink, @InstagramLink, @PrefContact, 0, \
             @ORG, @Gender, @Ethnicity, @GradYear);"
 
     request = new Request(sqlQuery, function (err, rowCount) {
@@ -329,8 +339,6 @@ function createUser(userInfo, callback) {
     request.addParameter('FacebookLink', TYPES.Int, userInfo.Facebook);
     request.addParameter('LinkedInLink', TYPES.VarChar, userInfo.LinkedIn);
     request.addParameter('InstagramLink', TYPES.VarChar, userInfo.Instagram);
-    request.addParameter('LGBTQPFRD', TYPES.Bit, userInfo.lgbtqpFriendly);
-    request.addParameter('ACCESSFRD', TYPES.Bit, userInfo.accessibilityFriendly);
     request.addParameter('PrefContact', TYPES.VarChar, userInfo.preferredContactMethod);
     request.addParameter('ORG', TYPES.VarChar, userInfo.org);
     request.addParameter('Gender', TYPES.VarChar, userInfo.gender);
