@@ -262,8 +262,8 @@ function createListing(listingInfo, callback) {
     request.addParameter('ZipCode', TYPES.Int, listingInfo.zipCode);
     request.addParameter('Neighborhood', TYPES.VarChar, listingInfo.neighborhood);
     request.addParameter('HousingRules', TYPES.VarChar, listingInfo.housingRules);
-    request.addParameter('LGBTQPFRD', TYPES.Bit, userInfo.lgbtqpFriendly);
-    request.addParameter('ACCESSFRD', TYPES.Bit, userInfo.accessibilityFriendly);
+    request.addParameter('LGBTQPFRD', TYPES.Bit, listingInfo.lgbtqpFriendly);
+    request.addParameter('ACCESSFRD', TYPES.Bit, listingInfo.accessibilityFriendly);
     request.addParameter('AccessInfo', TYPES.VarChar, listingInfo.accessibilityInfo);
     request.addParameter('ListingName', TYPES.VarChar, listingInfo.listingName);
     request.addParameter('LivingSituation', TYPES.VarChar, listingInfo.livingSituation);
