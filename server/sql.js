@@ -20,11 +20,8 @@ var config = {
     }
 };
 
+var connection;
 
-var connection;// = new Connection(config);
-// connection.on('connect', function (err) {
-//     console.log("Connected");
-// });
 
 function getUserID(email, callback) {
     connection = new Connection(config);
@@ -54,7 +51,8 @@ function getUserID(email, callback) {
     });
 
     request.on('requestCompleted', function () {
-        connnection.close();
+        console.log("/getUserID SQL DB Returned Successfully");
+        connection.close();
         callback(result, code)
     });
 
@@ -65,7 +63,7 @@ function getUserID(email, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/getUserID SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
@@ -78,11 +76,12 @@ function getSchoolListings(email, school, callback) {
     var code = 200;
 
     sqlQuery =
-        "SELECT listingID, userTable.userID, listingName, \
-        zipCode, prefEmail, grad_year, city, state  \
+        "SELECT listingID, userTable.userID, \
+        listingName, zipCode, prefEmail, grad_year, \
+        city, lgbtqpFriendly, accessibilityFriendly, state\
         FROM listingTable JOIN userTable \
         ON (listingTable.userID = userTable.userID) \
-        WHERE disabledAcct = 0 AND orgEmail != @Email AND org=@School";
+        WHERE disabledAcct = 0 AND orgEmail!=@Email AND org=@School";
 
     request = new Request(sqlQuery, function (err, rowCount) {
 
@@ -106,6 +105,7 @@ function getSchoolListings(email, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        console.log("/getListings SQL DB Returned Successfully");
         connection.close();
         callback(result, code)
     });
@@ -118,10 +118,11 @@ function getSchoolListings(email, school, callback) {
 
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/getListings SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
+
 
 function getUsersListings(email, school, callback) {
     connection = new Connection(config);
@@ -157,6 +158,7 @@ function getUsersListings(email, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        console.log("/getUsersListings SQL DB Returned Successfully");
         connection.close();
         callback(result, code)
     });
@@ -168,10 +170,11 @@ function getUsersListings(email, school, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/getUsersListings SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
+
 
 function getListing(email, listing, school, callback) {
     connection = new Connection(config);
@@ -209,6 +212,7 @@ function getListing(email, listing, school, callback) {
     });
 
     request.on('requestCompleted', function () {
+        console.log("/getListing SQL Returned");
         connection.close();
         callback(result, code)
     });
@@ -220,18 +224,27 @@ function getListing(email, listing, school, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/getListing SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
+
 
 function createListing(listingInfo, callback) {
     connection = new Connection(config);
     code = 200;
 
     sqlQuery =
-        "INSERT INTO listingTable (userID, addressLineOne, addressLineTwo, city, state, zipCode, neighborhood, housingRules, accessbilityInfo, listingName, livingSituation)\
-        VALUES(@UserID, @AddressLineOne, @AddressLineTwo, @City, @State, @ZipCode, @Neighborhood, @HousingRules, @AccessInfo, @ListingName, @LivingSituation);"
+        "INSERT INTO listingTable \
+            (userID, addressLineOne, addressLineTwo, \
+            city, state, zipCode, neighborhood, housingRules, \
+            lgbtqpFriendly, accessibilityFriendly, \
+            accessbilityInfo, listingName, livingSituation)\
+        VALUES(\
+            @UserID, @AddressLineOne, @AddressLineTwo, @City, \
+            @State, @ZipCode, @Neighborhood, @HousingRules, \
+            @LGBTQPFRD, @ACCESSFRD, @AccessInfo, @ListingName, \
+            @LivingSituation);"
 
     request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
@@ -249,12 +262,15 @@ function createListing(listingInfo, callback) {
     request.addParameter('ZipCode', TYPES.Int, listingInfo.zipCode);
     request.addParameter('Neighborhood', TYPES.VarChar, listingInfo.neighborhood);
     request.addParameter('HousingRules', TYPES.VarChar, listingInfo.housingRules);
+    request.addParameter('LGBTQPFRD', TYPES.Bit, listingInfo.lgbtqpFriendly);
+    request.addParameter('ACCESSFRD', TYPES.Bit, listingInfo.accessibilityFriendly);
     request.addParameter('AccessInfo', TYPES.VarChar, listingInfo.accessibilityInfo);
     request.addParameter('ListingName', TYPES.VarChar, listingInfo.listingName);
     request.addParameter('LivingSituation', TYPES.VarChar, listingInfo.livingSituation);
 
 
     request.on('requestCompleted', function () {
+        console.log("/createListing Listing Inserted into DB")
         connection.close();
         callback("Success", code)
     });
@@ -266,10 +282,11 @@ function createListing(listingInfo, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("Connected Successfully");
+        console.log("/createListing SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
+
 
 function createListingHandler(email, listingInfo, callback) {
     status = 200
@@ -292,4 +309,59 @@ function createListingHandler(email, listingInfo, callback) {
     })
 }
 
-module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, getUserID }
+
+function createUser(userInfo, callback) {
+    connection = new Connection(config);
+    code = 200;
+
+    sqlQuery =
+        "INSERT INTO userTable \
+            (firstName, lastName, orgEmail, prefEmail, phoneNumber, \
+            Facebook, LinkedIn, Instagram, preferredContactMethod, \
+            disabledAcct, org, gender, ethnicity, grad_year)\
+        VALUES(@FirstName, @LastName, @OrgEmail, @PrefEmail, @Phone, @FacebookLink, \
+            @LinkedInLink, @InstagramLink, @PrefContact, 0, \
+            @ORG, @Gender, @Ethnicity, @GradYear);"
+
+    request = new Request(sqlQuery, function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+    });
+
+    request.addParameter('FirstName', TYPES.VarChar, userInfo.firstName);
+    request.addParameter('LastName', TYPES.VarChar, userInfo.lastName);
+    request.addParameter('OrgEmail', TYPES.VarChar, userInfo.orgEmail);
+    request.addParameter('PrefEmail', TYPES.VarChar, userInfo.prefEmail);
+    request.addParameter('Phone', TYPES.VarChar, userInfo.phoneNumber);
+    request.addParameter('FacebookLink', TYPES.Int, userInfo.Facebook);
+    request.addParameter('LinkedInLink', TYPES.VarChar, userInfo.LinkedIn);
+    request.addParameter('InstagramLink', TYPES.VarChar, userInfo.Instagram);
+    request.addParameter('PrefContact', TYPES.VarChar, userInfo.preferredContactMethod);
+    request.addParameter('ORG', TYPES.VarChar, userInfo.org);
+    request.addParameter('Gender', TYPES.VarChar, userInfo.gender);
+    request.addParameter('Ethnicity', TYPES.VarChar, userInfo.ethnicity);
+    request.addParameter('GradYear', TYPES.VarChar, userInfo.grad_year);
+
+    request.on('requestCompleted', function () {
+        console.log("/createUser User Inserted into DB");
+        connection.close();
+        callback("Success", code)
+    });
+
+    request.on('error', (err) => {
+        console.error(err);
+        result = "Internal Server Error"
+        code = 500;
+    })
+
+    connection.on('connect', function (err) {
+        console.log("/createUser SQL DB Connected Successfully");
+        connection.execSql(request);
+    });
+}
+
+
+module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, createUser }

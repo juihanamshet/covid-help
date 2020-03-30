@@ -8,10 +8,10 @@ let bodyParser = require('body-parser');
 require('dotenv').config()
 
 
-// const client = new okta.Client({
-//     orgUrl: process.env.OKTA_BASE_URL + '/',
-//     token: process.env.OKTA_TOKEN
-// });
+const client = new okta.Client({
+    orgUrl: process.env.OKTA_BASE_URL + '/',
+    token: process.env.OKTA_TOKEN
+});
 
 
 const oktaJwtVerifier = new OktaJwtVerifier({
@@ -50,24 +50,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.listen(8080);
 
-app.post("/register", function (req, res) {
-    // TODO: Check that req.body is what we want it to be
-    // TODO: Need to really test this insert statement lmfao
-    var user = req.body;
-
-    connection.query('INSERT INTO UserTable(firstName, lastName, orgEmail, pswd, prefEmail, phoneNumber, addressLineOne, addressLineTwo, city, state, zipcode, facebook, Linkedin, Instagram, providerBool, requester, offerHousing, housingRules, lgbtqp, accessibilityFriendly, preferredContact, disabledAcct, transFriendly, accessibilityInfo) VALUES ?', user, function (err, result) {
-        if (err) {
-            console.log(err);
-        }
-    });
-    // TODO: move to next page
-    res.end('Success');
-})
 
 function extractSchool(email) {
     const school = email.substring(email.lastIndexOf("@") + 1, email.lastIndexOf(".edu"))
     return school
 }
+
 
 app.get("/getListings", authenticationRequired, function (req, res, next) {
     console.log('/getListings called')
@@ -90,6 +78,7 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
 app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
+    console.log("/getUsersListings: Getting Personal Listings for\n\t User: " + userEmail + "\n\tSchool: " + userSchool);
 
     sqltools.getUsersListings(userEmail, userSchool, (sqlResult, status) => {
         if (status === 200) {
@@ -105,6 +94,7 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     const listingID = req.query.listingID;
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
+    console.log("/getListing: Getting - \n\tListing: " + listingID + "\n\tUser: " + userEmail + "\n\tSchool: " + userSchool)
 
     sqltools.getListing(userEmail, listingID, userSchool, (sqlResult, status) => {
         if (status === 200) {
@@ -119,8 +109,36 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
 app.post("/createListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const listingInfo = req.body.listingInfo;
+    console.log("/createListing: Creating Listing for " + userEmail)
 
     sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
+        if (status === 200) {
+            res.json(status);
+        } else {
+            res.statusCode = 500;
+            res.send("Internal Server Error");
+        }
+    })
+})
+
+
+app.post("/createUser", authenticationRequired, async function (req, res, next) {
+    const userEmail = req.jwt.claims.sub;
+    const userSchool = extractSchool(userEmail);
+    const userInfo = req.body.userInfo;
+    userInfo['org'] = userSchool;
+    console.log("/createUser called for User: " + userEmail);
+
+    await client.getUser(userEmail)
+        .then(user => {
+            console.log("/createUser: Retrieved Okta User Info")
+            userInfo['firstName'] = user.profile.firstName
+            userInfo['lastName'] = user.profile.lastName
+            userInfo['phoneNumber'] = user.profile.mobilePhone
+            userInfo['orgEmail'] = user.profile.email
+        });
+
+    sqltools.createUser(userInfo, (sqlResult, status) => {
         if (status === 200) {
             res.json(status);
         } else {
