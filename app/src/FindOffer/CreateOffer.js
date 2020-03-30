@@ -70,11 +70,12 @@ function CreateOffer(props) {
                     accessibilityFriendly: accessibility,
                     accesibilityInfo: accessibilityInfo,
                     livingSituation: livingSituation,
-                    // housingInfo: description, TODO
+                    housingInfo: description,
                     // images: images
                 }
             }
         };
+        console.log(config.params);
         var self = this;
         axios.post(BASE_URL + '/createListing', config)
             .then(function (response) {
