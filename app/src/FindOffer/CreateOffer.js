@@ -1,7 +1,10 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { makeStyles } from '@material-ui/core/styles';
-import { Dialog, DialogTitle, DialogContent, Paper, Grid, TextField, Button, Typography, FormControlLabel, FormGroup, FormHelperText, Checkbox, Link } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, Paper, Grid, TextField, Button, Typography, FormControlLabel, FormHelperText, Checkbox, Link } from '@material-ui/core';
 import axios from 'axios';
+import { useInput } from '../hooks/input-hook';
+
+const BASE_URL = 'http://localhost:8080'
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -20,9 +23,48 @@ const useStyles = makeStyles(theme => ({
 function CreateOffer(props) {
     const classes = useStyles();
 
+    const [lgbtq, setLgbtq] = useState(false);
+    const [accessibility, setAccessibility] = useState(false);
+
+    const { value:listingName, bind:bindListingName, reset:resetListingName } = useInput('');
+    const { value:addressOne, bind:bindAddressOne, reset:resetAddressOne } = useInput('');
+    const { value:addressTwo, bind:bindAddressTwo, reset:resetAddressTwo } = useInput('');
+    const { value:neighborhood, bind:bindNeighborhood, reset:resetNeighborhood } = useInput('');
+    const { value:city, bind:bindCity, reset:resetCity } = useInput('');
+    const { value:state, bind:bindState, reset:resetState } = useInput('');
+    const { value:zipcode, bind:bindZipcode, reset:resetZipcode } = useInput('');
+    const { value:accessibilityInfo, bind:bindAccesibilityInfo, reset: AccesibilityInfo} = useInput('');
+    const { value:livingSituation, bind:bindLivingSituation, reset: resetLivingSituation} = useInput('');
+    const { value:description, bind:bindDescription, reset: resetDescription} = useInput('');
+    const { value:housingRules, bind:bindHousingRules, reset: resetHousingRules} = useInput('');
+
+    // TODO: snackbar and check
+    
     const handleSubmit = async(e) => {
+        const accessToken = this.props.authState.accessToken;
+        var config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            params: {
+                listingName: listingName,
+                addressLineOne: addressOne,
+                addressLineTwo: addressTwo,
+                city: city,
+                state: state,
+                zipCode: zipcode,
+                neighborhood: neighborhood,
+                housingRules: housingRules,
+                lgbtqpFriendly: lgbtq,
+                accessibilityFriendly: accessibility,
+                accesibilityInfo: accessibilityInfo,
+                livingSituation: livingSituation,
+            }
+        };
+        var self = this;
         e.preventDefault()
-        
+        axios.post(BASE_URL + '/createListing', config);
     };
 
     return (
@@ -33,7 +75,7 @@ function CreateOffer(props) {
                 aria-labelledby="alert-dialog-title" 
                 style={{ minWidth:450 }}
             >
-            <Paper className={classes.root} >
+            <Paper className={classes.root}>
             <Link onClick={() => props.handleClose()} style={{float:"right"}} className={classes.closeDialog}>
                 close
             </Link>
@@ -47,6 +89,7 @@ function CreateOffer(props) {
                     <Grid container spacing={2} style={{ paddingBottom:20 }}>
                         <Grid item xs={12}>
                             <TextField
+                                {...bindListingName}
                                 name="listingName"
                                 variant="outlined"
                                 required
@@ -59,6 +102,7 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                {...bindAddressOne}
                                 autoComplete="street-address"
                                 name="addyOne"
                                 variant="outlined"
@@ -70,9 +114,9 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                {...bindAddressTwo}
                                 variant="outlined"
                                 name="addyTwo"
-                                required
                                 fullWidth
                                 id="addyTwo"
                                 label="Address 2"
@@ -80,6 +124,7 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                {...bindNeighborhood}
                                 variant="outlined"
                                 name="neighborhood"
                                 fullWidth
@@ -89,6 +134,7 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
+                                {...bindCity}
                                 variant="outlined"
                                 name="city"
                                 required
@@ -100,6 +146,7 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12} sm={3}>
                             <TextField
+                                {...bindState}
                                 variant="outlined"
                                 name="password"
                                 required
@@ -110,6 +157,7 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12} sm={3}>
                             <TextField
+                                {...bindZipcode}
                                 variant="outlined"
                                 name="zipcode"
                                 required
@@ -121,17 +169,18 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12}>
                             <FormControlLabel
-                                control={<Checkbox value="lgbtqFriendly" color="primary" />}
+                                control={<Checkbox checked={lgbtq} onChange={()=>setLgbtq(!lgbtq)} value="lgbtqFriendly" color="primary" />}
                                 label="LGBTQ Friendly 🏳️‍🌈"
                             />
                             <FormControlLabel
-                                control={<Checkbox value="accesibilityFriendly" color="primary" />}
+                                control={<Checkbox checked={accessibility} onChange={()=>setAccessibility(!accessibility)} value="accesibilityFriendly" color="primary" />}
                                 label="Accesibility Friendly ♿"
                             />
                             <FormHelperText>Find out if your space is <Link target="_blank" href="https://www.tripadvisor.com/ShowTopic-g1-i12336-k4150249-Accessibility_Checklist_for_Hotel_Accommodation-Traveling_With_Disabilities.html"> accessibility friendly here.</Link></FormHelperText>
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                {...bindAccesibilityInfo}
                                 variant="outlined"
                                 name="accessibilityInfo"
                                 required
@@ -145,6 +194,7 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                {...bindLivingSituation}
                                 variant="outlined"
                                 name="livingSituation"
                                 required
@@ -156,6 +206,7 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                {...bindDescription}
                                 variant="outlined"
                                 name="description"
                                 fullWidth
@@ -167,6 +218,7 @@ function CreateOffer(props) {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                {...bindHousingRules}
                                 variant="outlined"
                                 name="housingRules"
                                 fullWidth

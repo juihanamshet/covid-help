@@ -14,9 +14,6 @@ const OwnerDialog = React.lazy(() => import('./OwnerDialog.js'));
 const CreateOffer = React.lazy(() => import('./CreateOffer.js'));
 
 
-
-
-
 const BASE_URL = 'http://localhost:8080'
 
 const styles = theme => ({
@@ -129,8 +126,7 @@ class FindOffer extends Component {
             });
     }
 
-    getCurrentListing = async(listingId) => e => {
-        e.preventDefault();
+    getCurrentListing = async(listingId) => {
         const accessToken = this.props.authState.accessToken;
         var config = {
             params: {
