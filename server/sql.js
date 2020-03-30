@@ -239,12 +239,12 @@ function createListing(listingInfo, callback) {
             (userID, addressLineOne, addressLineTwo, \
             city, state, zipCode, neighborhood, housingRules, \
             lgbtqpFriendly, accessibilityFriendly, \
-            accessbilityInfo, listingName, livingSituation)\
+            accessbilityInfo, listingName, livingSituation, housingInfo)\
         VALUES(\
             @UserID, @AddressLineOne, @AddressLineTwo, @City, \
             @State, @ZipCode, @Neighborhood, @HousingRules, \
             @LGBTQPFRD, @ACCESSFRD, @AccessInfo, @ListingName, \
-            @LivingSituation);"
+            @LivingSituation, @HousingInfo);"
 
     request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
@@ -267,6 +267,7 @@ function createListing(listingInfo, callback) {
     request.addParameter('AccessInfo', TYPES.VarChar, listingInfo.accessibilityInfo);
     request.addParameter('ListingName', TYPES.VarChar, listingInfo.listingName);
     request.addParameter('LivingSituation', TYPES.VarChar, listingInfo.livingSituation);
+    request.addParameter('HousingInfo', TYPES.VarChar, listingInfo.housingInfo);
 
 
     request.on('requestCompleted', function () {
