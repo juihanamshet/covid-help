@@ -17,7 +17,7 @@ const MEDIA_ICONS = {Email: <MailOutline></MailOutline>, Facebook: <Facebook></F
 
 const useStyles = makeStyles(theme => ({
     root: {
-        maxWidth: 500
+        maxWidth: 475
     },
     titleDiv: {
         paddingTop: 10,
@@ -72,7 +72,7 @@ function ListingDetails(props) {
 
     return (
         <div className={classes.root}>
-            <Map center={props.zipcode} zoom={13} size="500x300" apiKey="AIzaSyAV09jD3Q3W28UXfaBQAfdP8n9rn8A0kHY">
+            <Map center={props.zipcode} zoom={13} size="475x300" apiKey="AIzaSyAV09jD3Q3W28UXfaBQAfdP8n9rn8A0kHY">
                 <Marker location={props.zipcode}></Marker>
             </Map>
             <div className={classes.titleDiv} style={{color:'grey'}}>
@@ -143,7 +143,7 @@ function ListingDetails(props) {
                 <Card style={{paddingTop: 10}} className={classes.fieldsDiv}>
                     <Grid container spacing={1}>
                         <Grid item xs={2} style={{display: 'flex', alignItems:'center'}}>
-                            <Avatar src={props.avatarPhoto} src={jordad}></Avatar>
+                            <Avatar style={{ width: 60, height: 60}} src={props.avatarPhoto} src={jordad}></Avatar>
                         </Grid>
                         <Grid item xs={10}>
                         <div>

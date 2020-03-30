@@ -1,14 +1,21 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import axios from 'axios';
-import Listing from './Listing.js';
-import ListingDetails from './ListingDetails.js';
-import OwnerDialog from './OwnerDialog.js';
 
 import { withStyles } from '@material-ui/styles';
 import Button from 'react-bootstrap/Button';
-import { Grid, Typography, SwipeableDrawer } from '@material-ui/core'
+import { Grid, Typography, SwipeableDrawer, CircularProgress } from '@material-ui/core'
 import NavBar from '../NavBar.js'
 import { withOktaAuth } from '@okta/okta-react';
+
+// lazy loading
+const Listing = React.lazy(() => import('./Listing.js'));
+const ListingDetails = React.lazy(() => import('./ListingDetails.js'));
+const OwnerDialog = React.lazy(() => import('./OwnerDialog.js'));
+const CreateOffer = React.lazy(() => import('./CreateOffer.js'));
+
+
+
+
 
 const BASE_URL = 'http://localhost:8080'
 
@@ -36,21 +43,31 @@ class FindOffer extends Component {
         this.state = {
             find: true,
             drawerOpen: false,
+            ownerDialogOpen: false,
+            createOfferOpen: false,
             findListings: [],
             offerListings: [],
-            // we want curr listing to hold the various components of getListing
+            currListings: [],
             currListing: {},
             currListingID: -1,
-            ownerDialogOpen: false,
         }
     };
 
+    // opening the various create offers
     openOwnerDialog = () => {
         this.setState({ ownerDialogOpen: true });
     }
 
     closeOwnerDialog = () => {
         this.setState({ ownerDialogOpen: false });
+    }
+
+    openCreateOffer = () => {
+        this.setState({ createOfferOpen: true });
+    }
+
+    closeCreateOffer = () => {
+        this.setState({ createOfferOpen: false });
     }
 
     async componentDidMount() {
@@ -112,7 +129,8 @@ class FindOffer extends Component {
             });
     }
 
-    getCurrentListing = async(listingId) => {
+    getCurrentListing = async(listingId) => e => {
+        e.preventDefault();
         const accessToken = this.props.authState.accessToken;
         var config = {
             params: {
@@ -142,7 +160,6 @@ class FindOffer extends Component {
     };
 
     render() {
-        console.log("render");
         // for styling
         const { classes } = this.props;
 
@@ -156,15 +173,11 @@ class FindOffer extends Component {
             currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
         });
 
-        if (currListings.length < 1) {
-            currListings.push(<Typography key='default' variant="subtitle1" color="error"> No Current Listings</Typography>)
-        }
-
         /* LOGIC FOR ACTIVE PAGE */
 
         // styling and components for offer page
         var offerIsActive = this.state.find ? '' : 'linkIsActive';
-        var listingButton = this.state.find ? '' : (<div className={classes.sidebar}><Button id='addListing' variant="link">+ Add Listing&nbsp;&nbsp;</Button></div>);
+        var listingButton = this.state.find ? '' : <div className={classes.sidebar}><Button id='addListing' variant="link" onClick={this.openCreateOffer}>+ Add Listing&nbsp;&nbsp;</Button></div>;
 
         // styling for find page
         var findIsActive = this.state.find ? 'linkIsActive' : '';
@@ -215,7 +228,9 @@ class FindOffer extends Component {
                     </Grid>
                     <Grid item xs={12}>
                         <div className={classes.sidebar}>
-                            {currListings}
+                            <Suspense fallback={<CircularProgress />}>
+                                {currListings}
+                            </Suspense>
                         </div>
                     </Grid>
                     <Grid item lg={12}>
@@ -227,44 +242,55 @@ class FindOffer extends Component {
                     open={this.state.drawerOpen}
                     onClose={this.toggleDrawer(false)}
                     onOpen={this.toggleDrawer(true)}>
-                    <ListingDetails
-                        // info for the housing
-                        key={this.state.currListing.listingID + Math.random()}
-                        zipcode={this.state.currListing.zipCode}
-                        listingTitle={this.state.currListing.listingName}
-                        location={this.state.currListing.neighborhood + ", " + this.state.currListing.city + ", " + this.state.currListing.state + " (" + this.state.currListing.zipCode + ")"}
-                        lgbtqpFriendly={this.state.currListing.lgbtqpFriendly}
-                        accessibilityFriendly={this.state.currListing.accessibilityFriendly}
-                        livingSitch={this.state.currListing.livingSituation}
-                        houseRules={this.state.currListing.housingRules}
-                        access={this.state.currListing.accessbilityInfo}
+                    <Suspense fallback={<CircularProgress />}>
+                        <ListingDetails
+                            // info for the housing
+                            key={this.state.currListing.listingID + Math.random()}
+                            zipcode={this.state.currListing.zipCode}
+                            listingTitle={this.state.currListing.listingName}
+                            location={this.state.currListing.neighborhood + ", " + this.state.currListing.city + ", " + this.state.currListing.state + " (" + this.state.currListing.zipCode + ")"}
+                            lgbtqpFriendly={this.state.currListing.lgbtqpFriendly}
+                            accessibilityFriendly={this.state.currListing.accessibilityFriendly}
+                            livingSitch={this.state.currListing.livingSituation}
+                            houseRules={this.state.currListing.housingRules}
+                            access={this.state.currListing.accessbilityInfo}
 
-                        // info for the owner
-                        ownerName={this.state.currListing.firstName + " " + this.state.currListing.lastName}
-                        org={this.state.currListing.org}
-                        gradYear={this.state.currListing.grad_year}
-                        preferredContactMethod={this.state.currListing.preferredContactMethod}
-                        
-                        // contact info
-                        contacts={{'Email': this.state.currListing.prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
+                            // info for the owner
+                            ownerName={this.state.currListing.firstName + " " + this.state.currListing.lastName}
+                            org={this.state.currListing.org}
+                            gradYear={this.state.currListing.grad_year}
+                            preferredContactMethod={this.state.currListing.preferredContactMethod}
+                            
+                            // contact info
+                            contacts={{'Email': this.state.currListing.prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
 
-                        //learn more about owner button
-                        ownerDialogOnClick={this.openOwnerDialog}
-                    >
-                    </ListingDetails>
+                            //learn more about owner button
+                            ownerDialogOnClick={this.openOwnerDialog}
+                        >
+                        </ListingDetails>
+                    </Suspense>
                 </SwipeableDrawer>
-                <OwnerDialog
-                    open={this.state.ownerDialogOpen}
-                    handleClose={this.closeOwnerDialog}
-                    name={this.state.currListing.firstName + " " + this.state.currListing.lastName}
-                    gradYear={this.state.currListing.grad_year}
-                    gender={this.state.currListing.gender}
-                    //pronouns={this.state.currListing.pronouns}
-                    ethnicity={this.state.currListing.ethnicity}
-                    //bio={this.state.currListing.bio}
-                    socialMedia={{'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
-                >
-                </OwnerDialog>
+                <Suspense fallback={<CircularProgress />}>
+                    <OwnerDialog
+                        open={this.state.ownerDialogOpen}
+                        handleClose={this.closeOwnerDialog}
+                        name={this.state.currListing.firstName + " " + this.state.currListing.lastName}
+                        gradYear={this.state.currListing.grad_year}
+                        gender={this.state.currListing.gender}
+                        //pronouns={this.state.currListing.pronouns}
+                        ethnicity={this.state.currListing.ethnicity}
+                        //bio={this.state.currListing.bio}
+                        socialMedia={{'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
+                    >
+                    </OwnerDialog>
+                </Suspense>
+                <Suspense fallback={<CircularProgress />}>
+                    <CreateOffer
+                        open={this.state.createOfferOpen}
+                        handleClose={this.closeCreateOffer}
+                    >
+                    </CreateOffer>
+                </Suspense>
             </div>
         )
     }

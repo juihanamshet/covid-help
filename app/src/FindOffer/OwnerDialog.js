@@ -57,7 +57,7 @@ function OwnerDialog(props) {
                 onClose={() => props.handleClose()}
                 aria-labelledby="alert-dialog-title"
             >
-                <DialogTitle id="alert-dialog-title">
+                <DialogTitle disableTypography={true} id="alert-dialog-title">
                     <Grid container direction="column" alignItems="center">
                         <Grid item sm={12} style={{ textAlign: 'center' }}>
                             <Avatar className={classes.pp} sizes="large" src={props.avatarPhoto}></Avatar>
@@ -69,7 +69,6 @@ function OwnerDialog(props) {
                 </DialogTitle>
 
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
                             <List>
                                 <ListItem className={classes.listItem}>
                                     <Typography color="primary" variant="h5">
@@ -114,7 +113,6 @@ function OwnerDialog(props) {
                                     {buttonList}
                                 </ListItem>
                             </List>
-                    </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => props.handleClose()} color="primary" autoFocus>
