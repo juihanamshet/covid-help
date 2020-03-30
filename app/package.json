@@ -15,6 +15,7 @@
     "bootstrap": "^4.4.1",
     "express": "^4.17.1",
     "formik": "^2.1.4",
+    "material-ui-dropzone": "^2.4.9",
     "pigeon-maps": "^0.15.0",
     "pigeon-marker": "^0.3.4",
     "react": "^16.13.0",
