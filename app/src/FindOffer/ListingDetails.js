@@ -10,7 +10,7 @@ import {  StaticGoogleMap as Map, Marker } from 'react-static-google-map';
 //temp import
 import jordad from '../img/jordad.png';
 
-const API_KEY = process.env.GOOGLE_MAPS_API;
+const GOOGLE_MAPS = process.env.REACT_APP_GOOGLE_MAPS_API;
 
 const MAPTILER_ACCESS_TOKEN = 'prxcBM7GNRKVr9ucT9no';
 const MAP_ID = '9ddbdaa1-4ce7-48c2-a288-d73cddca9aac';
@@ -74,7 +74,7 @@ function ListingDetails(props) {
 
     return (
         <div className={classes.root}>
-            <Map center={props.zipcode} zoom={13} size="475x300" apiKey={API_KEY}>
+            <Map center={props.zipcode} zoom={13} size="475x300" apiKey={GOOGLE_MAPS}>
                 <Marker location={props.zipcode}></Marker>
             </Map>
             <div className={classes.titleDiv} style={{color:'grey'}}>
