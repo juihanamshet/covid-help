@@ -51,7 +51,6 @@ function getUserID(email, callback) {
     });
 
     request.on('requestCompleted', function () {
-        console.log("/getUserID SQL DB Returned Successfully");
         connection.close();
         callback(result, code)
     });
@@ -105,7 +104,6 @@ function getSchoolListings(email, school, callback) {
     });
 
     request.on('requestCompleted', function () {
-        console.log("/getListings SQL DB Returned Successfully");
         connection.close();
         callback(result, code)
     });
@@ -158,7 +156,6 @@ function getUsersListings(email, school, callback) {
     });
 
     request.on('requestCompleted', function () {
-        console.log("/getUsersListings SQL DB Returned Successfully");
         connection.close();
         callback(result, code)
     });
@@ -212,7 +209,6 @@ function getListing(email, listing, school, callback) {
     });
 
     request.on('requestCompleted', function () {
-        console.log("/getListing SQL Returned");
         connection.close();
         callback(result, code)
     });
@@ -271,7 +267,6 @@ function createListing(listingInfo, callback) {
 
 
     request.on('requestCompleted', function () {
-        console.log("/createListing Listing Inserted into DB")
         connection.close();
         callback("Success", code)
     });
@@ -347,7 +342,6 @@ function createUser(userInfo, callback) {
     request.addParameter('GradYear', TYPES.VarChar, userInfo.grad_year);
 
     request.on('requestCompleted', function () {
-        console.log("/createUser User Inserted into DB");
         connection.close();
         callback("Success", code)
     });

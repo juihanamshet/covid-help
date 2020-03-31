@@ -51,36 +51,35 @@ function CreateOffer(props) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const accessToken = props.authState.accessToken;
+        var data = {
+            listingInfo: {
+                listingName: listingName,
+                addressLineOne: addressOne,
+                addressLineTwo: addressTwo,
+                city: city,
+                state: state,
+                zipCode: zipcode,
+                neighborhood: neighborhood,
+                housingRules: housingRules,
+                lgbtqpFriendly: lgbtq,
+                accessibilityFriendly: accessibility,
+                accessibilityInfo: accessibilityInfo,
+                livingSituation: livingSituation,
+                housingInfo: description,
+                // images: images
+            }
+        };
         var config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            params: {
-                listingInfo: {
-                    listingName: listingName,
-                    addressLineOne: addressOne,
-                    addressLineTwo: addressTwo,
-                    city: city,
-                    state: state,
-                    zipCode: zipcode,
-                    neighborhood: neighborhood,
-                    housingRules: housingRules,
-                    lgbtqpFriendly: lgbtq,
-                    accessibilityFriendly: accessibility,
-                    accesibilityInfo: accessibilityInfo,
-                    livingSituation: livingSituation,
-                    housingInfo: description,
-                    // images: images
-                }
-            }
         };
-        console.log(config.params);
         var self = this;
-        axios.post(BASE_URL + '/createListing', config)
+        axios.post(BASE_URL + '/createListing', data, config)
             .then(function (response) {
                 console.log(response);
-             })
+            })
             .catch(function (error) {
                 console.log(error);
             });

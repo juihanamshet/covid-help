@@ -82,6 +82,7 @@ app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
 
     sqltools.getUsersListings(userEmail, userSchool, (sqlResult, status) => {
         if (status === 200) {
+            console.log("/getUsersListings SQL DB Returned Successfully");
             res.json(sqlResult);
         } else {
             res.statusCode = 500;
@@ -98,6 +99,7 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
 
     sqltools.getListing(userEmail, listingID, userSchool, (sqlResult, status) => {
         if (status === 200) {
+            console.log("/getListing SQL Returned Successfully");
             res.json(sqlResult);
         } else {
             res.statusCode = 500;
@@ -113,6 +115,7 @@ app.post("/createListing", authenticationRequired, function (req, res, next) {
 
     sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
         if (status === 200) {
+            console.log("/createListing Listing Inserted into DB")
             res.json(status);
         } else {
             res.statusCode = 500;
@@ -140,6 +143,7 @@ app.post("/createUser", authenticationRequired, async function (req, res, next) 
 
     sqltools.createUser(userInfo, (sqlResult, status) => {
         if (status === 200) {
+            console.log("/createUser User Inserted into DB");
             res.json(status);
         } else {
             res.statusCode = 500;
