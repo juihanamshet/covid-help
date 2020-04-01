@@ -172,6 +172,50 @@ function getUsersListings(email, school, callback) {
     });
 }
 
+function getUser (email, callback){
+    connection = new Connection (config);
+    var result = [];
+    var code = 200;
+
+    sqlQuery = 
+        "SELECT * \
+        FROM userTable \
+        WHERE userTable.orgEmail = @email"
+    
+    request = new Request(sqlQuery, function (err, rowCount){
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+    });
+
+    request.addParameter('email', Types.VarChar, email);
+
+    request.on('row', function (columns) {
+        listing = {}
+        for (var name in columns) {
+            listing[name] = columns[name].value
+        }
+        result.push(listing)
+    });
+
+    request.on('requestCompleted', function () {
+        connection.close();
+        callback(result, code)
+    });
+
+    request.on('error', (err) => {
+        console.error(err);
+        result = "Internal Server Error"
+        code = 500;
+    })
+
+    connection.on('connect', function (err) {
+        console.log("/getListing SQL DB Connected Successfully");
+        connection.execSql(request);
+    });
+}
 
 function getListing(email, listing, school, callback) {
     connection = new Connection(config);
@@ -359,4 +403,4 @@ function createUser(userInfo, callback) {
 }
 
 
-module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, createUser }
+module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, createUser, getUser }

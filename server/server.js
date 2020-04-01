@@ -75,6 +75,22 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
     })
 })
 
+app.get("getUser", authenticationRequired, function (req, res, next){
+    console.log('/getUsers called. HOPE THIS WORKSSSS')
+    const userEmail = req.jwt.claims.sub;
+
+    sqltools.getUser(userEmail, (sqlResult, status) => {
+        if (status === 200){
+            console.log("/getUser was succcessfully called")
+            res.json(sqlResult);
+        } else {
+            res.statusCode = 500;
+            res.send("Internal Server Error");
+        }
+    })
+})
+
+
 app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
