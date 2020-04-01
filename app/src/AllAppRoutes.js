@@ -1,10 +1,11 @@
+import React, { useState } from 'react';
 import { Security, LoginCallback, SecureRoute, useOktaAuth } from '@okta/okta-react';
 import { Toolbar, AppBar, Typography, Button } from '@material-ui/core';
 import AboutUs from './About/AboutUs.js';
 import FindOffer from './FindOffer/FindOffer.js';
 import Logout from './Logout'
 import Auth from './Auth.js';
-import React, { useState } from 'react';
+import User from './User.js'
 import { useHistory, Link, BrowserRouter as Router, Route } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -51,6 +52,7 @@ const AllAppRoutes = () => {
             <SecureRoute path='/offers' exact={true} component={FindOffer} />
             <Route path='/login' exact={true} component={Auth} />
             <SecureRoute path='/logout' exact={true} component={Logout} />
+            <SecureRoute path='/user' exact={true} component={User}/>
             <Route path='/implicit/callback' component={LoginCallback} />
         </Security >
     )
