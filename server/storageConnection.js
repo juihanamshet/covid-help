@@ -38,7 +38,7 @@ function addProfilePhoto(userID, filePath){
 
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobClient = containerClient.getBlobClient(blobName);
-    const blockBlobClient = blobClient.getBlockBlobClient();
+    // const blockBlobClient = blobClient.getBlockBlobClient();
     
     const aborter = AbortController.timeout(30 * ONE_MINUTE);
 
