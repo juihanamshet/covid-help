@@ -78,10 +78,13 @@ function CreateOffer(props) {
         var self = this;
         axios.post(BASE_URL + '/createListing', data, config)
             .then(function (response) {
-                console.log(response);
+                props.openSnackBar({severity: 'success', message: 'Succesfully created new listing!'});
+                props.handleClose();
+                props.refreshOffers();
             })
             .catch(function (error) {
                 console.log(error);
+                props.openSnackBar({severity: 'error', message: 'Unable to create new listing, please try again.'});                
             });
     };
 

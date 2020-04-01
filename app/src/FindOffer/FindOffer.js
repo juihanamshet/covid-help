@@ -3,7 +3,8 @@ import axios from 'axios';
 
 import { withStyles } from '@material-ui/styles';
 import Button from 'react-bootstrap/Button';
-import { Grid, Typography, SwipeableDrawer, CircularProgress } from '@material-ui/core'
+import { Grid, Typography, SwipeableDrawer, CircularProgress, Snackbar } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import NavBar from '../NavBar.js'
 import { withOktaAuth } from '@okta/okta-react';
 
@@ -32,7 +33,11 @@ const styles = theme => ({
     addListing: {
         fontSize: "14!important"
     }
-})
+});
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class FindOffer extends Component {
     constructor(props) {
@@ -47,6 +52,9 @@ class FindOffer extends Component {
             currListings: [],
             currListing: {},
             currListingID: -1,
+            // SNACKBAR severity: error, warning, success
+            snackBarOpen: false,
+            snackBar: {severity:'success', message:'action was a success!'},
         }
     };
 
@@ -65,6 +73,15 @@ class FindOffer extends Component {
 
     closeCreateOffer = () => {
         this.setState({ createOfferOpen: false });
+    }
+
+    //given an object {severity: '', message: ''}
+    openSnackBar = (newSnackBar) => {
+        this.setState({ snackBarOpen: true, snackBar: newSnackBar});
+    }
+
+    closeSnackBar = () => {
+        this.setState({ snackBarOpen: false });
     }
 
     async componentDidMount() {
@@ -140,6 +157,7 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListing', config)
             .then(function (response) {
+                console.log(response.data[0]);
                 self.setState({ currListing : response.data[0],
                                 drawerOpen: true });
             })
@@ -168,6 +186,10 @@ class FindOffer extends Component {
             var location = listing.city + ", " + listing.state + " " + listing.zipCode;
             currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
         });
+
+        if(currListings < 1){
+            currListings.push(<Typography color="error">No Current Listings!</Typography>);
+        };
 
         /* LOGIC FOR ACTIVE PAGE */
 
@@ -284,9 +306,16 @@ class FindOffer extends Component {
                     <CreateOffer
                         open={this.state.createOfferOpen}
                         handleClose={this.closeCreateOffer}
+                        openSnackBar={this.openSnackBar}
+                        refreshOffers={this.getUserListings}
                     >
                     </CreateOffer>
                 </Suspense>
+                <Snackbar open={this.state.snackBarOpen} autoHideDuration={6000} onClose={() => this.closeSnackBar()}>
+                    <Alert onClose={() => this.closeSnackBar()} severity={this.state.snackBar.severity}>
+                        {this.state.snackBar.message}
+                    </Alert>
+                </Snackbar>
             </div>
         )
     }
