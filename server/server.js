@@ -75,7 +75,7 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
     })
 })
 
-app.get("getUser", authenticationRequired, function (req, res, next){
+app.get("/getUser", authenticationRequired, function (req, res, next){
     console.log('/getUsers called. HOPE THIS WORKSSSS')
     const userEmail = req.jwt.claims.sub;
 
@@ -90,6 +90,13 @@ app.get("getUser", authenticationRequired, function (req, res, next){
     })
 })
 
+
+app.get("/updateUser", authenticationRequired, function (req, res, next){
+    const userInfo = req.body.userInfo;
+
+
+
+})
 
 app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
