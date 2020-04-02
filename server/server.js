@@ -91,6 +91,13 @@ app.get("/getUser", authenticationRequired, function (req, res, next){
 })
 
 
+app.get("/updateUser", authenticationRequired, function (req, res, next){
+    const userInfo = req.body.userInfo;
+
+
+
+})
+
 app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);

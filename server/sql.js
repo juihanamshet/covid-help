@@ -190,7 +190,7 @@ function getUser (email, callback){
         }
     });
 
-    request.addParameter('email', Types.VarChar, email);
+    request.addParameter('email', TYPES.VarChar, email);
 
     request.on('row', function (columns) {
         listing = {}
@@ -349,6 +349,19 @@ function createListingHandler(email, listingInfo, callback) {
     })
 }
 
+function updateUser(userInfo, callback){
+    connection = new Connection (config);
+    code = 200;
+
+    sqlQuery = 
+        "UPDATE userTable \
+        SET firstName = @FirstName, lastName = @LastName,\
+        orgEmail = @OrgEmail, prefEmail = @PrefEmail, phoneNumber = @PhoneNumber,\
+        Facebook = @FacebookLink, Instagram = @InstagramLink, preferredContactMethod = @PrefContact, \
+        org = @Org, gender = @Gender, ethnicity = @Ethnicity, grad_year = @GradYear, \
+        preferred_pronouns = @PrefPronoun, bio = @Bio,\
+        WHERE userID = @UserID"
+}
 
 function createUser(userInfo, callback) {
     connection = new Connection(config);
