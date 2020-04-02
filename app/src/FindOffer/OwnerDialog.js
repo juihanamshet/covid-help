@@ -43,11 +43,15 @@ function OwnerDialog(props) {
             keyCount++;
         }
     });
-    var pronouns = (props.pronouns === null || props.pronouns === undefined) ? 'N/A' : props.pronouns;
-    var gender = (props.gender === null || props.gender === undefined) ? 'N/A' : props.gender;
+    if(keyCount == 0){
+        buttonList.push(<Typography key="error">No available social media</Typography>)
+    }
 
-    var identity = pronouns + " | " + gender;
-    var ethnicity = (props.gender === null || props.gender === undefined) ? "N/A" : props.ethnicity;
+    var pronouns = (props.pronouns === null || props.pronouns === undefined) ? 'Not Available' : props.pronouns;
+    var gender = (props.gender === null || props.gender === undefined) ? 'Not Available' : props.gender;
+
+    var identity = gender + " // " + pronouns;
+    var ethnicity = (props.gender === null || props.gender === undefined) ? "Not Available" : props.ethnicity;
     var bio = (props.bio === null || props.bio === undefined) ? "User doesn't have a bio!" : props.bio;
 
     return (
@@ -72,7 +76,7 @@ function OwnerDialog(props) {
                             <List>
                                 <ListItem className={classes.listItem}>
                                     <Typography color="primary" variant="h5">
-                                        Grad Year/Position
+                                        Grad Year or Position
                                     </Typography>
                                     <Typography variant="body1" className={classes.body}>
                                         {props.gradYear}

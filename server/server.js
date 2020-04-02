@@ -75,7 +75,7 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
     })
 })
 
-app.get("getUser", authenticationRequired, function (req, res, next){
+app.get("/getUser", authenticationRequired, function (req, res, next){
     console.log('/getUsers called. HOPE THIS WORKSSSS')
     const userEmail = req.jwt.claims.sub;
 

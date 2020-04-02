@@ -85,7 +85,6 @@ class FindOffer extends Component {
     }
 
     async componentDidMount() {
-        console.log("compomentMounted");
         const accessToken = this.props.authState.accessToken;
         var config = {
             headers: {
@@ -188,7 +187,7 @@ class FindOffer extends Component {
         });
 
         if(currListings < 1){
-            currListings.push(<Typography color="error">No Current Listings!</Typography>);
+            currListings.push(<Typography key="error" color="error">No Current Listings!</Typography>);
         };
 
         /* LOGIC FOR ACTIVE PAGE */
