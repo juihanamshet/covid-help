@@ -66,7 +66,7 @@ function ListingDetails(props) {
         // if the social media url isn't null or undefined
         if(contact[1]){
             // key creation
-            buttonList.push(<IconButton key={keyCount} color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
+            buttonList.push(<IconButton key={keyCount} target="_blank" href={contact[1]} color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
             keyCount++;
         }
     });
@@ -86,6 +86,7 @@ function ListingDetails(props) {
                 </Typography>
             </div>
             <div className={classes.fieldsDiv}>
+            <Card style={{paddingTop: 10}} className={classes.fieldsDiv}>
                 <div className={classes.fieldDiv}>
                     <Typography variant="inherit">
                     <span role="img" aria-label="pin emoji">📍</span> Location:&nbsp;
@@ -135,6 +136,15 @@ function ListingDetails(props) {
                         {props.access}
                     </Typography>
                 </div>
+                <div className={classes.fieldDiv}>
+                    <Typography variant='inherit'>
+                    <span role="img" aria-label="bed">🛌</span> Description:&nbsp;
+                    </Typography>
+                    <Typography className={classes.fieldInfo} variant="inherit">
+                        {props.housingInfo}
+                    </Typography>
+                </div>
+                </Card>
             </div>
             <div className={classes.titleDiv}>
                 <Typography align="center" variant="h5">

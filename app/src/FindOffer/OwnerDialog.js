@@ -39,7 +39,7 @@ function OwnerDialog(props) {
     var contacts = Object.entries(props.socialMedia);
     contacts.forEach(function (contact) {
         if(contact[1]){
-            buttonList.push(<IconButton key={keyCount} color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
+            buttonList.push(<IconButton key={keyCount} target="_blank" href={contact[1]} color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
             keyCount++;
         }
     });

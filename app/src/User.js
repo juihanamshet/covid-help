@@ -207,9 +207,9 @@ function User(props) {
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
                                         <Link className={socialDisabled ? classes.edit : classes.save} onClick={() => setSocialDisabled(!socialDisabled)}><Typography variant='inherit'>{socialDisabled ? 'Edit' : 'Save'}</Typography></Link>
                                         <Typography color="primary" variant="h5">Social Media</Typography>
-                                        <InlineEdit disabled={socialDisabled} label="Facebook:" defaultInput={user.Facebook} onChange={setFb}></InlineEdit>
-                                        <InlineEdit disabled={socialDisabled} label="Instagram:" defaultInput={user.Instagram} onChange={setIg}></InlineEdit>
-                                        <InlineEdit disabled={socialDisabled} label="LinkedIn:" defaultInput={user.LinkedIn} onChange={setLi}></InlineEdit>
+                                        <InlineEdit disabled={socialDisabled} label="Facebook URL:" defaultInput={user.Facebook} onChange={setFb}></InlineEdit>
+                                        <InlineEdit disabled={socialDisabled} label="Instagram URL:" defaultInput={user.Instagram} onChange={setIg}></InlineEdit>
+                                        <InlineEdit disabled={socialDisabled} label="LinkedIn URL:" defaultInput={user.LinkedIn} onChange={setLi}></InlineEdit>
                                     </ListItem>
                                 </List>
                             </Grid>

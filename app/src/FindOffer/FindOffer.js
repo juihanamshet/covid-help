@@ -84,7 +84,7 @@ class FindOffer extends Component {
         this.setState({ snackBarOpen: false });
     }
 
-    async componentDidMount() {
+    componentDidMount() {
         const accessToken = this.props.authState.accessToken;
         var config = {
             headers: {
@@ -156,7 +156,6 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListing', config)
             .then(function (response) {
-                console.log(response.data[0]);
                 self.setState({ currListing : response.data[0],
                                 drawerOpen: true });
             })
@@ -198,6 +197,8 @@ class FindOffer extends Component {
 
         // styling for find page
         var findIsActive = this.state.find ? 'linkIsActive' : '';
+
+        var prefEmail = this.state.currListing.prefEmail ? this.state.currListing.prefEmail : this.state.currListing.orgEmail;
 
         return (
             <div className={classes.root}>
@@ -271,6 +272,7 @@ class FindOffer extends Component {
                             livingSitch={this.state.currListing.livingSituation}
                             houseRules={this.state.currListing.housingRules}
                             access={this.state.currListing.accessbilityInfo}
+                            housingInfo={this.state.currListing.housingInfo}
 
                             // info for the owner
                             ownerName={this.state.currListing.firstName + " " + this.state.currListing.lastName}
@@ -279,7 +281,7 @@ class FindOffer extends Component {
                             preferredContactMethod={this.state.currListing.preferredContactMethod}
                             
                             // contact info
-                            contacts={{'Email': this.state.currListing.prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
+                            contacts={{'Email': prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
 
                             //learn more about owner button
                             ownerDialogOnClick={this.openOwnerDialog}
@@ -294,9 +296,9 @@ class FindOffer extends Component {
                         name={this.state.currListing.firstName + " " + this.state.currListing.lastName}
                         gradYear={this.state.currListing.grad_year}
                         gender={this.state.currListing.gender}
-                        //pronouns={this.state.currListing.pronouns}
+                        pronouns={this.state.currListing.preferred_pronouns}
                         ethnicity={this.state.currListing.ethnicity}
-                        //bio={this.state.currListing.bio}
+                        bio={this.state.currListing.bio}
                         socialMedia={{'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
                     >
                     </OwnerDialog>
