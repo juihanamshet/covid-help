@@ -38,7 +38,7 @@ function OwnerDialog(props) {
     var keyCount = 0;
     var contacts = Object.entries(props.socialMedia);
     contacts.forEach(function (contact) {
-        if(contact[1] !== null){
+        if(contact[1]){
             buttonList.push(<IconButton key={keyCount} color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
             keyCount++;
         }
@@ -47,12 +47,11 @@ function OwnerDialog(props) {
         buttonList.push(<Typography key="error">No available social media</Typography>)
     }
 
-    var pronouns = (props.pronouns === null || props.pronouns === undefined) ? 'Not Available' : props.pronouns;
-    var gender = (props.gender === null || props.gender === undefined) ? 'Not Available' : props.gender;
-
+    var pronouns = props.pronouns ? props.pronouns : 'Not Available';
+    var gender = props.gender ? props.gender : 'Not Available';
     var identity = gender + " // " + pronouns;
-    var ethnicity = (props.gender === null || props.gender === undefined) ? "Not Available" : props.ethnicity;
-    var bio = (props.bio === null || props.bio === undefined) ? "User doesn't have a bio!" : props.bio;
+    var ethnicity = props.ethnicity ? props.ethnicity : "Not Available";
+    var bio = props.bio ? props.bio : "User doesn't have a bio!";
 
     return (
         <div>

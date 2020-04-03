@@ -181,7 +181,7 @@ class FindOffer extends Component {
         
         var currListings = [];
         listings.forEach(listing => {
-            var name = listing.listingName !== null ? listing.listingName : "Unnamed Listing"
+            var name = listing.listingName ? listing.listingName : "Unnamed Listing"
             var location = listing.city + ", " + listing.state + " " + listing.zipCode;
             currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
         });

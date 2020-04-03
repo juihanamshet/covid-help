@@ -64,7 +64,7 @@ function ListingDetails(props) {
     var contacts = Object.entries(props.contacts);
     contacts.forEach(function (contact) {
         // if the social media url isn't null or undefined
-        if(contact[1] !== null || contact[1] !== undefined){
+        if(contact[1]){
             // key creation
             buttonList.push(<IconButton key={keyCount} color="primary" display='inline'>{MEDIA_ICONS[contact[0]]}</IconButton>);
             keyCount++;

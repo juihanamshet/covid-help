@@ -103,7 +103,7 @@ function CreateOffer(props) {
                 <Paper className={classes.root}>
                     <Link onClick={() => props.handleClose()} style={{ float: "right" }} className={classes.closeDialog}>
                         close
-            </Link>
+                    </Link>
                     <DialogTitle disableTypography={true} id="alert-dialog-title">
                         <Typography variant="h5">
                             Add Listing
