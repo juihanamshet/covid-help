@@ -115,7 +115,6 @@ function User(props) {
     const [bioDisabled, setBioDisabled] = React.useState(true);
     const [socialDisabled, setSocialDisabled] = React.useState(true);
 
-    const
 
     const accessToken = props.authState.accessToken;
     React.useEffect(() => {
