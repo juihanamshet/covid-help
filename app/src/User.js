@@ -7,7 +7,8 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Prompt } from 'react-router'
-import _ from 'lodash';
+import _ from 'lodash'
+import sanitizeHtml from 'sanitize-html-react'
 
 
 const BASE_URL = 'http://localhost:8080'
@@ -61,58 +62,68 @@ function User(props) {
     // refs for the contact information
     const prefEmail = useRef('')
     const setPrefEmail = (newVal) => {
-        prefEmail.current = newVal
+        prefEmail.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log("newPrefEmail: ", prefEmail.current)
     }
     const phoneNumber = useRef('')
     const setPhoneNumber = (newVal) => {
-        phoneNumber.current = newVal
+        phoneNumber.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log("newPhoneNumber: ", phoneNumber.current)
     }
     const preferredContactMethod = useRef('')
     const setPreferredContactMethod = (newVal) => {
-        preferredContactMethod.current = newVal
+        preferredContactMethod.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log("newContactMethod: ", preferredContactMethod.current)
     }
 
     // refs for the basic information
     const gender = useRef('')
     const setGender = (newVal) => {
-        gender.current = newVal
+        gender.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log('newGender: ', gender.current)
     }
     const ethnicity = useRef('')
     const setEthnicity = (newVal) => {
-        ethnicity.current = newVal
+        ethnicity.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log('newEthnicity: ', ethnicity.current)
     }
     const pp = useRef('')
     const setPp = (newVal) => {
-        pp.current = newVal
+        pp.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log('newPp: ', pp.current)
     }
 
     // ref for bio
     const bio = useRef('')
     const setBio = (newVal) => {
-        bio.current = newVal
+        bio.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log('newBio: ', bio.current);
     }
 
     // refs for socials
     const fb = useRef('')
     const setFb = (newVal) => {
-        fb.current = newVal
+        fb.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log('newFB: ', fb.current)
     }
     const ig = useRef('')
     const setIg = (newVal) => {
-        ig.current = newVal
+        ig.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log('newIG: ', ig.current)
     }
     const li = useRef('')
     const setLi = (newVal) => {
-        li.current = newVal
+        li.current = sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []})
         console.log('newLI: ', li.current)
     }
 

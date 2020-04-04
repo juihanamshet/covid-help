@@ -164,9 +164,9 @@ function ListingDetails(props) {
                             </Typography>
                             <div>
                                 <Typography variant="inherit">
-                                    {aboutMe}
+                                    {aboutMe}&nbsp; 
                                     <Link className={classes.viewProfile} style={{color: "#2196f3"}} onClick={() => props.ownerDialogOnClick()}>
-                                        &nbsp; View Profile
+                                        View Profile
                                     </Link>
                                 </Typography>    
                             </div>
