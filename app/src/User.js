@@ -151,7 +151,7 @@ function User(props) {
             .catch(function (error) {
                 console.log(error);
             });
-    }, [user]);
+    }, [user, contactDisabled, basicDisabled, bioDisabled, socialDisabled]);
 
     const saveChanges = async(state, callback) => {
         const accessToken = props.authState.accessToken;
