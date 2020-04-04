@@ -3,7 +3,8 @@ import NavBar from './NavBar.js'
 import InlineEdit from './InlineEdit.js'
 import axios from 'axios'
 import { withOktaAuth } from '@okta/okta-react';
-import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link } from '@material-ui/core'
+import MuiAlert from '@material-ui/lab/Alert';
+import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Prompt } from 'react-router'
 import _ from 'lodash';
@@ -44,6 +45,10 @@ const useStyles = makeStyles(theme => ({
         }
     }
 }));
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function User(props) {
     const classes = useStyles();
@@ -109,11 +114,13 @@ function User(props) {
     const [disabledAct, setDisabledAct] = useState('')
 
 
-    const [user, setUser] = React.useState({});
-    const [contactDisabled, setContactDisabled] = React.useState(true);
-    const [basicDisabled, setBasicDisabled] = React.useState(true);
-    const [bioDisabled, setBioDisabled] = React.useState(true);
-    const [socialDisabled, setSocialDisabled] = React.useState(true);
+    const [user, setUser] = useState({});
+    const [contactDisabled, setContactDisabled] = useState(true);
+    const [basicDisabled, setBasicDisabled] = useState(true);
+    const [bioDisabled, setBioDisabled] = useState(true);
+    const [socialDisabled, setSocialDisabled] = useState(true);
+    const [snackBar, setSnackBar] = useState(false);
+    const [snackBarMessage, setSnackBarMessage] = useState({severity:'success', message:'successfully updated profile!'})
 
     const accessToken = props.authState.accessToken;
     React.useEffect(() => {
@@ -181,9 +188,13 @@ function User(props) {
             .then(function (response) {
                 console.log(response)
                 callback(!state)
+                setSnackBar(true);
+                setSnackBarMessage({severity: 'success', message: 'Successfully updated profile!'})
             })
             .catch(function (error) {
                 console.log(error)
+                setSnackBar(true);
+                setSnackBarMessage({severity: 'error', message: 'Unable to update profile, please try again.'})
         });
     }
 
@@ -258,6 +269,11 @@ function User(props) {
                 </Grid>
 
             </Grid>
+            <Snackbar open={snackBar} autoHideDuration={6000} onClose={() => setSnackBar(false)}>
+                <Alert onClose={() => setSnackBar(false)} severity={snackBarMessage.severity}>
+                    {snackBarMessage.message}
+                </Alert>
+            </Snackbar>
         </div>
     )
 }
