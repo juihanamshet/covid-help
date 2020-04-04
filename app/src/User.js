@@ -133,7 +133,7 @@ function User(props) {
                 setPrefEmail(response.data[0].prefEmail)
                 setPhoneNumber(response.data[0].phoneNumber)
                 setPreferredContactMethod(response.data[0].preferredContactMethod)
-                setEthnicity(response.data[0].ethnicty)
+                setEthnicity(response.data[0].ethnicity)
                 setGender(response.data[0].gender)
                 setPp(response.data[0].preferred_pronouns)
                 setBio(response.data[0].bio)
@@ -169,6 +169,7 @@ function User(props) {
                 Instagram: ig.current,
             }
         };
+        console.log(data);
         var config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -218,7 +219,7 @@ function User(props) {
                                 <List>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={contactDisabled ? classes.edit : classes.save} onClick={() => saveChanges(contactDisabled, setContactDisabled)}><Typography variant='inherit'>{contactDisabled ? 'Edit' : 'Save'}</Typography></Link>
+                                        <Link className={contactDisabled ? classes.edit : classes.save} onClick={!contactDisabled ? () => saveChanges(contactDisabled, setContactDisabled) : () => setContactDisabled(!contactDisabled)}><Typography variant='inherit'>{contactDisabled ? 'Edit' : 'Save'}</Typography></Link>
                                         <Typography align="left" color="primary" variant="h5">Contact Information</Typography>
                                         <InlineEdit disabled={true} label="School Email:" defaultInput={user.orgEmail}></InlineEdit>
                                         <InlineEdit disabled={contactDisabled} label="Preferred Email:" defaultInput={user.prefEmail} onChange={setPrefEmail}></InlineEdit>
