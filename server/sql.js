@@ -353,14 +353,7 @@ function updateUser(userInfo, callback){
     connection = new Connection (config);
     code = 200;
 
-    request = new Request(sqlQuery, function (err, rowCount) {
-        if (err) {
-            console.error(err);
-            result = "Internal Server Error"
-            code = 500;
-        }
-    });
-
+    
     sqlQuery = 
         "UPDATE userTable \
         SET firstName = @FirstName, lastName = @LastName,\
@@ -370,6 +363,13 @@ function updateUser(userInfo, callback){
         preferred_pronouns = @PrefPronoun, bio = @Bio\
         WHERE userID = @UserID"
 
+    request = new Request(sqlQuery, function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+    });
     
     request.addParameter('UserId', TYPES.VarChar, userInfo.userID) 
     request.addParameter('FirstName', TYPES.VarChar, userInfo.firstName);
