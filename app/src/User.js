@@ -170,7 +170,7 @@ function User(props) {
                 gender: gender.current,
                 ethnicity: ethnicity.current,
                 preferred_pronouns: pp.current,
-                bio: bio,
+                bio: bio.current,
                 LinkedIn: li.current,
                 Facebook: fb.current,
                 Instagram: ig.current,
