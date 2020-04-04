@@ -94,7 +94,16 @@ app.get("/getUser", authenticationRequired, function (req, res, next){
 app.get("/updateUser", authenticationRequired, function (req, res, next){
     const userInfo = req.body.userInfo;
 
-
+    
+    sqltools.getUser(userInfo, (sqlResult, status) => {
+        if (status === 200){
+            console.log("/updateUser was succcessfully called")
+            res.json(sqlResult);
+        } else {
+            res.statusCode = 500;
+            res.send("Internal Server Error");
+        }
+    })
 
 })
 

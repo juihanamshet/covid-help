@@ -185,7 +185,7 @@ function getUser (email, callback){
     request = new Request(sqlQuery, function (err, rowCount){
         if (err) {
             console.error(err);
-            result = "Internal Server Error"
+            result = "Internal Server E　rror"
             code = 500;
         }
     });
@@ -353,14 +353,55 @@ function updateUser(userInfo, callback){
     connection = new Connection (config);
     code = 200;
 
+    request = new Request(sqlQuery, function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+    });
+
     sqlQuery = 
         "UPDATE userTable \
         SET firstName = @FirstName, lastName = @LastName,\
-        orgEmail = @OrgEmail, prefEmail = @PrefEmail, phoneNumber = @PhoneNumber,\
-        Facebook = @FacebookLink, Instagram = @InstagramLink, preferredContactMethod = @PrefContact, \
+        orgEmail = @OrgEmail, prefEmail = @PrefEmail, phoneNumber = @Phone,\
+        Facebook = @FacebookLink, LinkedIn = @LinkedInLink, Instagram = @InstagramLink, preferredContactMethod = @PrefContact, \
         org = @Org, gender = @Gender, ethnicity = @Ethnicity, grad_year = @GradYear, \
         preferred_pronouns = @PrefPronoun, bio = @Bio,\
         WHERE userID = @UserID"
+
+    
+    request.addParameter('UserId', TYPES.VarChar, userInfo.userID) 
+    request.addParameter('FirstName', TYPES.VarChar, userInfo.firstName);
+    request.addParameter('LastName', TYPES.VarChar, userInfo.lastName);
+    request.addParameter('OrgEmail', TYPES.VarChar, userInfo.orgEmail);
+    request.addParameter('PrefEmail', TYPES.VarChar, userInfo.prefEmail);
+    request.addParameter('Phone', TYPES.VarChar, userInfo.phoneNumber);
+    request.addParameter('FacebookLink', TYPES.Int, userInfo.Facebook);
+    request.addParameter('LinkedInLink', TYPES.VarChar, userInfo.LinkedIn);
+    request.addParameter('InstagramLink', TYPES.VarChar, userInfo.Instagram);
+    request.addParameter('PrefContact', TYPES.VarChar, userInfo.preferredContactMethod);
+    request.addParameter('Org', TYPES.VarChar, userInfo.org);
+    request.addParameter('Gender', TYPES.VarChar, userInfo.gender);
+    request.addParameter('Ethnicity', TYPES.VarChar, userInfo.ethnicity);
+    request.addParameter('GradYear', TYPES.VarChar, userInfo.grad_year);
+
+    request.on('requestCompleted', function () {
+        connection.close();
+        callback("Success", code)
+    });
+
+    request.on('error', (err) => {
+        console.error(err);
+        result = "Internal Server Error"
+        code = 500;
+    })
+
+    connection.on('connect', function (err) {
+        console.log("/updateUser SQL DB Connected Successfully");
+        connection.execSql(request);
+    });
+    
 }
 
 function createUser(userInfo, callback) {
