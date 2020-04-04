@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react'
-import NavBar from './NavBar.js'
+import NavBar from '../NavBar.js'
 import InlineEdit from './InlineEdit.js'
 import axios from 'axios'
 import { withOktaAuth } from '@okta/okta-react';
@@ -45,6 +45,15 @@ const useStyles = makeStyles(theme => ({
         color: '#F08080!important',
         "&:hover": {
             color: 'LightGreen!important',
+            textDecoration: 'underline!important'
+        }
+    },
+    cancel: {
+        float: 'right',
+        marginLeft: 10,
+        color: 'gray!important',
+        "&:hover": {
+            color: '#F08080!important',
             textDecoration: 'underline!important'
         }
     },
@@ -214,6 +223,8 @@ function User(props) {
 
     var school = user.org ? user.org.toUpperCase() : '';
 
+    const cancelButton = editDisabled ? '' : <Link className={classes.cancel} onClick={() => setEditDisabled(!editDisabled)}><Typography variant='inherit'>Cancel</Typography></Link>
+
     return (
         <div>
             <Prompt
@@ -242,6 +253,7 @@ function User(props) {
                             <Grid item sm={12} className={classes.section} style={{ maxWidth: 600 }}>
                                 <List>
                                     <ListItem className={classes.editSection} style={{ display: 'block' }}>
+                                        {cancelButton}
                                         <Link className={editDisabled ? classes.edit : classes.save} onClick={!editDisabled ? () => saveChanges() : () => setEditDisabled(!editDisabled)}><Typography variant='inherit'>{editDisabled ? 'Edit' : 'Save'}</Typography></Link>
                                     </ListItem>
                                     <Divider />

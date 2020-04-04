@@ -5,7 +5,7 @@ import AboutUs from './About/AboutUs.js';
 import FindOffer from './FindOffer/FindOffer.js';
 import Logout from './Logout'
 import Auth from './Auth.js';
-import User from './User.js'
+import User from './User/User.js'
 import { useHistory, Link, BrowserRouter as Router, Route } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 
