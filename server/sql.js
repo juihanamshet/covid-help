@@ -367,7 +367,7 @@ function updateUser(userInfo, callback){
         orgEmail = @OrgEmail, prefEmail = @PrefEmail, phoneNumber = @Phone,\
         Facebook = @FacebookLink, LinkedIn = @LinkedInLink, Instagram = @InstagramLink, preferredContactMethod = @PrefContact, \
         org = @Org, gender = @Gender, ethnicity = @Ethnicity, grad_year = @GradYear, \
-        preferred_pronouns = @PrefPronoun, bio = @Bio,\
+        preferred_pronouns = @PrefPronoun, bio = @Bio\
         WHERE userID = @UserID"
 
     
@@ -377,7 +377,7 @@ function updateUser(userInfo, callback){
     request.addParameter('OrgEmail', TYPES.VarChar, userInfo.orgEmail);
     request.addParameter('PrefEmail', TYPES.VarChar, userInfo.prefEmail);
     request.addParameter('Phone', TYPES.VarChar, userInfo.phoneNumber);
-    request.addParameter('FacebookLink', TYPES.Int, userInfo.Facebook);
+    request.addParameter('FacebookLink', TYPES.VarChar, userInfo.Facebook);
     request.addParameter('LinkedInLink', TYPES.VarChar, userInfo.LinkedIn);
     request.addParameter('InstagramLink', TYPES.VarChar, userInfo.Instagram);
     request.addParameter('PrefContact', TYPES.VarChar, userInfo.preferredContactMethod);
@@ -432,7 +432,7 @@ function createUser(userInfo, callback) {
     request.addParameter('OrgEmail', TYPES.VarChar, userInfo.orgEmail);
     request.addParameter('PrefEmail', TYPES.VarChar, userInfo.prefEmail);
     request.addParameter('Phone', TYPES.VarChar, userInfo.phoneNumber);
-    request.addParameter('FacebookLink', TYPES.Int, userInfo.Facebook);
+    request.addParameter('FacebookLink', TYPES.VarChar, userInfo.Facebook);
     request.addParameter('LinkedInLink', TYPES.VarChar, userInfo.LinkedIn);
     request.addParameter('InstagramLink', TYPES.VarChar, userInfo.Instagram);
     request.addParameter('PrefContact', TYPES.VarChar, userInfo.preferredContactMethod);

@@ -91,9 +91,11 @@ app.get("/getUser", authenticationRequired, function (req, res, next){
 })
 
 
-app.post("/updateUser", authenticationRequired, function (req, res, next){
-    const userInfo = req.body.userInfo;
 
+app.post("/updateUser", authenticationRequired, function (req, res, next){
+    console.log("Update User. Hope this works")
+    const userInfo = req.body.userInfo;
+    
     
     sqltools.updateUser(userInfo, (sqlResult, status) => {
         if (status === 200){
