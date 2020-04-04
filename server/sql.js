@@ -459,4 +459,4 @@ function createUser(userInfo, callback) {
 }
 
 
-module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, createUser, getUser }
+module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, createUser, getUser, updateUser }
