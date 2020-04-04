@@ -115,7 +115,6 @@ function User(props) {
     const [bioDisabled, setBioDisabled] = React.useState(true);
     const [socialDisabled, setSocialDisabled] = React.useState(true);
 
-
     const accessToken = props.authState.accessToken;
     React.useEffect(() => {
         let config = {
@@ -146,6 +145,46 @@ function User(props) {
                 console.log(error);
             });
     }, [user]);
+
+    const saveChanges = async(state, callback) => {
+        const accessToken = props.authState.accessToken;
+        var data = {
+            userInfo: {
+                userID: user.userID,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                org: user.org,
+                grad_year: user.grad_year,
+                disabledAcct: user.disabledAcct,
+                orgEmail: user.orgEmail,
+                prefEmail: prefEmail.current,
+                phoneNumber: phoneNumber.current,
+                preferredContactMethod: preferredContactMethod.current,
+                gender: gender.current,
+                ethnicity: ethnicity.current,
+                preferred_pronouns: pp.current,
+                bio: bio,
+                LinkedIn: li.current,
+                Facebook: fb.current,
+                Instagram: ig.current,
+            }
+        };
+        var config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        };
+        var self = this;
+        axios.post(BASE_URL + '/updateUser', data, config)
+            .then(function (response) {
+                console.log(response)
+                callback(!state)
+            })
+            .catch(function (error) {
+                console.log(error)
+        });
+    }
 
     var school = user.org ? user.org.toUpperCase() : '';
 
@@ -179,7 +218,7 @@ function User(props) {
                                 <List>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={contactDisabled ? classes.edit : classes.save} onClick={() => setContactDisabled(!contactDisabled)}><Typography variant='inherit'>{contactDisabled ? 'Edit' : 'Save'}</Typography></Link>
+                                        <Link className={contactDisabled ? classes.edit : classes.save} onClick={() => saveChanges(contactDisabled, setContactDisabled)}><Typography variant='inherit'>{contactDisabled ? 'Edit' : 'Save'}</Typography></Link>
                                         <Typography align="left" color="primary" variant="h5">Contact Information</Typography>
                                         <InlineEdit disabled={true} label="School Email:" defaultInput={user.orgEmail}></InlineEdit>
                                         <InlineEdit disabled={contactDisabled} label="Preferred Email:" defaultInput={user.prefEmail} onChange={setPrefEmail}></InlineEdit>
