@@ -8,7 +8,7 @@ export default function InlineEdit(props) {
     const label = props.label ? <Typography>{props.label}&nbsp;</Typography> : <Typography></Typography>;
 
     return (
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", paddingTop: 2.5, paddingBottom: 2.5 }}>
             {label}
             <ContentEditable text={defaultInput}
                 html={defaultInput}

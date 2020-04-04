@@ -24,10 +24,13 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 300,
     },
     listItem: {
-        padddingBottom: "20px!important",
+        paddingBottom: "20px!important",
     },
     divider: {
         height: 10
+    },
+    title: {
+        paddingBottom: 2.5
     },
     edit: {
         float: 'right',
@@ -43,6 +46,9 @@ const useStyles = makeStyles(theme => ({
             color: 'LightGreen!important',
             textDecoration: 'underline!important'
         }
+    },
+    editSection: {
+        marginBottom: '20px!important'
     }
 }));
 
@@ -115,10 +121,7 @@ function User(props) {
 
 
     const [user, setUser] = useState({});
-    const [contactDisabled, setContactDisabled] = useState(true);
-    const [basicDisabled, setBasicDisabled] = useState(true);
-    const [bioDisabled, setBioDisabled] = useState(true);
-    const [socialDisabled, setSocialDisabled] = useState(true);
+    const [editDisabled, setEditDisabled] = useState(true);
     const [snackBar, setSnackBar] = useState(false);
     const [snackBarMessage, setSnackBarMessage] = useState({severity:'success', message:'successfully updated profile!'})
 
@@ -151,9 +154,9 @@ function User(props) {
             .catch(function (error) {
                 console.log(error);
             });
-    }, [user, contactDisabled, basicDisabled, bioDisabled, socialDisabled]);
+    }, [user, editDisabled]);
 
-    const saveChanges = async(state, callback) => {
+    const saveChanges = async() => {
         const accessToken = props.authState.accessToken;
         var data = {
             userInfo: {
@@ -187,7 +190,7 @@ function User(props) {
         axios.post(BASE_URL + '/updateUser', data, config)
             .then(function (response) {
                 console.log(response)
-                callback(!state)
+                setEditDisabled(!editDisabled)
                 setSnackBar(true);
                 setSnackBarMessage({severity: 'success', message: 'Successfully updated profile!'})
             })
@@ -203,7 +206,7 @@ function User(props) {
     return (
         <div>
             <Prompt
-                when={!(contactDisabled & basicDisabled & bioDisabled & socialDisabled)}
+                when={!editDisabled}
                 message='You have unsaved changes, are you sure you want to leave?'
             />
             <NavBar></NavBar>
@@ -225,42 +228,48 @@ function User(props) {
                             <Grid item sm={12} style={{ marginTop: 5 }}>
                                 <Typography className={classes.text} variant="body1">{school + " // " + user.grad_year}</Typography>
                             </Grid>
-                            <Divider />
-                            <Grid item sm={12} className={classes.section} style={{ minWidth: 500 }}>
+                            <Grid item sm={12} className={classes.section} style={{ maxWidth: 600 }}>
                                 <List>
+                                    <ListItem className={classes.editSection} style={{ display: 'block' }}>
+                                        <Link className={editDisabled ? classes.edit : classes.save} onClick={!editDisabled ? () => saveChanges() : () => setEditDisabled(!editDisabled)}><Typography variant='inherit'>{editDisabled ? 'Edit' : 'Save'}</Typography></Link>
+                                    </ListItem>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={contactDisabled ? classes.edit : classes.save} onClick={!contactDisabled ? () => saveChanges(contactDisabled, setContactDisabled) : () => setContactDisabled(!contactDisabled)}><Typography variant='inherit'>{contactDisabled ? 'Edit' : 'Save'}</Typography></Link>
-                                        <Typography align="left" color="primary" variant="h5">Contact Information</Typography>
+                                        <div className={classes.title}>
+                                            <Typography align="left" color="primary" variant="h5">Contact Information</Typography>
+                                        </div>
                                         <InlineEdit disabled={true} label="School Email:" defaultInput={user.orgEmail}></InlineEdit>
-                                        <InlineEdit disabled={contactDisabled} label="Preferred Email:" defaultInput={user.prefEmail} onChange={setPrefEmail}></InlineEdit>
-                                        <InlineEdit disabled={contactDisabled} label="Phone Number:" defaultInput={user.phoneNumber} onChange={setPhoneNumber}></InlineEdit>
-                                        <InlineEdit disabled={contactDisabled} label="Preferred Contact Method:" defaultInput={user.preferredContactMethod} onChange={setPreferredContactMethod}></InlineEdit>
+                                        <InlineEdit disabled={editDisabled} label="Preferred Email:" defaultInput={user.prefEmail} onChange={setPrefEmail}></InlineEdit>
+                                        <InlineEdit disabled={editDisabled} label="Phone Number:" defaultInput={user.phoneNumber} onChange={setPhoneNumber}></InlineEdit>
+                                        <InlineEdit disabled={editDisabled} label="Preferred Contact Method:" defaultInput={user.preferredContactMethod} onChange={setPreferredContactMethod}></InlineEdit>
                                     </ListItem>
                                     <div className={classes.divider}></div>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={basicDisabled ? classes.edit : classes.save} onClick={!basicDisabled ? () => saveChanges(basicDisabled, setBasicDisabled) : () => setBasicDisabled(!basicDisabled)}><Typography variant='inherit'>{basicDisabled ? 'Edit' : 'Save'}</Typography></Link>
-                                        <Typography color="primary" variant="h5">Basic Information</Typography>
-                                        <InlineEdit disabled={basicDisabled} label="Ethnicity:" defaultInput={user.ethnicity} onChange={setEthnicity}></InlineEdit>
-                                        <InlineEdit disabled={basicDisabled} label="Gender:" defaultInput={user.gender} onChange={setGender}></InlineEdit>
-                                        <InlineEdit disabled={basicDisabled} label="Preferred Pronouns:" defaultInput={user.preferred_pronouns} onChange={setPp}></InlineEdit>
+                                        <div className={classes.title}>
+                                            <Typography color="primary" variant="h5">Basic Information</Typography>
+                                        </div>
+                                        <InlineEdit disabled={editDisabled} label="Ethnicity:" defaultInput={user.ethnicity} onChange={setEthnicity}></InlineEdit>
+                                        <InlineEdit disabled={editDisabled} label="Gender:" defaultInput={user.gender} onChange={setGender}></InlineEdit>
+                                        <InlineEdit disabled={editDisabled} label="Preferred Pronouns:" defaultInput={user.preferred_pronouns} onChange={setPp}></InlineEdit>
                                     </ListItem>
                                     <div className={classes.divider}></div>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={bioDisabled ? classes.edit : classes.save} onClick={!bioDisabled ? () => saveChanges(bioDisabled, setBioDisabled) : () => setBioDisabled(!bioDisabled)}><Typography variant='inherit'>{bioDisabled ? 'Edit' : 'Save'}</Typography></Link>
-                                        <Typography color="primary" variant="h5">Bio</Typography>
-                                        <InlineEdit disabled={bioDisabled} defaultInput={user.bio} onChange={setBio}></InlineEdit>
+                                        <div className={classes.title}>
+                                            <Typography color="primary" variant="h5">Bio</Typography>
+                                        </div>
+                                        <InlineEdit disabled={editDisabled} defaultInput={user.bio} onChange={setBio}></InlineEdit>
                                     </ListItem>
                                     <div className={classes.divider}></div>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={socialDisabled ? classes.edit : classes.save} onClick={!socialDisabled ? saveChanges(socialDisabled, setSocialDisabled ): () => setSocialDisabled(!socialDisabled)}><Typography variant='inherit'>{socialDisabled ? 'Edit' : 'Save'}</Typography></Link>
-                                        <Typography color="primary" variant="h5">Social Media</Typography>
-                                        <InlineEdit disabled={socialDisabled} label="Facebook URL:" defaultInput={user.Facebook} onChange={setFb}></InlineEdit>
-                                        <InlineEdit disabled={socialDisabled} label="Instagram URL:" defaultInput={user.Instagram} onChange={setIg}></InlineEdit>
-                                        <InlineEdit disabled={socialDisabled} label="LinkedIn URL:" defaultInput={user.LinkedIn} onChange={setLi}></InlineEdit>
+                                        <div className={classes.title}>
+                                            <Typography color="primary" variant="h5">Social Media</Typography>
+                                        </div>
+                                        <InlineEdit disabled={editDisabled} label="Facebook URL:" defaultInput={user.Facebook} onChange={setFb}></InlineEdit>
+                                        <InlineEdit disabled={editDisabled} label="Instagram URL:" defaultInput={user.Instagram} onChange={setIg}></InlineEdit>
+                                        <InlineEdit disabled={editDisabled} label="LinkedIn URL:" defaultInput={user.LinkedIn} onChange={setLi}></InlineEdit>
                                     </ListItem>
                                 </List>
                             </Grid>

@@ -279,6 +279,7 @@ class FindOffer extends Component {
                             org={this.state.currListing.org}
                             gradYear={this.state.currListing.grad_year}
                             preferredContactMethod={this.state.currListing.preferredContactMethod}
+                            bio={this.state.currListing.bio}
                             
                             // contact info
                             contacts={{'Email': prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}

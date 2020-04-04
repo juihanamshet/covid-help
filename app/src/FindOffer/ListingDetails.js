@@ -54,7 +54,7 @@ function ListingDetails(props) {
 
     // form a default bio if the user is unavailable
     var school = props.org.replace(/^\w/, c => c.toUpperCase());
-    var aboutMeDefault = GREETINGS[Math.floor(Math.random() * 5)] + " I'm " + school + " " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
+    var aboutMeDefault = props.bio ? props.bio : GREETINGS[Math.floor(Math.random() * 5)] + " I'm " + school + " " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
     // TODO: once user has personalBio, provide option to switch between the two
     var aboutMe = aboutMeDefault;
 
@@ -166,7 +166,7 @@ function ListingDetails(props) {
                                 <Typography variant="inherit">
                                     {aboutMe}
                                     <Link className={classes.viewProfile} style={{color: "#2196f3"}} onClick={() => props.ownerDialogOnClick()}>
-                                        View Profile
+                                        &nbsp; View Profile
                                     </Link>
                                 </Typography>    
                             </div>
