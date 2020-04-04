@@ -367,7 +367,7 @@ function updateUser(userInfo, callback){
         orgEmail = @OrgEmail, prefEmail = @PrefEmail, phoneNumber = @Phone,\
         Facebook = @FacebookLink, LinkedIn = @LinkedInLink, Instagram = @InstagramLink, preferredContactMethod = @PrefContact, \
         org = @Org, gender = @Gender, ethnicity = @Ethnicity, grad_year = @GradYear, \
-        preferred_pronouns = @PrefPronoun, bio = @Bio,\
+        preferred_pronouns = @PrefPronoun, bio = @Bio\
         WHERE userID = @UserID"
 
     
