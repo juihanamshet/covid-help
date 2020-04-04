@@ -377,7 +377,7 @@ function updateUser(userInfo, callback){
     request.addParameter('OrgEmail', TYPES.VarChar, userInfo.orgEmail);
     request.addParameter('PrefEmail', TYPES.VarChar, userInfo.prefEmail);
     request.addParameter('Phone', TYPES.VarChar, userInfo.phoneNumber);
-    request.addParameter('FacebookLink', TYPES.Int, userInfo.Facebook);
+    request.addParameter('FacebookLink', TYPES.VarChar, userInfo.Facebook);
     request.addParameter('LinkedInLink', TYPES.VarChar, userInfo.LinkedIn);
     request.addParameter('InstagramLink', TYPES.VarChar, userInfo.Instagram);
     request.addParameter('PrefContact', TYPES.VarChar, userInfo.preferredContactMethod);
@@ -432,7 +432,7 @@ function createUser(userInfo, callback) {
     request.addParameter('OrgEmail', TYPES.VarChar, userInfo.orgEmail);
     request.addParameter('PrefEmail', TYPES.VarChar, userInfo.prefEmail);
     request.addParameter('Phone', TYPES.VarChar, userInfo.phoneNumber);
-    request.addParameter('FacebookLink', TYPES.Int, userInfo.Facebook);
+    request.addParameter('FacebookLink', TYPES.VarChar, userInfo.Facebook);
     request.addParameter('LinkedInLink', TYPES.VarChar, userInfo.LinkedIn);
     request.addParameter('InstagramLink', TYPES.VarChar, userInfo.Instagram);
     request.addParameter('PrefContact', TYPES.VarChar, userInfo.preferredContactMethod);
