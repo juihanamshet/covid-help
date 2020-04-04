@@ -240,7 +240,7 @@ function User(props) {
                                     <div className={classes.divider}></div>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={basicDisabled ? classes.edit : classes.save} onClick={() => setBasicDisabled(!basicDisabled)}><Typography variant='inherit'>{basicDisabled ? 'Edit' : 'Save'}</Typography></Link>
+                                        <Link className={basicDisabled ? classes.edit : classes.save} onClick={!basicDisabled ? () => saveChanges(basicDisabled, setBasicDisabled) : () => setBasicDisabled(!basicDisabled)}><Typography variant='inherit'>{basicDisabled ? 'Edit' : 'Save'}</Typography></Link>
                                         <Typography color="primary" variant="h5">Basic Information</Typography>
                                         <InlineEdit disabled={basicDisabled} label="Ethnicity:" defaultInput={user.ethnicity} onChange={setEthnicity}></InlineEdit>
                                         <InlineEdit disabled={basicDisabled} label="Gender:" defaultInput={user.gender} onChange={setGender}></InlineEdit>
@@ -249,14 +249,14 @@ function User(props) {
                                     <div className={classes.divider}></div>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={bioDisabled ? classes.edit : classes.save} onClick={() => setBioDisabled(!bioDisabled)}><Typography variant='inherit'>{bioDisabled ? 'Edit' : 'Save'}</Typography></Link>
+                                        <Link className={bioDisabled ? classes.edit : classes.save} onClick={!bioDisabled ? () => saveChanges(bioDisabled, setBioDisabled) : () => setBioDisabled(!bioDisabled)}><Typography variant='inherit'>{bioDisabled ? 'Edit' : 'Save'}</Typography></Link>
                                         <Typography color="primary" variant="h5">Bio</Typography>
                                         <InlineEdit disabled={bioDisabled} defaultInput={user.bio} onChange={setBio}></InlineEdit>
                                     </ListItem>
                                     <div className={classes.divider}></div>
                                     <Divider />
                                     <ListItem className={classes.listItem} style={{ display: 'block' }}>
-                                        <Link className={socialDisabled ? classes.edit : classes.save} onClick={() => setSocialDisabled(!socialDisabled)}><Typography variant='inherit'>{socialDisabled ? 'Edit' : 'Save'}</Typography></Link>
+                                        <Link className={socialDisabled ? classes.edit : classes.save} onClick={!socialDisabled ? saveChanges(socialDisabled, setSocialDisabled ): () => setSocialDisabled(!socialDisabled)}><Typography variant='inherit'>{socialDisabled ? 'Edit' : 'Save'}</Typography></Link>
                                         <Typography color="primary" variant="h5">Social Media</Typography>
                                         <InlineEdit disabled={socialDisabled} label="Facebook URL:" defaultInput={user.Facebook} onChange={setFb}></InlineEdit>
                                         <InlineEdit disabled={socialDisabled} label="Instagram URL:" defaultInput={user.Instagram} onChange={setIg}></InlineEdit>
