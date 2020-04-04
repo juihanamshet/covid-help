@@ -385,6 +385,8 @@ function updateUser(userInfo, callback){
     request.addParameter('Gender', TYPES.VarChar, userInfo.gender);
     request.addParameter('Ethnicity', TYPES.VarChar, userInfo.ethnicity);
     request.addParameter('GradYear', TYPES.VarChar, userInfo.grad_year);
+    request.addParameter('PrefPronoun', TYPES.VarChar, userInfo.preferred_pronouns)
+    request.addParameter('Bio', TYPES.VarChar, userInfo.bio)
 
     request.on('requestCompleted', function () {
         connection.close();
