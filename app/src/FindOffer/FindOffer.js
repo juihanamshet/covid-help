@@ -198,7 +198,7 @@ class FindOffer extends Component {
         // styling for find page
         var findIsActive = this.state.find ? 'linkIsActive' : '';
 
-        var prefEmail = this.state.currListing.prefEmail ? this.state.currListing.prefEmail : this.state.currListing.orgEmail;
+        var prefEmail = this.state.currListing.prefEmail ?  this.state.currListing.prefEmail : this.state.currListing.orgEmail;
 
         return (
             <div className={classes.root}>
@@ -282,7 +282,7 @@ class FindOffer extends Component {
                             bio={this.state.currListing.bio}
                             
                             // contact info
-                            contacts={{'Email': prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
+                            contacts={{'Email': "mailto:"+ prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
 
                             //learn more about owner button
                             ownerDialogOnClick={this.openOwnerDialog}

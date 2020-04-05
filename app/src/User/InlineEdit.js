@@ -8,7 +8,7 @@ const useStyles = makeStyles(theme => ({
         minHeight: 20,
         minWidth: 175,
         border: '1px solid #aaa',
-        borderRadius: 10,
+        borderRadius: 7.5,
         paddingRight: 15,
         paddingLeft: 5,
     },
