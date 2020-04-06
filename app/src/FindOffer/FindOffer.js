@@ -156,6 +156,7 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListing', config)
             .then(function (response) {
+                console.log(response.data[0])
                 self.setState({ currListing : response.data[0],
                                 drawerOpen: true });
             })
@@ -250,7 +251,7 @@ class FindOffer extends Component {
                             <Suspense fallback={<div>Loading...</div>}>
                                 {currListings}
                             </Suspense>
-                        </div> : <div className={classes.sidebar}><CircularProgress size={75}/></div>}
+                        </div> : <div className={classes.sidebar}><CircularProgress size={50}/></div>}
                     </Grid>
                     <Grid item lg={12}>
                         {listingButton}
@@ -263,6 +264,8 @@ class FindOffer extends Component {
                     onOpen={this.toggleDrawer(true)}>
                     <Suspense fallback={<CircularProgress />}>
                         <ListingDetails
+                            // if this is user owned listing
+                            isOwner={!this.state.find}
                             // info for the housing
                             key={this.state.currListing.listingID + Math.random()}
                             zipcode={this.state.currListing.zipCode}

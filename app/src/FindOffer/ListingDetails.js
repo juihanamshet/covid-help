@@ -3,17 +3,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Typography, Card, Avatar, Link, Button, IconButton } from '@material-ui/core';
 import { MailOutline, Facebook, LinkedIn, Instagram } from '@material-ui/icons';
 import {  StaticGoogleMap as Map, Marker } from 'react-static-google-map';
-
-// import Map from 'pigeon-maps';
-// import Marker from 'pigeon-marker';
-
 //temp import
 import jordad from '../img/jordad.png';
 
+const BASE_URL = 'http://localhost:8080'
 const GOOGLE_MAPS = process.env.REACT_APP_GOOGLE_MAPS_API;
 
-const MAPTILER_ACCESS_TOKEN = 'prxcBM7GNRKVr9ucT9no';
-const MAP_ID = '9ddbdaa1-4ce7-48c2-a288-d73cddca9aac';
 const GREETINGS = ["Hey!", "Hello!", "Bonjour!", "Howdy!", "Nice to meet you!"]
 const MEDIA_ICONS = {Email: <MailOutline></MailOutline>, Facebook: <Facebook></Facebook>, LinkedIn: <LinkedIn></LinkedIn>, Instagram: <Instagram></Instagram>}
 
@@ -40,15 +35,40 @@ const useStyles = makeStyles(theme => ({
         "&:hover": {
             textDecoration: "underline!important"
         }
-    }
+    },
+    deleteButton: {
+        color: "#DC143C",
+        "&:hover": {
+            backgroundColor: "rgba(220,20,60,0.04)"
+        }
+    },
+    disableButton: {
+        color: "#FFC400",
+        "&:hover": {
+            backgroundColor: "rgba(255, 196, 0, 0.04)"
+        }
+    },
+    confirmClick: {
+        borderColor: "#32CD32",
+        color: "#32CD32",
+        "&:hover": {
+            backgroundColor: "rgba(50,205,50,0.04)"
+        }
+    },
+    cancelButton: {
+        "&:hover": {
+            textDecoration: "underline"
+        }
+    },
 }));
 
 // props: listingTitle, coordinates, location, livingSitch, houseRules, details (additional details), ownerName, ownerAvatar, ownerDeets
 function ListingDetails(props) {
     const classes = useStyles();
+    const [clickedDelete, setClickedDelete] = useState(false);
+    const [clickedDisable, setClickedDisable] = useState(false);
 
-    const [coor, setCoor] = useState(props.coordinates);
-
+    // accesibility
     var accessibilityFriendly = props.accessibilityFriendly ? "Yes" : "No";
     var lgbtqpFriendly = props.lgbtqpFriendly ? "Yes" : "No";
 
@@ -61,7 +81,7 @@ function ListingDetails(props) {
     // set up list of buttons that can be used for contact
     var buttonList = [];
     var keyCount = 0;
-    var contacts = Object.entries(props.contacts);
+    const contacts = Object.entries(props.contacts);
     contacts.forEach(function (contact) {
         // if the social media url isn't null or undefined
         if(contact[1]){
@@ -70,7 +90,36 @@ function ListingDetails(props) {
             keyCount++;
         }
     });
+
+    const submitDeleteReq = () => {
+        console.log('submitted delete request')
+        setClickedDelete(!clickedDelete)
+    }
+
+    const submitDisableReq = () => {
+        console.log('submitted disable request')
+        setClickedDisable(!clickedDisable)
+    }
+
+    const clearClicks = (e) => {
+        e.preventDefault();
+        setClickedDisable(false);
+        setClickedDelete(false);
+    }
+
+    // if listing is owned by user, provide delete and disable options
+    var deleteButton = '';
+    var disableButton = '';
+    var cancelButton = '';
+    if(props.isOwner){
+        cancelButton = (clickedDelete || clickedDisable) ? <Button className={classes.cancelButton} onClick={clearClicks}>Cancel</Button> : '';
+        deleteButton = <Button onClick={clickedDelete ? submitDeleteReq : () => setClickedDelete(!clickedDelete)} variant={clickedDelete ? 'outlined': 'text'} className={clickedDelete ? classes.confirmClick : classes.deleteButton} style={{marginLeft:10, float:'right'}}>{clickedDelete ? 'Confirm' : 'Delete'}</Button>
+        disableButton = <Button onClick={clickedDisable ? submitDisableReq : () => setClickedDisable(!clickedDisable)} variant={clickedDisable ? 'outlined': 'text'} className={clickedDisable ? classes.confirmClick : classes.disableButton} style={{float:'right'}}>{clickedDisable? 'Confirm' : 'Disable'}</Button>
+    }
+
+
     // avatar profile photos
+
 
     return (
         <div className={classes.root}>
@@ -184,6 +233,11 @@ function ListingDetails(props) {
                 <Card style={{paddingBottom: 25, paddingTop: 25, display: 'flex', justifyContent: 'space-around'}} className={classes.fieldsDiv}>
                     {buttonList}
                 </Card>
+            </div>
+            <div className={classes.fieldsDiv} style={{paddingTop:5, paddingBottom: 10, overflow: 'auto'}}>
+                {cancelButton}
+                {deleteButton}
+                {disableButton}
             </div>
         </div>
     )
