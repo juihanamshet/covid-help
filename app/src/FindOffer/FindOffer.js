@@ -245,11 +245,12 @@ class FindOffer extends Component {
                         </div>
                     </Grid>
                     <Grid item xs={12}>
+                        { listings.length ? 
                         <div className={classes.sidebar}>
-                            <Suspense fallback={<CircularProgress />}>
+                            <Suspense fallback={<div>Loading...</div>}>
                                 {currListings}
                             </Suspense>
-                        </div>
+                        </div> : <div className={classes.sidebar}><CircularProgress size={75}/></div>}
                     </Grid>
                     <Grid item lg={12}>
                         {listingButton}

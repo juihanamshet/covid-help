@@ -4,7 +4,7 @@ import InlineEdit from './InlineEdit.js'
 import axios from 'axios'
 import { withOktaAuth } from '@okta/okta-react';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar, IconButton, Tooltip } from '@material-ui/core'
+import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar, IconButton, Tooltip, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Prompt } from 'react-router'
 import _ from 'lodash'
@@ -193,7 +193,7 @@ function User(props) {
             .catch(function (error) {
                 console.log(error);
             });
-    }, [user, editDisabled, profilePhoto]);
+    }, [user, editDisabled, profilePhoto, profilePhotoURL]);
 
     const saveChanges = async() => {
         const accessToken = props.authState.accessToken;
@@ -240,13 +240,16 @@ function User(props) {
         });
     }
 
-    const onProfilePhotoChange = (e) =>{
-        console.log(e.target.files[0]);
-        if(!e.target.files[0]){ // catch all non uploads
+    const onProfilePhotoChange = async(e) =>{
+        let image = e.target.files[0];
+        let imageURL = URL.createObjectURL(e.target.files[0])
+        console.log('image file: ', image);
+        console.log('image url: ', imageURL);
+        if(!image){ // catch all non uploads
             return;
         }
-        setProfilePhoto(e.target.files[0]);
-        setProfilePhotoURL(URL.createObjectURL(e.target.files[0]));
+        setProfilePhoto(image);
+        setProfilePhotoURL(imageURL);
     }
     
     const uploadProfilePhoto = async() =>{
@@ -301,6 +304,7 @@ function User(props) {
                 justify="center" >
                 <Grid item>
                     <Paper style={{ paddingRight: 50, paddingLeft: 50, paddingTop: 25, paddingBottom: 25 }}>
+                        {user.userID ? (
                         <Grid container direction="column" alignItems="center">
                             <Grid item sm={12} className={classes.section}>
                                 <input type="file" accept="image/jpg,image/png,image/jpeg" className={classes.input} id="icon-button-file" onChange={onProfilePhotoChange}/>
@@ -365,6 +369,7 @@ function User(props) {
                                 </List>
                             </Grid>
                         </Grid>
+                        ) : <div style={{textAlign:"center"}}><CircularProgress size={75}/><div><Typography variant="h5">Loading...</Typography></div></div>}
                     </Paper>
                 </Grid>
 
