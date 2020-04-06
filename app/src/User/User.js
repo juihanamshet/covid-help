@@ -10,6 +10,8 @@ import { Prompt } from 'react-router'
 import _ from 'lodash'
 import sanitizeHtml from 'sanitize-html-react'
 import FormData from 'form-data'
+const fs = require("fs");
+const path = require("path");
 
 const BASE_URL = 'http://localhost:8080'
 
@@ -250,9 +252,7 @@ function User(props) {
         }
         setProfilePhoto(image);
         setProfilePhotoURL(imageURL);
-    }
-    
-    const uploadProfilePhoto = async() =>{
+
         if(profilePhoto === null){
             console.log('null file provided')
             return;
@@ -260,7 +260,9 @@ function User(props) {
         const accessToken = props.authState.accessToken;
         console.log("new profile photo: ", profilePhoto);
         const fd = new FormData();
-        fd.append('image', profilePhoto, profilePhoto.name);
+        fd.append('name', image);
+        fd.append('stream', fs.createReadStream(image));
+
         console.log("form data: ", fd);
         
         const config = {
