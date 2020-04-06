@@ -4,12 +4,12 @@ import InlineEdit from './InlineEdit.js'
 import axios from 'axios'
 import { withOktaAuth } from '@okta/okta-react';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar } from '@material-ui/core'
+import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar, IconButton, Tooltip } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Prompt } from 'react-router'
 import _ from 'lodash'
 import sanitizeHtml from 'sanitize-html-react'
-
+import FormData from 'form-data'
 
 const BASE_URL = 'http://localhost:8080'
 
@@ -59,8 +59,26 @@ const useStyles = makeStyles(theme => ({
     },
     editSection: {
         marginBottom: '20px!important'
-    }
+    },
+    input: {
+        display: 'none',
+    },
 }));
+
+// styling for just the tooltip
+const useStylesBootstrap = makeStyles((theme) => ({
+    arrow: {
+      color: theme.palette.common.black,
+    },
+    tooltip: {
+      backgroundColor: theme.palette.common.black,
+    },
+  }));
+
+function BootstrapTooltip(props) {
+    const classes = useStylesBootstrap();
+    return <Tooltip arrow classes={classes} {...props} placement="top"/>;
+  }
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -73,19 +91,19 @@ function User(props) {
     const setPrefEmail = (newVal) => {
         prefEmail.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log("newPrefEmail: ", prefEmail.current)
+        // console.log("newPrefEmail: ", prefEmail.current)
     }
     const phoneNumber = useRef('')
     const setPhoneNumber = (newVal) => {
         phoneNumber.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log("newPhoneNumber: ", phoneNumber.current)
+        //  console.log("newPhoneNumber: ", phoneNumber.current)
     }
     const preferredContactMethod = useRef('')
     const setPreferredContactMethod = (newVal) => {
         preferredContactMethod.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log("newContactMethod: ", preferredContactMethod.current)
+        // console.log("newContactMethod: ", preferredContactMethod.current)
     }
 
     // refs for the basic information
@@ -93,19 +111,19 @@ function User(props) {
     const setGender = (newVal) => {
         gender.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log('newGender: ', gender.current)
+        // console.log('newGender: ', gender.current)
     }
     const ethnicity = useRef('')
     const setEthnicity = (newVal) => {
         ethnicity.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log('newEthnicity: ', ethnicity.current)
+        // console.log('newEthnicity: ', ethnicity.current)
     }
     const pp = useRef('')
     const setPp = (newVal) => {
         pp.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log('newPp: ', pp.current)
+        // console.log('newPp: ', pp.current)
     }
 
     // ref for bio
@@ -113,7 +131,7 @@ function User(props) {
     const setBio = (newVal) => {
         bio.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log('newBio: ', bio.current);
+        // console.log('newBio: ', bio.current);
     }
 
     // refs for socials
@@ -121,26 +139,27 @@ function User(props) {
     const setFb = (newVal) => {
         fb.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log('newFB: ', fb.current)
+        // console.log('newFB: ', fb.current)
     }
     const ig = useRef('')
     const setIg = (newVal) => {
         ig.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log('newIG: ', ig.current)
+        // console.log('newIG: ', ig.current)
     }
     const li = useRef('')
     const setLi = (newVal) => {
         li.current = sanitizeHtml(newVal, {allowedTags: [],
             allowedAttributes: []})
-        console.log('newLI: ', li.current)
+        // console.log('newLI: ', li.current)
     }
 
     // state for disabling account: TODO
     const [disabledAct, setDisabledAct] = useState('')
 
-
     const [user, setUser] = useState({});
+    const [profilePhoto, setProfilePhoto] = useState(null);
+    const [profilePhotoURL, setProfilePhotoURL] = useState('');
     const [editDisabled, setEditDisabled] = useState(true);
     const [snackBar, setSnackBar] = useState(false);
     const [snackBarMessage, setSnackBarMessage] = useState({severity:'success', message:'successfully updated profile!'})
@@ -174,7 +193,7 @@ function User(props) {
             .catch(function (error) {
                 console.log(error);
             });
-    }, [user, editDisabled]);
+    }, [user, editDisabled, profilePhoto]);
 
     const saveChanges = async() => {
         const accessToken = props.authState.accessToken;
@@ -221,6 +240,48 @@ function User(props) {
         });
     }
 
+    const onProfilePhotoChange = (e) =>{
+        console.log(e.target.files[0]);
+        if(!e.target.files[0]){ // catch all non uploads
+            return;
+        }
+        setProfilePhoto(e.target.files[0]);
+        setProfilePhotoURL(URL.createObjectURL(e.target.files[0]));
+    }
+    
+    const uploadProfilePhoto = async() =>{
+        if(profilePhoto === null){
+            console.log('null file provided')
+            return;
+        }
+        const accessToken = props.authState.accessToken;
+        console.log("new profile photo: ", profilePhoto);
+        const fd = new FormData();
+        fd.append('image', profilePhoto, profilePhoto.name);
+        console.log("form data: ", fd);
+        
+        const config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+                'accept': 'application/json',
+                'Accept-Language': 'en-US,en;q=0.8',
+                'Content-Type': `multipart/form-data; boundary=${fd._boundary}`,
+            },
+        };
+        var self = this;
+        axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
+            .then(function (response) {
+                setSnackBar(true);
+                setSnackBarMessage({severity: 'success', message: 'Succesfully updated profile!'});
+            })
+            .catch(function (error) {
+                console.log(error);
+                setSnackBar(true);
+                setSnackBarMessage({severity: 'error', message: 'Unable to update profile.'});                
+            });
+    }
+
     var school = user.org ? user.org.toUpperCase() : '';
 
     const cancelButton = editDisabled ? '' : <Link className={classes.cancel} onClick={() => setEditDisabled(!editDisabled)}><Typography variant='inherit'>Cancel</Typography></Link>
@@ -242,7 +303,14 @@ function User(props) {
                     <Paper style={{ paddingRight: 50, paddingLeft: 50, paddingTop: 25, paddingBottom: 25 }}>
                         <Grid container direction="column" alignItems="center">
                             <Grid item sm={12} className={classes.section}>
-                                <Avatar style={{ height: 150, width: 150 }} src={props.avatarPhoto}></Avatar>
+                                <input type="file" accept="image/jpg,image/png,image/jpeg" className={classes.input} id="icon-button-file" onChange={onProfilePhotoChange}/>
+                                    <BootstrapTooltip title="Update profile photo" aria-label="Update profile photo">
+                                    <label htmlFor="icon-button-file">
+                                        <IconButton component="span">
+                                            <Avatar style={{ height: 150, width: 150 }} src={profilePhotoURL}></Avatar>
+                                        </IconButton>
+                                    </label>
+                                    </BootstrapTooltip>
                             </Grid>
                             <Grid item sm={12} className={classes.section}>
                                 <Typography variant="h4">{user.firstName + " " + user.lastName}</Typography>
