@@ -75,12 +75,12 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
     })
 })
 
-app.get("/getUser", authenticationRequired, function (req, res, next){
+app.get("/getUser", authenticationRequired, function (req, res, next) {
     console.log('/getUsers called. HOPE THIS WORKSSSS')
     const userEmail = req.jwt.claims.sub;
 
     sqltools.getUser(userEmail, (sqlResult, status) => {
-        if (status === 200){
+        if (status === 200) {
             console.log("/getUser was succcessfully called")
             res.json(sqlResult);
         } else {
@@ -92,13 +92,13 @@ app.get("/getUser", authenticationRequired, function (req, res, next){
 
 
 
-app.post("/updateUser", authenticationRequired, function (req, res, next){
+app.post("/updateUser", authenticationRequired, function (req, res, next) {
     console.log("Update User. Hope this works")
     const userInfo = req.body.userInfo;
-    
-    
+
+
     sqltools.updateUser(userInfo, (sqlResult, status) => {
-        if (status === 200){
+        if (status === 200) {
             console.log("/updateUser was succcessfully called")
             res.json(sqlResult);
         } else {
@@ -182,6 +182,55 @@ app.post("/createUser", authenticationRequired, async function (req, res, next) 
         } else {
             res.statusCode = 500;
             res.send("Internal Server Error");
+        }
+    })
+})
+
+app.put("/disableListing", authenticationRequired, function (req, res, next) {
+    const userEmail = req.jwt.claims.sub;
+    const listingID = req.body.listingID;
+    console.log("/disableListing: disabling Listing for listingID " + listingID + " and user: " + userEmail);
+
+    sqltools.disableListing(listingID, userEmail, (sqlResult, status) => {
+        if (status === 200) {
+            console.log("/disableListing Listing updated DB")
+            res.statusCode = 200;
+            res.send("/disableListing success");
+        } else {
+            res.statusCode = 500;
+            res.send("/disableListing Server Error");
+        }
+    })
+})
+
+app.put("/enableListing", authenticationRequired, function (req, res, next) {
+    const userEmail = req.jwt.claims.sub;
+    const listingID = req.body.listingiD;
+    console.log("/enableListing: disabling Listing for listingID" + listingID + " and user: " + userEmail);
+
+    sqltools.enableListing(listingID, userEmail, (sqlResult, status) => {
+        if (status === 200) {
+            console.log("/enableListing Listing updated DB")
+            res.json(status);
+        } else {
+            res.statusCode = 500;
+            res.send("enableListing Server Error");
+        }
+    })
+})
+
+app.delete("/deleteListing", authenticationRequired, function (req, res, next) {
+    const userEmail = req.jwt.claims.sub;
+    const listingID = req.body.listingID;
+    console.log("/deleteListing: deleting Listing for listingID" + listingID + " and user: " + userEmail);
+
+    sqltools.deleteListing(listingID, userEmail, (sqlResult, status) => {
+        if (status === 200) {
+            console.log("/deleteListing Listing updated DB")
+            res.json(status);
+        } else {
+            res.statusCode = 500;
+            res.send("deleteListing Server Error");
         }
     })
 })
