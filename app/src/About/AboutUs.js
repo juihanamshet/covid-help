@@ -89,7 +89,9 @@ class AboutUs extends Component {
                                     </CarouselItem>
                                 </Carousel>
                                 <hr/>
-                                <Button variant="outlined" color="primary"> Sign Up </Button>
+                                <div style={{width: '100%', textAlign:'center'}}>
+                                    <Button href="/login" variant="contained" color="primary" style={{color:'white', paddingLeft: 20, paddingRight: 20,}}> Sign Up </Button>
+                                </div>
                             </Card>
                         </Grid>
                         <Grid className={classes.titleGrid} item sm={12} md={6}>
