@@ -22,10 +22,10 @@ const useStyles = makeStyles(theme => ({
         }
     },
     titleText:{
-        color: theme.palette.primary,
+        color: theme.palette.primary.main,
     },
     tab: {
-        color: theme.palette.primary,
+        color: theme.palette.primary.main,
         paddingRight: 15,
         fontWeight: 500,
         "&:hover": {
@@ -58,7 +58,7 @@ const NavBar = () => {
     
     const handleClose = (event) => {
         if (anchorRef.current && anchorRef.current.contains(event.target)) {
-          return;
+            return;
         }
         setOpen(false);
     };
@@ -84,10 +84,10 @@ const NavBar = () => {
         <Link className={classes.tab} to="/login">Login</Link> :
         <Link
           ref={anchorRef}
-          onMouseEnter={handleToggle}
+          onMouseOver={handleToggle}
           className={classes.tab}
           to="/user">
-            User <ArrowDropDownIcon/>
+            User
         </Link>;
 
     return (
