@@ -80,7 +80,7 @@ function getSchoolListings(email, school, callback) {
         city, lgbtqpFriendly, accessibilityFriendly, state\
         FROM listingTable JOIN userTable \
         ON (listingTable.userID = userTable.userID) \
-        WHERE disabledAcct = 0 AND orgEmail!=@Email AND org=@School";
+        WHERE disabledAcct = 0 AND orgEmail!=@Email AND org=@School AND disabledListing!=1";
 
     request = new Request(sqlQuery, function (err, rowCount) {
 
@@ -172,17 +172,17 @@ function getUsersListings(email, school, callback) {
     });
 }
 
-function getUser (email, callback){
-    connection = new Connection (config);
+function getUser(email, callback) {
+    connection = new Connection(config);
     var result = [];
     var code = 200;
 
-    sqlQuery = 
+    sqlQuery =
         "SELECT * \
         FROM userTable \
         WHERE userTable.orgEmail = @email"
-    
-    request = new Request(sqlQuery, function (err, rowCount){
+
+    request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
             console.error(err);
             result = "Internal Server E　rror"
@@ -279,12 +279,12 @@ function createListing(listingInfo, callback) {
             (userID, addressLineOne, addressLineTwo, \
             city, state, zipCode, neighborhood, housingRules, \
             lgbtqpFriendly, accessibilityFriendly, \
-            accessbilityInfo, listingName, livingSituation, housingInfo)\
+            accessbilityInfo, listingName, livingSituation, housingInfo, disabledListing)\
         VALUES(\
             @UserID, @AddressLineOne, @AddressLineTwo, @City, \
             @State, @ZipCode, @Neighborhood, @HousingRules, \
             @LGBTQPFRD, @ACCESSFRD, @AccessInfo, @ListingName, \
-            @LivingSituation, @HousingInfo);"
+            @LivingSituation, @HousingInfo, 0);"
 
     request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
@@ -349,12 +349,12 @@ function createListingHandler(email, listingInfo, callback) {
     })
 }
 
-function updateUser(userInfo, callback){
-    connection = new Connection (config);
+function updateUser(userInfo, callback) {
+    connection = new Connection(config);
     code = 200;
 
-    
-    sqlQuery = 
+
+    sqlQuery =
         "UPDATE userTable \
         SET firstName = @FirstName, lastName = @LastName,\
         orgEmail = @OrgEmail, prefEmail = @PrefEmail, phoneNumber = @Phone,\
@@ -370,8 +370,8 @@ function updateUser(userInfo, callback){
             code = 500;
         }
     });
-    
-    request.addParameter('UserId', TYPES.VarChar, userInfo.userID) 
+
+    request.addParameter('UserId', TYPES.VarChar, userInfo.userID)
     request.addParameter('FirstName', TYPES.VarChar, userInfo.firstName);
     request.addParameter('LastName', TYPES.VarChar, userInfo.lastName);
     request.addParameter('OrgEmail', TYPES.VarChar, userInfo.orgEmail);
@@ -403,7 +403,7 @@ function updateUser(userInfo, callback){
         console.log("/updateUser SQL DB Connected Successfully");
         connection.execSql(request);
     });
-    
+
 }
 
 
@@ -460,4 +460,132 @@ function createUser(userInfo, callback) {
 }
 
 
-module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, createUser, getUser, updateUser, getUserID }
+function disableListing(listingID, userEmail, callback) {
+    connection = new Connection(config);
+    code = 200;
+
+    sqlQuery =
+        "UPDATE listingTable \
+        SET disabledListing=1 \
+        WHERE listingID=@ListingID\
+        AND userID in ( \
+            SELECT userID \
+            FROM userTable \
+            WHERE orgEmail=@OrgEmail);"
+
+    request = new Request(sqlQuery, function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+    });
+
+    request.addParameter('ListingID', TYPES.Int, listingID)
+    request.addParameter('OrgEmail', TYPES.VarChar, userEmail)
+
+    request.on('requestCompleted', function () {
+        connection.close();
+        callback("Success", code)
+    });
+
+    request.on('error', (err) => {
+        console.error(err);
+        result = "Internal Server Error"
+        code = 500;
+    })
+
+    connection.on('connect', function (err) {
+        console.log("/disableListing SQL DB Connected Successfully");
+        connection.execSql(request);
+    });
+}
+
+function enableListing(listingID, userEmail, callback) {
+    connection = new Connection(config);
+    code = 200;
+
+    sqlQuery =
+        "UPDATE listingTable \
+        SET disabledListing = 0 \
+        WHERE listingID=@ListingID\
+        AND userID in ( \
+            SELECT userID \
+            FROM userTable \
+            WHERE orgEmail=@OrgEmail);"
+
+    request = new Request(sqlQuery, function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+    });
+
+    request.addParameter('ListingID', TYPES.Int, listingID)
+    request.addParameter('OrgEmail', TYPES.VarChar, userEmail)
+
+    request.on('requestCompleted', function () {
+        connection.close();
+        callback("Success", code)
+    });
+
+    request.on('error', (err) => {
+        console.error(err);
+        result = "Internal Server Error"
+        code = 500;
+    })
+
+    connection.on('connect', function (err) {
+        console.log("/disableListing SQL DB Connected Successfully");
+        connection.execSql(request);
+    });
+}
+
+function deleteListing(listingID, userEmail, callback) {
+    connection = new Connection(config);
+    code = 200;
+
+    sqlQuery =
+        "DELETE FROM listingTable \
+        WHERE listingID=@ListingID \
+        AND userID in (\
+            SELECT userID \
+            FROM userTable \
+            WHERE orgEmail=@OrgEmail);"
+
+    request = new Request(sqlQuery, function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+    });
+
+    request.addParameter('ListingID', TYPES.Int, listingID)
+    request.addParameter('OrgEmail', TYPES.VarChar, userEmail)
+
+
+    request.on('requestCompleted', function () {
+        connection.close();
+        callback("Success", code)
+    });
+
+    request.on('error', (err) => {
+        console.error(err);
+        result = "Internal Server Error"
+        code = 500;
+    })
+
+    connection.on('connect', function (err) {
+        console.log("/deleteListing SQL DB Connected Successfully");
+        connection.execSql(request);
+    });
+}
+
+module.exports = {
+    getSchoolListings, getUsersListings,
+    getListing, createListingHandler,
+    createUser, getUser, updateUser,
+    disableListing, deleteListing, enableListing
+}

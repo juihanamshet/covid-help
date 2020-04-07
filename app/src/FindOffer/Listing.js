@@ -29,7 +29,7 @@ function Listing(props) {
   const classes = useStyles();
 
   var listingName = "default"
-  listingName = props.listingName;
+  listingName = props.listingName.length > 16 ? props.listingName.substring(0, 15)+ "..." : props.listingName;
 
   var listingDetail = "default";
   listingDetail = props.listingLocation;
@@ -39,11 +39,11 @@ function Listing(props) {
 
   return (
     <div className={classes.base}>
-      <Card className={classes.root}>
+      <Card elevation={3} className={classes.root}>
         <CardActionArea onClick={() => props.onClick(id)}>
           <CardMedia
             className={classes.media}
-            image={require("../img/location_not_found-claraMacDonell.png")}
+            image={require("../img/noListingImages.jpg")}
             title="Location Not Found"
           />
           <CardContent>

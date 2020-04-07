@@ -30,9 +30,6 @@ const styles = theme => ({
     spacer: {
         width: '5%'
     },
-    addListing: {
-        fontSize: "14!important"
-    }
 });
 
 function Alert(props) {
@@ -156,6 +153,7 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListing', config)
             .then(function (response) {
+                console.log(response.data[0])
                 self.setState({ currListing : response.data[0],
                                 drawerOpen: true });
             })
@@ -211,19 +209,19 @@ class FindOffer extends Component {
                         font-weight: 300;
                     }
                     .btn-link:hover{
-                        color: #90caf9;
+                        color: #ffb851;
                     }
                     #addListing {
-                        color: #42a5f5;
+                        color: #007bff;
                         font-weight: 400;
                         font-size: 25px;
                     }
                     #linkIsActive {
-                        color: #42a5f5;
+                        color: #ffa726;
                         text-decoration: underline;
                     }
                     #linkIsActive:hover {
-                        color: grey;
+                        color: #ffb851;
                     }
                     `}
                 </style>
@@ -250,7 +248,7 @@ class FindOffer extends Component {
                             <Suspense fallback={<div>Loading...</div>}>
                                 {currListings}
                             </Suspense>
-                        </div> : <div className={classes.sidebar}><CircularProgress size={75}/></div>}
+                        </div> : <div className={classes.sidebar}><CircularProgress size={50}/></div>}
                     </Grid>
                     <Grid item lg={12}>
                         {listingButton}
@@ -263,7 +261,10 @@ class FindOffer extends Component {
                     onOpen={this.toggleDrawer(true)}>
                     <Suspense fallback={<CircularProgress />}>
                         <ListingDetails
+                            // if this is user owned listing
+                            isOwner={!this.state.find}
                             // info for the housing
+                            listingId = {this.state.currListing.listingID}
                             key={this.state.currListing.listingID + Math.random()}
                             zipcode={this.state.currListing.zipCode}
                             listingTitle={this.state.currListing.listingName}
@@ -287,6 +288,10 @@ class FindOffer extends Component {
 
                             //learn more about owner button
                             ownerDialogOnClick={this.openOwnerDialog}
+
+                            // for snackbar and reload
+                            openSnackBar={this.openSnackBar}
+                            refreshOffers={this.getUserListings}
                         >
                         </ListingDetails>
                     </Suspense>
