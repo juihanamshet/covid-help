@@ -259,10 +259,9 @@ function User(props) {
         const accessToken = props.authState.accessToken;
         console.log("new profile photo: ", profilePhoto);
         const fd = new FormData();
-        fd.append('name', image.name);
         fd.append('stream', image);
 
-        console.log("form data: ", fd);
+        console.log("form data: ", fd.get('stream'));
         
         const config = {
             headers: {

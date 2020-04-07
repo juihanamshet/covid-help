@@ -13,6 +13,10 @@ const {AbortController} = require('@azure/abort-controller');
 const fs = require("fs");
 const path = require("path");
 require('dotenv').config()
+const formidable = require("express-formidable");
+
+
+
 
 const STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const ACCOUNT_ACCESS_KEY = process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY;
@@ -62,8 +66,13 @@ function authenticationRequired(req, res, next) {
 
 
 const app = express();
+
 app.use(cors());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(bodyParser.json());
+app.use(formidable());
 app.listen(8080);
 
 
@@ -106,24 +115,22 @@ app.get("/getUser", authenticationRequired, function (req, res, next) {
     })
 })
 
-async function addPhoto(containerClient, stream, aborter, filePath){
-    
+async function addPhoto(containerClient, filePath, extname, aborter){
+    filePath = path.resolve(filePath);
+
     // const fileName = "profilePhoto" + path.extname(filePath)
-    const fileName = "profilePhoto"
+    const fileName = "profilePhoto" + extname;
     
     const blobClient = containerClient.getBlobClient(fileName);
     const blockBlobClient = blobClient.getBlockBlobClient();
 
-    const uploadOptions = {
-        bufferSize: 8 * ONE_MEGABYTE,
-        maxBuffers: 8,
-    };
 
-    return await blockBlobClient.uploadStream(
-                    stream, 
-                    uploadOptions.bufferSize, 
-                    uploadOptions.maxBuffers,
-                    aborter);
+    // return await blockBlobClient.uploadStream(
+    //                 fs.createReadStream(stream, 
+    //                 uploadOptions.bufferSize, 
+    //                 uploadOptions.maxBuffers,
+    //                 aborter);
+    return await blockBlobClient.uploadFile(filePath, aborter);
 }
 
 app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next) {
@@ -134,11 +141,11 @@ app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next
 
     //then
     const userEmail = req.jwt.claims.sub;
-    const stream = req.body.stream;
-    const filePath = req.body.name;
-    console.log(req.body);
+    const stream = req.files.stream;
+    console.log(path.extname(stream.name));
+    // fs.readFile(stream.path)
+    const containerName = "container5";
 
-    const containerName = "5";
     const containerClient = blobServiceClient.getContainerClient(containerName);
     if (! containerClient.exists()) {
         //If the container doesn't exists, then create one
@@ -147,13 +154,12 @@ app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next
     }
     const aborter = AbortController.timeout(30 * 60 * 1000);
 
-    console.log(filePath);
-    console.log(stream);
-    addPhoto(containerClient, stream, aborter, filePath).then(() => console.log("success"))
+    addPhoto(containerClient, stream.path, path.extname(stream.name), aborter).then(() => console.log("success"))
         .catch((e) => console.log(e))
 
+    console.log("Profile Photo has successfully been updated");
 
-    
+    res.statusCode = 200;
 
 })
 
@@ -232,6 +238,8 @@ app.post("/createListing", authenticationRequired, function (req, res, next) {
 
     // let images = ["",""];
     // let userID = "5";
+   // If you call data.append('file', file) multiple times your request will contain an array of your files...
+    var files = req.files.files;
     console.log(listingInfo.city);
     console.log(listingInfo.userID);
 
@@ -245,9 +253,9 @@ app.post("/createListing", authenticationRequired, function (req, res, next) {
     }
     const aborter = AbortController.timeout(30 * 60 * 1000);
 
-    for (image of images){
+    for (file of files){
     
-        uploadLocalFile(aborter, containerClient, image).then(() => console.log("sucess\
+        uploadLocalFile(aborter, containerClient, file.path).then(() => console.log("sucess\
         of image upload ")).catch((e) => console.log(e));
     }
 
