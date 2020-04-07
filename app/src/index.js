@@ -7,13 +7,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import { amber, blue} from '@material-ui/core/colors';
+import { orange, blue } from '@material-ui/core/colors';
 import * as serviceWorker from './serviceWorker';
 
 const theme = createMuiTheme({
     palette: {
         primary: blue,
-        secondary: amber
+        secondary: orange
     },
 });
 // ReactDOM.render(<App />, document.getElementById('root'));

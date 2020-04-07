@@ -29,7 +29,7 @@ function Listing(props) {
   const classes = useStyles();
 
   var listingName = "default"
-  listingName = props.listingName;
+  listingName = props.listingName.length > 16 ? props.listingName.substring(0, 15)+ "..." : props.listingName;
 
   var listingDetail = "default";
   listingDetail = props.listingLocation;

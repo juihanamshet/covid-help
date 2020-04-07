@@ -127,7 +127,7 @@ function ListingDetails(props) {
                 <Marker location={props.zipcode}></Marker>
             </Map>
             <div className={classes.titleDiv} style={{color:'grey'}}>
-                <Typography color="primary" align="center" variant="h4"> Listing Details </Typography>
+                <Typography color="secondary" align="center" variant="h4"> Listing Details </Typography>
             </div>
             <div className={classes.titleDiv}>
                 <Typography align="center" variant="h5">
@@ -135,7 +135,7 @@ function ListingDetails(props) {
                 </Typography>
             </div>
             <div className={classes.fieldsDiv}>
-            <Card style={{paddingTop: 10}} className={classes.fieldsDiv}>
+            <Card elevation={3} style={{paddingTop: 10}} className={classes.fieldsDiv}>
                 <div className={classes.fieldDiv}>
                     <Typography variant="inherit">
                     <span role="img" aria-label="pin emoji">📍</span> Location:&nbsp;
@@ -201,7 +201,7 @@ function ListingDetails(props) {
                 </Typography>
             </div>
             <div className={classes.fieldsDiv}>
-                <Card style={{paddingTop: 10}} className={classes.fieldsDiv}>
+                <Card elevation={3} style={{paddingTop: 10}} className={classes.fieldsDiv}>
                     <Grid container spacing={1}>
                         <Grid item xs={2} style={{display: 'flex', alignItems:'center'}}>
                             <Avatar style={{ width: 60, height: 60}} src={props.avatarPhoto} src={jordad}></Avatar>
@@ -230,7 +230,7 @@ function ListingDetails(props) {
                 </Typography>
             </div>
             <div className={classes.fieldsDiv}>
-                <Card style={{paddingBottom: 25, paddingTop: 25, display: 'flex', justifyContent: 'space-around'}} className={classes.fieldsDiv}>
+                <Card elevation={3} style={{paddingBottom: 25, paddingTop: 25, display: 'flex', justifyContent: 'space-around'}} className={classes.fieldsDiv}>
                     {buttonList}
                 </Card>
             </div>
