@@ -6,18 +6,23 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import App from './App';
 
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider, createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
 import { blue } from '@material-ui/core/colors';
 import * as serviceWorker from './serviceWorker';
 
-const theme = createMuiTheme({
+let theme = createMuiTheme({
     palette: {
-        primary: blue,
+        primary: {
+            main: '#6699ff'
+        },
         secondary: {
-            main: '#ffa726',
+            main: '#ffa666',
         },
     },
 });
+
+theme = responsiveFontSizes(theme);
+
 // ReactDOM.render(<App />, document.getElementById('root'));
 ReactDOM.render(<MuiThemeProvider theme={theme}><App /></MuiThemeProvider>, document.getElementById('root'));
 

@@ -1,44 +1,65 @@
 import React, { Component } from 'react';
 import Explainer from './Explainer.js';
-
 import { withStyles } from '@material-ui/styles';
-import { Paper, Typography, Grid, Card, CardContent, CardActions, Button } from '@material-ui/core';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import bgImage from '../img/neighborhood-aerial.jpg';
+import { Typography, Grid, Card, CardContent, CardActions, Button } from '@material-ui/core';
+import Carousel from 'react-material-ui-carousel'
+import bgImage from '../img/bedroom.jpg';
 import NavBar from '../NavBar.js'
-
-const styling = {
-    paperContainer: {
-        background: `url(${bgImage}) no-repeat center center fixed`,
-        backgroundSize: 'cover',
-    }
-};
+import CarouselItem from './CarouselItem.js';
+import Text  from './Text.js';
 
 const styles = theme => ({
-    banner: {
-        boxShadow: 'none'
+    root: {
+        background: `url(${bgImage}) no-repeat center center fixed`,
+        backgroundSize: 'cover',
+        minHeight: '100vh',
+    },
+    infoGrid: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    titleGrid: {
+        marginTop: 20,
+    },
+    titleDiv: {
+        [theme.breakpoints.up('md')]: {
+            float: 'right',
+            borderTopLeftRadius: 5,
+            borderBottomLeftRadius: 5,
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+        },
+        float: 'left',
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderTopRightRadius: 5,
+        borderBottomRightRadius: 5,
+        backgroundColor: 'rgba(255, 166, 102, 0.85)',
+        paddingTop: 20,
+        paddingRight: 20,
+        paddingBottom: 20,
+        paddingLeft: 30,
+
     },
     bannerTitle: {
         color: 'white',
-        fontWeight: '300'
-    },
-    titleDiv: {
-        paddingTop: '10%',
-        paddingLeft: 20
-    },
-    descriptionDiv: {
-        paddingBottom: '10%',
-        paddingLeft: 20
     },
     bannerDescription: {
         fontStyle: 'italic'
     },
-    cardActions: {
-        justifyContent: 'center'
-    },
-    details: {
-        padding: 25
+    introCard: {
+        maxHeight: '75vh',
+        width: '80%',
+        maxWidth: '80%',
+        padding: 25,
+        marginLeft: 25,
+        marginBottom: 50,
+        marginRight: 25,
+        marginTop: 50,
+        overflow: 'auto',
     }
+    
 });
 
 class AboutUs extends Component {
@@ -50,53 +71,37 @@ class AboutUs extends Component {
     }
     render() {
         const { classes } = this.props;
-
         return (
-
-            <div style={styling.paperContainer}>
+            <div className={classes.root}>
                 <NavBar></NavBar>
-                    <Grid container spacing={3}>
-                        <Grid item sm={12}>
+                    <Grid alignItems='center' wrap='wrap-reverse' container spacing={1}>
+                        <Grid className={classes.infoGrid} item sm={12} md={6}>
+                            <Card className={classes.introCard}>
+                                <Carousel autoPlay={false}>
+                                    <CarouselItem title="About Us">
+                                        <Text></Text>
+                                    </CarouselItem>
+                                    <CarouselItem title="How it Works">
+                                        <Explainer></Explainer>
+                                    </CarouselItem>
+                                    <CarouselItem title="FAQ">
+                                    </CarouselItem>
+                                </Carousel>
+                                <hr class="solid"/>
+                                <Button> Sign Up </Button>
+                            </Card>
+                        </Grid>
+                        <Grid className={classes.titleGrid} item sm={12} md={6}>
                             <div className={classes.titleDiv}>
                                 <Typography className={classes.bannerTitle} variant='h2'>
                                     Project Student Relief
                                 </Typography>
-                            </div>
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={3}>
-                        <Grid item sm={12}>
-                            <div className={classes.descriptionDiv}>
-                                <Typography className={classes.bannerDescription} color="secondary" variant='h5'>
+                                <Typography className={classes.bannerDescription} variant='h5'>
                                     Connecting open doors with students in need.
                                 </Typography>
                             </div>
                         </Grid>
                     </Grid>
-                <div></div>
-                <Grid container spacing={2} className={classes.details}>
-                    <Grid item xs={12} sm={6}>
-                        <div>
-                            <Card style={{height:450, maxHeight:600, overflow:'auto'}}>
-                                <CardContent>
-                                    <Typography align='center' variant="h4">
-                                        - Our Goal -
-                                    </Typography>
-                                    <br />
-                                    <Typography variant='inherit'>
-                                        In response to the recent outbreak of COVID-19, many universities in the United States have closed indefintely to help mitigate the spread of the disease. While for some, this period marks an opportunity to return home to friends and family, for others, the closing of school represents a period of housing uncertainty. <br /> <br /> International students barred from returning home or local students without the resources to return home are put in a very difficult situation with no clear end in sight. COVID-19 exposes a very clear need for a network of good samaritans to help support college students in times of emergency when going home is not an option. Our goal is simple: we want to connect faculty, alumni, and fellow students with empty bedrooms or open floor space with students in need of emergency housing. <br /><br /> We hope you will join us.
-                                        </Typography>
-                                </CardContent>
-                                <CardActions className={classes.cardActions}>
-                                    <Button color="primary" variant="contained" endIcon={<ArrowForwardIcon></ArrowForwardIcon>}> Sign Me Up</Button>
-                                </CardActions>
-                            </Card>
-                        </div>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <Explainer></Explainer>
-                    </Grid>
-                </Grid>
             </div>
         )
     }
