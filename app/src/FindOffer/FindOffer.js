@@ -30,9 +30,6 @@ const styles = theme => ({
     spacer: {
         width: '5%'
     },
-    addListing: {
-        fontSize: "14!important"
-    }
 });
 
 function Alert(props) {
@@ -215,7 +212,7 @@ class FindOffer extends Component {
                         color: #ffb851;
                     }
                     #addListing {
-                        color: #42a5f5;
+                        color: #007bff;
                         font-weight: 400;
                         font-size: 25px;
                     }
@@ -267,6 +264,7 @@ class FindOffer extends Component {
                             // if this is user owned listing
                             isOwner={!this.state.find}
                             // info for the housing
+                            listingId = {this.state.currListing.listingID}
                             key={this.state.currListing.listingID + Math.random()}
                             zipcode={this.state.currListing.zipCode}
                             listingTitle={this.state.currListing.listingName}
@@ -290,6 +288,10 @@ class FindOffer extends Component {
 
                             //learn more about owner button
                             ownerDialogOnClick={this.openOwnerDialog}
+
+                            // for snackbar and reload
+                            openSnackBar={this.openSnackBar}
+                            refreshOffers={this.getUserListings}
                         >
                         </ListingDetails>
                     </Suspense>

@@ -24,7 +24,7 @@ function Explainer(props) {
 
     return (
         <div>
-            <Card>
+            <Card style={{height:450, maxHeight:600, overflow:'auto'}}>
                 <CardContent>
                     <Typography align='center' variant="h4">
                         - How It Works -

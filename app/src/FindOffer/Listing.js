@@ -39,11 +39,11 @@ function Listing(props) {
 
   return (
     <div className={classes.base}>
-      <Card className={classes.root}>
+      <Card elevation={3} className={classes.root}>
         <CardActionArea onClick={() => props.onClick(id)}>
           <CardMedia
             className={classes.media}
-            image={require("../img/location_not_found-claraMacDonell.png")}
+            image={require("../img/noListingImages.jpg")}
             title="Location Not Found"
           />
           <CardContent>

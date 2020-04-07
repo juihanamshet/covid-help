@@ -12,24 +12,24 @@ const useStyles = makeStyles(theme => ({
         flexGrow: 1,
     },
     appBar: {
-        boxShadow: 'none',
+        backgroundColor: 'white',
     },
     title: {
         flexGrow: 1,
         "&:hover": {
-            color: '#eceff1',
+            color: theme.palette.primary.light,
             textDecoration: 'none',
         }
     },
     titleText:{
-        color: 'white',
+        color: theme.palette.primary,
     },
     tab: {
-        color: 'white',
+        color: theme.palette.primary,
         paddingRight: 15,
         fontWeight: 500,
         "&:hover": {
-            color: '#eceff1',
+            color: theme.palette.primary.light,
             textDecoration: 'underline',
         }
     },
@@ -91,7 +91,7 @@ const NavBar = () => {
         </Link>;
 
     return (
-        <AppBar className={classes.appBar} position="sticky" color="primary">
+        <AppBar className={classes.appBar} position="sticky">
             <Toolbar>
                 <Link
                     className={classes.title}

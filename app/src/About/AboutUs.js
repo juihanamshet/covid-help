@@ -4,12 +4,12 @@ import Explainer from './Explainer.js';
 import { withStyles } from '@material-ui/styles';
 import { Paper, Typography, Grid, Card, CardContent, CardActions, Button } from '@material-ui/core';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import bgImage from '../img/neighborhood-lizSanchez.jpg';
+import bgImage from '../img/neighborhood-aerial.jpg';
 import NavBar from '../NavBar.js'
 
 const styling = {
     paperContainer: {
-        backgroundImage: `url(${bgImage})`,
+        background: `url(${bgImage}) no-repeat center center fixed`,
         backgroundSize: 'cover',
     }
 };
@@ -53,13 +53,12 @@ class AboutUs extends Component {
 
         return (
 
-            <div>
+            <div style={styling.paperContainer}>
                 <NavBar></NavBar>
-                <Paper square className={classes.banner} style={styling.paperContainer}>
                     <Grid container spacing={3}>
                         <Grid item sm={12}>
                             <div className={classes.titleDiv}>
-                                <Typography className={classes.bannerTitle} variant='h1'>
+                                <Typography className={classes.bannerTitle} variant='h2'>
                                     Project Student Relief
                                 </Typography>
                             </div>
@@ -68,18 +67,17 @@ class AboutUs extends Component {
                     <Grid container spacing={3}>
                         <Grid item sm={12}>
                             <div className={classes.descriptionDiv}>
-                                <Typography className={classes.bannerDescription} color="secondary" variant='h4'>
+                                <Typography className={classes.bannerDescription} color="secondary" variant='h5'>
                                     Connecting open doors with students in need.
                                 </Typography>
                             </div>
                         </Grid>
                     </Grid>
-                </Paper>
                 <div></div>
                 <Grid container spacing={2} className={classes.details}>
                     <Grid item xs={12} sm={6}>
                         <div>
-                            <Card >
+                            <Card style={{height:450, maxHeight:600, overflow:'auto'}}>
                                 <CardContent>
                                     <Typography align='center' variant="h4">
                                         - Our Goal -

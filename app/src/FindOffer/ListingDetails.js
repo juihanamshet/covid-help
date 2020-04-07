@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Typography, Card, Avatar, Link, Button, IconButton } from '@material-ui/core';
 import { MailOutline, Facebook, LinkedIn, Instagram } from '@material-ui/icons';
 import {  StaticGoogleMap as Map, Marker } from 'react-static-google-map';
+import { withOktaAuth } from '@okta/okta-react';
+import axios from 'axios'
 //temp import
 import jordad from '../img/jordad.png';
 
@@ -15,6 +17,9 @@ const MEDIA_ICONS = {Email: <MailOutline></MailOutline>, Facebook: <Facebook></F
 const useStyles = makeStyles(theme => ({
     root: {
         maxWidth: 475
+    },
+    listingDeets: {
+        paddingTop: 10,
     },
     titleDiv: {
         paddingTop: 10,
@@ -65,6 +70,7 @@ const useStyles = makeStyles(theme => ({
 // props: listingTitle, coordinates, location, livingSitch, houseRules, details (additional details), ownerName, ownerAvatar, ownerDeets
 function ListingDetails(props) {
     const classes = useStyles();
+    const accessToken = props.authState.accessToken;
     const [clickedDelete, setClickedDelete] = useState(false);
     const [clickedDisable, setClickedDisable] = useState(false);
 
@@ -93,12 +99,52 @@ function ListingDetails(props) {
 
     const submitDeleteReq = () => {
         console.log('submitted delete request')
-        setClickedDelete(!clickedDelete)
+        var config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                Authorization: `Bearer ${accessToken}`,
+            },
+            data: {
+                listingID: props.listingId
+            }
+        };
+        var self = this;
+        axios.delete(BASE_URL + '/deleteListing', config)
+            .then(function (response) {
+                setClickedDelete(!clickedDelete)
+                props.openSnackBar({severity: 'success', message: 'Succesfully deleted listing!'});
+                props.handleClose();
+                props.refreshOffers();
+            })
+            .catch(function (error) {
+                console.log(error);
+                props.openSnackBar({severity: 'error', message: 'Unable to delete listing, please try again.'});                
+            });
     }
 
     const submitDisableReq = () => {
         console.log('submitted disable request')
-        setClickedDisable(!clickedDisable)
+        var data = {
+            listingID: props.listingId
+        };
+        var config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        };
+        var self = this;
+        axios.put(BASE_URL + '/disableListing', data, config)
+            .then(function (response) {
+                setClickedDisable(!clickedDisable)
+                props.openSnackBar({severity: 'success', message: 'Succesfully disabled listing!'});
+                props.handleClose();
+                props.refreshOffers();
+            })
+            .catch(function (error) {
+                console.log(error);
+                props.openSnackBar({severity: 'error', message: 'Unable to disable listing, please try again.'});                
+            });
     }
 
     const clearClicks = (e) => {
@@ -126,7 +172,7 @@ function ListingDetails(props) {
             <Map center={props.zipcode} zoom={13} size="475x300" apiKey={GOOGLE_MAPS}>
                 <Marker location={props.zipcode}></Marker>
             </Map>
-            <div className={classes.titleDiv} style={{textAlign:'center'}}>
+            <div className={classes.listingDeets} style={{textAlign:'center'}}>
                 <Typography color="secondary" align="center" variant="overline"> Listing Details </Typography>
             </div>
             <div className={classes.titleDiv}>
@@ -243,4 +289,4 @@ function ListingDetails(props) {
     )
 }
 
-export default ListingDetails
+export default withOktaAuth(ListingDetails)
