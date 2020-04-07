@@ -7,6 +7,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar, IconButton, Tooltip, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Prompt } from 'react-router'
+import bgImage from '../img/house.jpg'
 import _ from 'lodash'
 import sanitizeHtml from 'sanitize-html-react'
 import FormData from 'form-data'
@@ -17,6 +18,10 @@ const BASE_URL = 'http://localhost:8080'
 
 const useStyles = makeStyles(theme => ({
     root: {
+        background: `url(${bgImage}) no-repeat center center fixed`,
+        opacity: 0.9,
+        backgroundSize: 'cover',
+        minHeight: '100vh',
         padding: 30
     },
     section: {

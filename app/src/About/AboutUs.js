@@ -11,6 +11,7 @@ import Text  from './Text.js';
 const styles = theme => ({
     root: {
         background: `url(${bgImage}) no-repeat center center fixed`,
+        opacity: 1,
         backgroundSize: 'cover',
         minHeight: '100vh',
     },
@@ -88,7 +89,7 @@ class AboutUs extends Component {
                                     </CarouselItem>
                                 </Carousel>
                                 <hr class="solid"/>
-                                <Button> Sign Up </Button>
+                                <Button variant="outlined" color="primary"> Sign Up </Button>
                             </Card>
                         </Grid>
                         <Grid className={classes.titleGrid} item sm={12} md={6}>
