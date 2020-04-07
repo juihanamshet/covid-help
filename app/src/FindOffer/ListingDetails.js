@@ -126,8 +126,8 @@ function ListingDetails(props) {
             <Map center={props.zipcode} zoom={13} size="475x300" apiKey={GOOGLE_MAPS}>
                 <Marker location={props.zipcode}></Marker>
             </Map>
-            <div className={classes.titleDiv} style={{color:'grey'}}>
-                <Typography color="secondary" align="center" variant="h4"> Listing Details </Typography>
+            <div className={classes.titleDiv} style={{textAlign:'center'}}>
+                <Typography color="secondary" align="center" variant="overline"> Listing Details </Typography>
             </div>
             <div className={classes.titleDiv}>
                 <Typography align="center" variant="h5">

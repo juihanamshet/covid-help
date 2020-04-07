@@ -212,7 +212,7 @@ class FindOffer extends Component {
                         font-weight: 300;
                     }
                     .btn-link:hover{
-                        color: #90caf9;
+                        color: #ffb851;
                     }
                     #addListing {
                         color: #42a5f5;
@@ -220,11 +220,11 @@ class FindOffer extends Component {
                         font-size: 25px;
                     }
                     #linkIsActive {
-                        color: #42a5f5;
+                        color: #ffa726;
                         text-decoration: underline;
                     }
                     #linkIsActive:hover {
-                        color: grey;
+                        color: #ffb851;
                     }
                     `}
                 </style>
