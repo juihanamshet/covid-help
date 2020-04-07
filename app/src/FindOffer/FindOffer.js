@@ -217,7 +217,7 @@ class FindOffer extends Component {
                         font-size: 25px;
                     }
                     #linkIsActive {
-                        color: #ffa726;
+                        color: #ffa666;
                         text-decoration: underline;
                     }
                     #linkIsActive:hover {

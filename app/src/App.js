@@ -6,6 +6,7 @@ import { Security, LoginCallback, SecureRoute, useOktaAuth } from '@okta/okta-re
 
 const useStyles = makeStyles(theme => ({
   root: {
+    minHeight: '100vh',
     flexGrow: 1,
   },
   appBar: {
