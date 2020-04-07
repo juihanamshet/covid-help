@@ -18,7 +18,7 @@ export default function CarouselItem(props) {
         <div>
             <Card elevation={0} className={classes.base}>
                 <Typography color="primary" variant="h4">{props.title}</Typography>
-                <hr class="solid"/>
+                <hr/>
                 {props.children}
             </Card>
         </div>

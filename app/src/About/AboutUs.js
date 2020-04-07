@@ -88,7 +88,7 @@ class AboutUs extends Component {
                                     <CarouselItem title="FAQ">
                                     </CarouselItem>
                                 </Carousel>
-                                <hr class="solid"/>
+                                <hr/>
                                 <Button variant="outlined" color="primary"> Sign Up </Button>
                             </Card>
                         </Grid>
