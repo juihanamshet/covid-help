@@ -406,6 +406,7 @@ function updateUser(userInfo, callback){
     
 }
 
+
 function createUser(userInfo, callback) {
     connection = new Connection(config);
     code = 200;
@@ -459,4 +460,4 @@ function createUser(userInfo, callback) {
 }
 
 
-module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, createUser, getUser, updateUser }
+module.exports = { getSchoolListings, getUsersListings, getListing, createListingHandler, createUser, getUser, updateUser, getUserID }

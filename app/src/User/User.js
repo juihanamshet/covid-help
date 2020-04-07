@@ -246,22 +246,21 @@ function User(props) {
         let image = e.target.files[0];
         let imageURL = URL.createObjectURL(e.target.files[0])
         console.log('image file: ', image);
-        console.log('image url: ', imageURL);
+        console.log('image url: ', image.name);
+        
         if(!image){ // catch all non uploads
             return;
         }
         setProfilePhoto(image);
         setProfilePhotoURL(imageURL);
-
-        if(profilePhoto === null){
-            console.log('null file provided')
-            return;
-        }
+        console.log('image file: ', image);
+        console.log('image url: ', image.name);
+        
         const accessToken = props.authState.accessToken;
         console.log("new profile photo: ", profilePhoto);
         const fd = new FormData();
-        fd.append('name', image);
-        fd.append('stream', fs.createReadStream(image));
+        fd.append('name', image.name);
+        fd.append('stream', image);
 
         console.log("form data: ", fd);
         

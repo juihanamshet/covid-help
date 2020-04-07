@@ -5,8 +5,24 @@ const OktaJwtVerifier = require('@okta/jwt-verifier');
 var sqltools = require("./sql.js");
 const okta = require('@okta/okta-sdk-nodejs');
 let bodyParser = require('body-parser');
+const {
+    StorageSharedKeyCredential,
+    BlobServiceClient
+    } = require('@azure/storage-blob');
+const {AbortController} = require('@azure/abort-controller');
+const fs = require("fs");
+const path = require("path");
 require('dotenv').config()
 
+const STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+const ACCOUNT_ACCESS_KEY = process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY;
+
+
+const credentials = new StorageSharedKeyCredential(STORAGE_ACCOUNT_NAME, ACCOUNT_ACCESS_KEY);
+
+const blobServiceClient = new BlobServiceClient(`https://${STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,credentials);
+
+const ONE_MEGABYTE = 1024 * 1024;
 
 const client = new okta.Client({
     orgUrl: process.env.OKTA_BASE_URL + '/',
@@ -90,6 +106,56 @@ app.get("/getUser", authenticationRequired, function (req, res, next){
     })
 })
 
+async function addPhoto(containerClient, stream, aborter, filePath){
+    
+    // const fileName = "profilePhoto" + path.extname(filePath)
+    const fileName = "profilePhoto"
+    
+    const blobClient = containerClient.getBlobClient(fileName);
+    const blockBlobClient = blobClient.getBlockBlobClient();
+
+    const uploadOptions = {
+        bufferSize: 8 * ONE_MEGABYTE,
+        maxBuffers: 8,
+    };
+
+    return await blockBlobClient.uploadStream(
+                    stream, 
+                    uploadOptions.bufferSize, 
+                    uploadOptions.maxBuffers,
+                    aborter);
+}
+
+app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next) {
+    console.log("/updateProfilePhoto is called. Hope this works");
+    
+    // he should do form.append('name', FILE_NAME)
+    // form.append('stream', fs.createReadStream('file path'))
+
+    //then
+    const userEmail = req.jwt.claims.sub;
+    const stream = req.body.stream;
+    const filePath = req.body.name;
+    console.log(req.body);
+
+    const containerName = "5";
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    if (! containerClient.exists()) {
+        //If the container doesn't exists, then create one
+        createContainer(containerClient).then(() => console.log("container \
+        creation success")).catch((e) => console.log(e));
+    }
+    const aborter = AbortController.timeout(30 * 60 * 1000);
+
+    console.log(filePath);
+    console.log(stream);
+    addPhoto(containerClient, stream, aborter, filePath).then(() => console.log("success"))
+        .catch((e) => console.log(e))
+
+
+    
+
+})
 
 
 app.post("/updateUser", authenticationRequired, function (req, res, next){
@@ -142,11 +208,53 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     })
 })
 
+async function uploadLocalFile(aborter, containerClient, filePath) {
+    filePath = path.resolve(filePath);
+
+    const fileName = path.basename(filePath);
+
+    console.log(fileName)
+    console.log(path.extname(filePath))
+
+    const blobClient = containerClient.getBlobClient(fileName);
+    const blockBlobClient = blobClient.getBlockBlobClient();
+
+    return await blockBlobClient.uploadFile(filePath,aborter);
+}
+
+async function createContainer(containerClient){
+    return await containerClient.create()
+}
+
 app.post("/createListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const listingInfo = req.body.listingInfo;
+
+    // let images = ["",""];
+    // let userID = "5";
+    console.log(listingInfo.city);
+    console.log(listingInfo.userID);
+
+    let containerName = "container" + userID;
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    console.log(containerName)
+    if (! containerClient.exists()) {
+        //If the container doesn't exists, then create one
+        createContainer(containerClient).then(() => console.log("container \
+        creation success")).catch((e) => console.log(e));
+    }
+    const aborter = AbortController.timeout(30 * 60 * 1000);
+
+    for (image of images){
+    
+        uploadLocalFile(aborter, containerClient, image).then(() => console.log("sucess\
+        of image upload ")).catch((e) => console.log(e));
+    }
+
+
     console.log("/createListing: Creating Listing for " + userEmail)
 
+    
     sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
         if (status === 200) {
             console.log("/createListing Listing Inserted into DB")
