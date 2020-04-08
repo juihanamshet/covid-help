@@ -22,15 +22,18 @@ const styles = theme => ({
         
     },
     sidebar: {
-        position: 'relative',
         display: 'flex',
-        flex: 1,
+        alignContent: 'center',
         justifyContent: 'center',
+        position: 'relative',
         flexWrap: 'wrap',
     },
     spacer: {
         width: '5%'
     },
+    labels: {
+        fontWeight: '300!important'
+    }
 });
 
 function Alert(props) {
@@ -179,12 +182,17 @@ class FindOffer extends Component {
         // if on find tab we'll set listings to be this.state.findListings
         var listings = this.state.find ? this.state.findListings : this.state.offerListings;
         var currListings = [];
+        var disabledListings = []; // we only populate this on the offers page
 
         if(listings){
             listings.forEach(listing => {
                 var name = listing.listingName ? listing.listingName : "Unnamed Listing"
                 var location = listing.city + ", " + listing.state + " " + listing.zipCode;
-                currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
+                if(listing.disabledListing){ // if the listing is disabled we add to disabled listing, all else (undefined, null, false) go in currListings
+                    disabledListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>)
+                }else{
+                    currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
+                }
             });
     
             if(currListings < 1){
@@ -214,19 +222,19 @@ class FindOffer extends Component {
                         font-weight: 300;
                     }
                     .btn-link:hover{
-                        color: #ffb851;
+                        color: #aaa9ad;
                     }
                     #addListing {
-                        color: #007bff;
+                        color: #6699ff;
                         font-weight: 400;
                         font-size: 25px;
                     }
                     #linkIsActive {
-                        color: #ffa666;
+                        color: #6699ff;
                         text-decoration: underline;
                     }
                     #linkIsActive:hover {
-                        color: #ffb851;
+                        color: #99bbff;
                     }
                     `}
                 </style>
@@ -249,11 +257,17 @@ class FindOffer extends Component {
                     </Grid>
                     <Grid item xs={12}>
                         { listings  ? 
-                        <div className={classes.sidebar}>
-                            <Suspense fallback={<div>Loading...</div>}>
-                                {currListings}
-                            </Suspense>
-                        </div> : <div className={classes.sidebar}><CircularProgress size={50}/></div>}
+                        <Suspense fallback={(<div className={classes.sidebar}>Loading...</div>)}>
+                            { this.state.find ? '' : <div><hr/></div> }
+                            { this.state.find ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Active</Typography></div>}
+                            <div className={classes.sidebar}>{currListings}</div>
+                            { this.state.find ? '' : <div><hr/></div> }
+                            { this.state.find ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Disabled</Typography></div>}
+                            <div className={classes.sidebar}>{disabledListings}</div>
+                            { this.state.find ? '' : <div><hr/></div> }
+                        </Suspense>: 
+                        <div className={classes.sidebar}><CircularProgress size={50}/></div>
+                        }
                     </Grid>
                     <Grid item lg={12}>
                         {listingButton}

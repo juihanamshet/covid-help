@@ -78,7 +78,7 @@ class AboutUs extends Component {
                     <Grid alignItems='center' wrap='wrap-reverse' container spacing={1}>
                         <Grid className={classes.infoGrid} item sm={12} md={6}>
                             <Card className={classes.introCard}>
-                                <Carousel autoPlay={false}>
+                                <Carousel autoPlay={false} animation="slide">
                                     <CarouselItem title="About Us">
                                         <Text></Text>
                                     </CarouselItem>

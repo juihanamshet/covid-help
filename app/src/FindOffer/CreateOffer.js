@@ -108,9 +108,9 @@ function CreateOffer(props) {
                         close
                     </Link>
                     <DialogTitle disableTypography={true} id="alert-dialog-title">
-                        <Typography variant="h5">
+                        <Typography color="primary" variant="h5">
                             Add Listing
-                </Typography>
+                        </Typography>
                     </DialogTitle>
                     <DialogContent>
                         <form onSubmit={handleSubmit}>
