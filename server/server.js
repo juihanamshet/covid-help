@@ -321,7 +321,7 @@ app.put("/disableListing", authenticationRequired, function (req, res, next) {
 
 app.put("/enableListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
-    const listingID = req.fields.listingiD;
+    const listingID = req.fields.listingID;
     console.log("/enableListing: disabling Listing for listingID" + listingID + " and user: " + userEmail);
 
     sqltools.enableListing(listingID, userEmail, (sqlResult, status) => {
@@ -330,7 +330,7 @@ app.put("/enableListing", authenticationRequired, function (req, res, next) {
             res.json(status);
         } else {
             res.statusCode = 500;
-            res.send("enableListing Server Error");
+            res.send("/enableListing Server Error");
         }
     })
 })

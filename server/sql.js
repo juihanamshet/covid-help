@@ -537,7 +537,7 @@ function enableListing(listingID, userEmail, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/disableListing SQL DB Connected Successfully");
+        console.log("/enableListing SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
