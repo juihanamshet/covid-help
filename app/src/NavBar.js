@@ -3,8 +3,6 @@ import { Toolbar, AppBar, Typography, MenuList, Divider, MenuItem, Popper, Paper
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import { useOktaAuth } from '@okta/okta-react';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import { Prompt } from 'react-router-dom'
  
 
 const useStyles = makeStyles(theme => ({
@@ -17,6 +15,7 @@ const useStyles = makeStyles(theme => ({
     },
     appBarAlt: {
         backgroundColor: 'transparent',
+        boxShadow: 'none',
     },
     title: {
         flexGrow: 1,
@@ -71,7 +70,7 @@ const useStyles = makeStyles(theme => ({
 
 const NavBar = (props) => {
     const classes = useStyles();
-    const { authState, authService } = useOktaAuth();
+    const { authState } = useOktaAuth();
     const anchorRef = React.useRef(null);
     const [open, setOpen] = React.useState(false);
 
@@ -88,8 +87,8 @@ const NavBar = (props) => {
     
     function handleListKeyDown(event) {
         if (event.key === 'Tab') {
-          event.preventDefault();
-          setOpen(false);
+            event.preventDefault();
+            setOpen(false);
         }
     }
     

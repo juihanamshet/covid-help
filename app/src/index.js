@@ -1,13 +1,9 @@
 import React from 'react';
 import './index.css';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import App from './App';
-
 import { MuiThemeProvider, createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
-import { blue } from '@material-ui/core/colors';
 import * as serviceWorker from './serviceWorker';
 
 let theme = createMuiTheme({

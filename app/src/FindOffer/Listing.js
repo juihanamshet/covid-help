@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -24,8 +24,6 @@ const useStyles = makeStyles(theme => ({
 
 // props: onClick, 
 function Listing(props) {
-  const [id, setId] = useState(props.listingId);
-
   const classes = useStyles();
 
   var listingName = "default"
@@ -40,7 +38,7 @@ function Listing(props) {
   return (
     <div className={classes.base}>
       <Card elevation={3} className={classes.root}>
-        <CardActionArea onClick={() => props.onClick(id)}>
+        <CardActionArea onClick={() => props.onClick(props.listingId)}>
           <CardMedia
             className={classes.media}
             image={require("../img/noListingImages.jpg")}
@@ -70,7 +68,7 @@ function Listing(props) {
           <Button component="a" target="_blank" href={`mailto:${props.listingEmail}`} size="small" color="primary">
             Contact
           </Button>
-          <Button size="small" color="primary" onClick={() => props.onClick(id)}>
+          <Button size="small" color="primary" onClick={() => props.onClick(props.listingId)}>
             Learn More
           </Button>
         </CardActions>

@@ -10,11 +10,11 @@ import NavBar from './NavBar.js'
 import config from './config';
 
 const Auth = () => {
-    const { authState, authService } = useOktaAuth();
+    const { authState } = useOktaAuth();
 
 
     useEffect(() => {
-        const { pkce, issuer, clientId, redirectUri, scopes } = config.oidc;
+        const { pkce, issuer, clientId, scopes } = config.oidc;
         const widget = new OktaSignIn({
             /**
              * Note: when using the Sign-In Widget for an OIDC flow, it still

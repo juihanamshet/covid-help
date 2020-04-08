@@ -37,17 +37,17 @@ function CreateOffer(props) {
     const [accessibility, setAccessibility] = useState(false);
     const [images, setImages] = useState([]);
 
-    const { value: listingName, bind: bindListingName, reset: resetListingName } = useInput('');
-    const { value: addressOne, bind: bindAddressOne, reset: resetAddressOne } = useInput('');
-    const { value: addressTwo, bind: bindAddressTwo, reset: resetAddressTwo } = useInput('');
-    const { value: neighborhood, bind: bindNeighborhood, reset: resetNeighborhood } = useInput('');
-    const { value: city, bind: bindCity, reset: resetCity } = useInput('');
-    const { value: state, bind: bindState, reset: resetState } = useInput('');
-    const { value: zipcode, bind: bindZipcode, reset: resetZipcode } = useInput('');
-    const { value: accessibilityInfo, bind: bindAccesibilityInfo, reset: AccesibilityInfo } = useInput('');
-    const { value: livingSituation, bind: bindLivingSituation, reset: resetLivingSituation } = useInput('');
-    const { value: description, bind: bindDescription, reset: resetDescription } = useInput('');
-    const { value: housingRules, bind: bindHousingRules, reset: resetHousingRules } = useInput('');
+    const { value: listingName, bind: bindListingName } = useInput('');
+    const { value: addressOne, bind: bindAddressOne } = useInput('');
+    const { value: addressTwo, bind: bindAddressTwo } = useInput('');
+    const { value: neighborhood, bind: bindNeighborhood } = useInput('');
+    const { value: city, bind: bindCity } = useInput('');
+    const { value: state, bind: bindState } = useInput('');
+    const { value: zipcode, bind: bindZipcode } = useInput('');
+    const { value: accessibilityInfo, bind: bindAccesibilityInfo } = useInput('');
+    const { value: livingSituation, bind: bindLivingSituation } = useInput('');
+    const { value: description, bind: bindDescription } = useInput('');
+    const { value: housingRules, bind: bindHousingRules } = useInput('');
 
     // TODO: snackbar and check
 
@@ -78,7 +78,6 @@ function CreateOffer(props) {
                 'Authorization': `Bearer ${accessToken}`,
             },
         };
-        var self = this;
         axios.post(BASE_URL + '/createListing', data, config)
             .then(function (response) {
                 props.openSnackBar({severity: 'success', message: 'Succesfully created new listing!'});
@@ -93,6 +92,7 @@ function CreateOffer(props) {
 
     const handleFile = (files) => {
         setImages(files);
+        console.log(images);
     }
 
     return (

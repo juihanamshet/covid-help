@@ -1,38 +1,15 @@
-import React, { useState } from 'react';
-import { Security, LoginCallback, SecureRoute, useOktaAuth } from '@okta/okta-react';
-import { Toolbar, AppBar, Typography, Button } from '@material-ui/core';
+import React from 'react';
+import { Security, LoginCallback, SecureRoute } from '@okta/okta-react';
 import AboutUs from './About/AboutUs.js';
 import FindOffer from './FindOffer/FindOffer.js';
 import Logout from './Logout'
 import Auth from './Auth.js';
 import User from './User/User.js'
-import { useHistory, Link, BrowserRouter as Router, Route } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
+import { useHistory, Route } from 'react-router-dom';
 
 
 
 const AllAppRoutes = () => {
-    const useStyles = makeStyles(theme => ({
-        root: {
-            flexGrow: 1,
-        },
-        appBar: {
-            boxShadow: 'none',
-        },
-        title: {
-            flexGrow: 1,
-        },
-        tab: {
-            color: 'white',
-            "&:hover": {
-                backgroundColor: 'transparent',
-                color: '#eceff1',
-                textDecoration: 'underline',
-            }
-        }
-    }));
-    const classes = useStyles();
-
     const history = useHistory();
     const onAuthRequired = () => {
         history.push('/login');

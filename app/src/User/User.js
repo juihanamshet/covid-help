@@ -11,8 +11,6 @@ import bgImage from '../img/house.jpg'
 import _ from 'lodash'
 import sanitizeHtml from 'sanitize-html-react'
 import FormData from 'form-data'
-const fs = require("fs");
-const path = require("path");
 
 const BASE_URL = 'http://localhost:8080'
 
@@ -161,8 +159,8 @@ function User(props) {
         // console.log('newLI: ', li.current)
     }
 
-    // state for disabling account: TODO
-    const [disabledAct, setDisabledAct] = useState('')
+    // state for disabling account: TODO (future builds)
+    // const [disabledAct, setDisabledAct] = useState('')
 
     const [user, setUser] = useState({});
     const [profilePhoto, setProfilePhoto] = useState(null);
@@ -171,8 +169,8 @@ function User(props) {
     const [snackBar, setSnackBar] = useState(false);
     const [snackBarMessage, setSnackBarMessage] = useState({severity:'success', message:'successfully updated profile!'})
 
-    const accessToken = props.authState.accessToken;
     React.useEffect(() => {
+        const accessToken = props.authState.accessToken;
         let config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -200,7 +198,7 @@ function User(props) {
             .catch(function (error) {
                 console.log(error);
             });
-    }, [user, editDisabled, profilePhoto, profilePhotoURL]);
+    }, [user, editDisabled, profilePhoto, props.authState.accessToken]);
 
     const saveChanges = async() => {
         const accessToken = props.authState.accessToken;
@@ -232,7 +230,6 @@ function User(props) {
                 'Authorization': `Bearer ${accessToken}`,
             },
         };
-        var self = this;
         axios.post(BASE_URL + '/updateUser', data, config)
             .then(function (response) {
                 console.log(response)
@@ -250,19 +247,17 @@ function User(props) {
     const onProfilePhotoChange = async(e) =>{
         let image = e.target.files[0];
         let imageURL = URL.createObjectURL(e.target.files[0])
-        console.log('image file: ', image);
-        console.log('image url: ', image.name);
         
         if(!image){ // catch all non uploads
             return;
-        }
+        };
+
         setProfilePhoto(image);
         setProfilePhotoURL(imageURL);
         console.log('image file: ', image);
-        console.log('image url: ', image.name);
         
         const accessToken = props.authState.accessToken;
-        console.log("new profile photo: ", profilePhoto);
+        
         const fd = new FormData();
         fd.append('stream', image);
 
@@ -277,7 +272,6 @@ function User(props) {
                 'Content-Type': `multipart/form-data; boundary=${fd._boundary}`,
             },
         };
-        var self = this;
         axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
             .then(function (response) {
                 setSnackBar(true);

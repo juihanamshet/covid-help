@@ -115,7 +115,6 @@ function ListingDetails(props) {
                 listingID: props.listingId
             }
         };
-        var self = this;
         axios.delete(BASE_URL + '/deleteListing', config)
             .then(function (response) {
                 console.log("deleted the listing");
@@ -141,7 +140,6 @@ function ListingDetails(props) {
                 'Authorization': `Bearer ${accessToken}`,
             },
         };
-        var self = this;
         axios.put(BASE_URL + '/disableListing', data, config)
             .then(function (response) {
                 console.log("disabled the listing");
@@ -167,7 +165,6 @@ function ListingDetails(props) {
                 'Authorization': `Bearer ${accessToken}`,
             },
         };
-        var self = this;
         axios.put(BASE_URL + '/enableListing', data, config)
             .then(function (response) {
                 console.log("disabled the listing");
@@ -287,7 +284,8 @@ function ListingDetails(props) {
                 <Card elevation={3} style={{paddingTop: 10}} className={classes.fieldsDiv}>
                     <Grid container spacing={1}>
                         <Grid item xs={2} style={{display: 'flex', alignItems:'center'}}>
-                            <Avatar style={{ width: 60, height: 60}} src={props.avatarPhoto} src={jordad}></Avatar>
+                            <Avatar style={{ width: 60, height: 60}} src={jordad}></Avatar>
+                            {/* <Avatar style={{ width: 60, height: 60}} src={props.avatarPhoto} src={jordad}></Avatar> */}
                         </Grid>
                         <Grid item xs={10}>
                         <div>

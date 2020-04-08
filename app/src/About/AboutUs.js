@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Explainer from './Explainer.js';
 import { withStyles } from '@material-ui/styles';
-import { Typography, Grid, Card, CardContent, CardActions, Button } from '@material-ui/core';
+import { Typography, Grid, Card, Button } from '@material-ui/core';
 import Carousel from 'react-material-ui-carousel'
 import bgImage from '../img/bedroom.jpg';
 import NavBar from '../NavBar.js'

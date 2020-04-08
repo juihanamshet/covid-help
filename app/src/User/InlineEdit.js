@@ -21,7 +21,6 @@ const useStyles = makeStyles(theme => ({
 export default function InlineEdit(props) {
     const classes = useStyles();
     const defaultInput = props.defaultInput ? props.defaultInput : 'no information provided';
-    const text = React.useRef('')
     const label = props.label ? <Typography>{props.label}&nbsp;</Typography> : <Typography></Typography>;
 
     return (
