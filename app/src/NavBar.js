@@ -8,24 +8,47 @@ import { Prompt } from 'react-router-dom'
  
 
 const useStyles = makeStyles(theme => ({
+    // alts: appBar, titleText, tab
     root: {
         flexGrow: 1,
     },
     appBar: {
         backgroundColor: 'white',
     },
+    appBarAlt: {
+        backgroundColor: 'transparent',
+    },
     title: {
         flexGrow: 1,
+        "&:hover": {
+            textDecoration: 'none',
+        }
+    },
+    titleText: {
+        color: theme.palette.primary.main,
         "&:hover": {
             color: theme.palette.primary.light,
             textDecoration: 'none',
         }
     },
-    titleText:{
-        color: theme.palette.primary.main,
+    titleTextAlt: {
+        color: theme.palette.primary.supaLight,
+        "&:hover": {
+            color: theme.palette.primary.main,
+            textDecoration: 'none',
+        }
     },
     tab: {
         color: theme.palette.primary.main,
+        paddingRight: 15,
+        fontWeight: 500,
+        "&:hover": {
+            color: theme.palette.primary.light,
+            textDecoration: 'underline',
+        }
+    },
+    tabAlt: {
+        color: theme.palette.primary.supaLight,
         paddingRight: 15,
         fontWeight: 500,
         "&:hover": {
@@ -38,7 +61,7 @@ const useStyles = makeStyles(theme => ({
         marginTop: 2.5
     },
     menuLink: {
-        color: 'black',
+        color: theme.palette.primary.main,
         "&:hover": {
             color: 'black',
             textDecoration: 'none'
@@ -46,7 +69,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const NavBar = () => {
+const NavBar = (props) => {
     const classes = useStyles();
     const { authState, authService } = useOktaAuth();
     const anchorRef = React.useRef(null);
@@ -81,32 +104,32 @@ const NavBar = () => {
       }, [open]);
 
     const loginButton = !authState.isAuthenticated ?
-        <Link className={classes.tab} to="/login">Login</Link> :
+        <Link className={props.alt ? classes.tabAlt : classes.tab} to="/login">Login</Link> :
         <Link
           ref={anchorRef}
           onMouseOver={handleToggle}
-          className={classes.tab}
+          className={props.alt ? classes.tabAlt : classes.tab}
           to="/user">
             User
         </Link>;
 
     return (
-        <AppBar className={classes.appBar} position="sticky">
+        <AppBar className={props.alt ? classes.appBarAlt : classes.appBar} position="sticky">
             <Toolbar>
                 <Link
                     className={classes.title}
                     to="/">
-                    <Typography className={classes.titleText} variant="h5" >
+                    <Typography className={props.alt ? classes.titleTextAlt : classes.titleText} variant="h5" >
                         <span role="img" aria-label="house with garden">🏡</span> Project Student Relief
                     </Typography>
                 </Link>
                 <Link
-                    className={classes.tab}
+                    className={props.alt ? classes.tabAlt : classes.tab}
                     to="/">
                     About Us
                 </Link>
                 <Link
-                    className={classes.tab}
+                    className={props.alt ? classes.tabAlt : classes.tab}
                     to="offers">
                     Find & Offer
                 </Link>

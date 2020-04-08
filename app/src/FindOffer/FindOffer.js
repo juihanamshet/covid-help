@@ -196,7 +196,7 @@ class FindOffer extends Component {
             });
     
             if(currListings < 1){
-                currListings.push(<Typography key="error" color="error">No Current Listings!</Typography>);
+                currListings.push(<Typography key="error" color="error" style={{margin: 25}}>No Current Listings!</Typography>);
             };
         }
         
@@ -255,21 +255,24 @@ class FindOffer extends Component {
                             </div>
                         </div>
                     </Grid>
+                    <Grid item lg={12}>
+                        {listings && listings.length ? listingButton : ''}
+                    </Grid> 
                     <Grid item xs={12}>
                         { listings  ? 
                         <Suspense fallback={(<div className={classes.sidebar}>Loading...</div>)}>
-                            { this.state.find ? '' : <div><hr/></div> }
-                            { this.state.find ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Active</Typography></div>}
+                            { this.state.find || !listings.length ? '' : <div><hr/></div> }
+                            { this.state.find || !listings.length ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Active</Typography></div>}
                             <div className={classes.sidebar}>{currListings}</div>
-                            { this.state.find ? '' : <div><hr/></div> }
-                            { this.state.find ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Disabled</Typography></div>}
+                            { this.state.find || !listings.length ? '' : <div><hr/></div> }
+                            { this.state.find || !disabledListings.length ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Disabled</Typography></div>}
                             <div className={classes.sidebar}>{disabledListings}</div>
-                            { this.state.find ? '' : <div><hr/></div> }
+                            { this.state.find || !disabledListings.length ? '' : <div><hr/></div> }
                         </Suspense>: 
                         <div className={classes.sidebar}><CircularProgress size={50}/></div>
                         }
                     </Grid>
-                    <Grid item lg={12}>
+                    <Grid item lg={12} style={{ marginBottom:15 }}>
                         {listingButton}
                     </Grid>
                 </Grid>

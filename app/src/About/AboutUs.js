@@ -46,9 +46,6 @@ const styles = theme => ({
     bannerTitle: {
         color: 'white',
     },
-    bannerDescription: {
-        fontStyle: 'italic'
-    },
     introCard: {
         maxHeight: '75vh',
         width: '80%',
@@ -74,7 +71,7 @@ class AboutUs extends Component {
         const { classes } = this.props;
         return (
             <div className={classes.root}>
-                <NavBar></NavBar>
+                <NavBar alt={true}></NavBar>
                     <Grid alignItems='center' wrap='wrap-reverse' container spacing={1}>
                         <Grid className={classes.infoGrid} item sm={12} md={6}>
                             <Card className={classes.introCard}>

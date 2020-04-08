@@ -13,7 +13,8 @@ import * as serviceWorker from './serviceWorker';
 let theme = createMuiTheme({
     palette: {
         primary: {
-            main: '#6699ff'
+            main: '#6699ff',
+            supaLight: "#e6eeff"
         },
         secondary: {
             main: '#ffa666',
