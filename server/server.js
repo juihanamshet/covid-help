@@ -8,8 +8,8 @@ let bodyParser = require('body-parser');
 const {
     StorageSharedKeyCredential,
     BlobServiceClient
-    } = require('@azure/storage-blob');
-const {AbortController} = require('@azure/abort-controller');
+} = require('@azure/storage-blob');
+const { AbortController } = require('@azure/abort-controller');
 const fs = require("fs");
 const path = require("path");
 require('dotenv').config()
@@ -24,7 +24,7 @@ const ACCOUNT_ACCESS_KEY = process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY;
 
 const credentials = new StorageSharedKeyCredential(STORAGE_ACCOUNT_NAME, ACCOUNT_ACCESS_KEY);
 
-const blobServiceClient = new BlobServiceClient(`https://${STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,credentials);
+const blobServiceClient = new BlobServiceClient(`https://${STORAGE_ACCOUNT_NAME}.blob.core.windows.net`, credentials);
 
 const ONE_MEGABYTE = 1024 * 1024;
 
@@ -71,8 +71,8 @@ app.use(cors());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-app.use(bodyParser.json());
 app.use(formidable());
+// app.use(bodyParser.json());
 app.listen(8080);
 
 
@@ -115,12 +115,12 @@ app.get("/getUser", authenticationRequired, function (req, res, next) {
     })
 })
 
-async function addPhoto(containerClient, filePath, extname, aborter){
+async function addPhoto(containerClient, filePath, extname, aborter) {
     filePath = path.resolve(filePath);
 
     // const fileName = "profilePhoto" + path.extname(filePath)
     const fileName = "profilePhoto" + extname;
-    
+
     const blobClient = containerClient.getBlobClient(fileName);
     const blockBlobClient = blobClient.getBlockBlobClient();
 
@@ -135,7 +135,7 @@ async function addPhoto(containerClient, filePath, extname, aborter){
 
 app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next) {
     console.log("/updateProfilePhoto is called. Hope this works");
-    
+
     // he should do form.append('name', FILE_NAME)
     // form.append('stream', fs.createReadStream('file path'))
 
@@ -147,7 +147,7 @@ app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next
     const containerName = "container5";
 
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    if (! containerClient.exists()) {
+    if (!containerClient.exists()) {
         //If the container doesn't exists, then create one
         createContainer(containerClient).then(() => console.log("container \
         creation success")).catch((e) => console.log(e));
@@ -166,7 +166,7 @@ app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next
 
 app.post("/updateUser", authenticationRequired, function (req, res, next) {
     console.log("Update User. Hope this works")
-    const userInfo = req.body.userInfo;
+    const userInfo = req.fields.userInfo;
 
 
     sqltools.updateUser(userInfo, (sqlResult, status) => {
@@ -225,20 +225,20 @@ async function uploadLocalFile(aborter, containerClient, filePath) {
     const blobClient = containerClient.getBlobClient(fileName);
     const blockBlobClient = blobClient.getBlockBlobClient();
 
-    return await blockBlobClient.uploadFile(filePath,aborter);
+    return await blockBlobClient.uploadFile(filePath, aborter);
 }
 
-async function createContainer(containerClient){
+async function createContainer(containerClient) {
     return await containerClient.create()
 }
 
 app.post("/createListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
-    const listingInfo = req.body.listingInfo;
+    const listingInfo = req.fields.listingInfo;
 
     // let images = ["",""];
     // let userID = "5";
-   // If you call data.append('file', file) multiple times your request will contain an array of your files...
+    // If you call data.append('file', file) multiple times your request will contain an array of your files...
     var files = req.files.files;
     console.log(listingInfo.city);
     console.log(listingInfo.userID);
@@ -246,15 +246,15 @@ app.post("/createListing", authenticationRequired, function (req, res, next) {
     let containerName = "container" + userID;
     const containerClient = blobServiceClient.getContainerClient(containerName);
     console.log(containerName)
-    if (! containerClient.exists()) {
+    if (!containerClient.exists()) {
         //If the container doesn't exists, then create one
         createContainer(containerClient).then(() => console.log("container \
         creation success")).catch((e) => console.log(e));
     }
     const aborter = AbortController.timeout(30 * 60 * 1000);
 
-    for (file of files){
-    
+    for (file of files) {
+
         uploadLocalFile(aborter, containerClient, file.path).then(() => console.log("sucess\
         of image upload ")).catch((e) => console.log(e));
     }
@@ -262,7 +262,7 @@ app.post("/createListing", authenticationRequired, function (req, res, next) {
 
     console.log("/createListing: Creating Listing for " + userEmail)
 
-    
+
     sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
         if (status === 200) {
             console.log("/createListing Listing Inserted into DB")
@@ -278,7 +278,7 @@ app.post("/createListing", authenticationRequired, function (req, res, next) {
 app.post("/createUser", authenticationRequired, async function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
-    const userInfo = req.body.userInfo;
+    const userInfo = req.fields.userInfo;
     userInfo['org'] = userSchool;
     console.log("/createUser called for User: " + userEmail);
 
@@ -304,7 +304,7 @@ app.post("/createUser", authenticationRequired, async function (req, res, next) 
 
 app.put("/disableListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
-    const listingID = req.body.listingID;
+    const listingID = req.fields.listingID;
     console.log("/disableListing: disabling Listing for listingID " + listingID + " and user: " + userEmail);
 
     sqltools.disableListing(listingID, userEmail, (sqlResult, status) => {
@@ -321,7 +321,7 @@ app.put("/disableListing", authenticationRequired, function (req, res, next) {
 
 app.put("/enableListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
-    const listingID = req.body.listingiD;
+    const listingID = req.fields.listingiD;
     console.log("/enableListing: disabling Listing for listingID" + listingID + " and user: " + userEmail);
 
     sqltools.enableListing(listingID, userEmail, (sqlResult, status) => {
@@ -337,7 +337,7 @@ app.put("/enableListing", authenticationRequired, function (req, res, next) {
 
 app.delete("/deleteListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
-    const listingID = req.body.listingID;
+    const listingID = req.fields.listingID;
     console.log("/deleteListing: deleting Listing for listingID" + listingID + " and user: " + userEmail);
 
     sqltools.deleteListing(listingID, userEmail, (sqlResult, status) => {
