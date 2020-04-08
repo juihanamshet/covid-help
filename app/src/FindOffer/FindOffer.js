@@ -45,8 +45,8 @@ class FindOffer extends Component {
             drawerOpen: false,
             ownerDialogOpen: false,
             createOfferOpen: false,
-            findListings: [],
-            offerListings: [],
+            findListings: null,
+            offerListings: null,
             currListings: [],
             currListing: {},
             currListingID: -1,
@@ -133,11 +133,12 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getUsersListings', config)
             .then(function (response) {
+                console.log(response.data)
                 self.setState({ offerListings: response.data, find: false});
             })
             .catch(function (error) {
                 console.log(error);
-            });
+        });
     }
 
     getCurrentListing = async(listingId) => {
@@ -164,6 +165,7 @@ class FindOffer extends Component {
     }
 
     toggleDrawer = (open) => e => {
+        console.log("toggling drawer");
         if (e && e.type === 'keydown' && (e.key === 'Tab' || e.key === 'Shift')) {
             return;
         }
@@ -176,18 +178,20 @@ class FindOffer extends Component {
 
         // if on find tab we'll set listings to be this.state.findListings
         var listings = this.state.find ? this.state.findListings : this.state.offerListings;
-        
         var currListings = [];
-        listings.forEach(listing => {
-            var name = listing.listingName ? listing.listingName : "Unnamed Listing"
-            var location = listing.city + ", " + listing.state + " " + listing.zipCode;
-            currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
-        });
 
-        if(currListings < 1){
-            currListings.push(<Typography key="error" color="error">No Current Listings!</Typography>);
-        };
-
+        if(listings){
+            listings.forEach(listing => {
+                var name = listing.listingName ? listing.listingName : "Unnamed Listing"
+                var location = listing.city + ", " + listing.state + " " + listing.zipCode;
+                currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
+            });
+    
+            if(currListings < 1){
+                currListings.push(<Typography key="error" color="error">No Current Listings!</Typography>);
+            };
+        }
+        
         /* LOGIC FOR ACTIVE PAGE */
 
         // styling and components for offer page
@@ -244,7 +248,7 @@ class FindOffer extends Component {
                         </div>
                     </Grid>
                     <Grid item xs={12}>
-                        { listings.length ? 
+                        { listings  ? 
                         <div className={classes.sidebar}>
                             <Suspense fallback={<div>Loading...</div>}>
                                 {currListings}
@@ -293,6 +297,7 @@ class FindOffer extends Component {
                             // for snackbar and reload
                             openSnackBar={this.openSnackBar}
                             refreshOffers={this.getUserListings}
+                            handleClose={() => this.toggleDrawer(false)}
                         >
                         </ListingDetails>
                     </Suspense>

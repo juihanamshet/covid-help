@@ -111,6 +111,7 @@ function ListingDetails(props) {
         var self = this;
         axios.delete(BASE_URL + '/deleteListing', config)
             .then(function (response) {
+                console.log("deleted the listing");
                 setClickedDelete(!clickedDelete)
                 props.openSnackBar({severity: 'success', message: 'Succesfully deleted listing!'});
                 props.handleClose();
@@ -136,9 +137,10 @@ function ListingDetails(props) {
         var self = this;
         axios.put(BASE_URL + '/disableListing', data, config)
             .then(function (response) {
+                console.log("disabled the listing");
                 setClickedDisable(!clickedDisable)
-                props.openSnackBar({severity: 'success', message: 'Succesfully disabled listing!'});
                 props.handleClose();
+                props.openSnackBar({severity: 'success', message: 'Succesfully disabled listing!'});
                 props.refreshOffers();
             })
             .catch(function (error) {
