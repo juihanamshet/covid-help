@@ -130,7 +130,7 @@ function getUsersListings(email, school, callback) {
     sqlQuery =
         "SELECT listingID, userTable.userID, \
         listingName, zipCode, prefEmail, grad_year, \
-        city,lgbtqpFriendly, accessibilityFriendly, state\
+        city,lgbtqpFriendly, accessibilityFriendly, state, disabledListing\
         FROM listingTable JOIN userTable \
         ON (listingTable.userID = userTable.userID) \
         WHERE disabledAcct = 0 AND orgEmail=@Email AND org=@School";
