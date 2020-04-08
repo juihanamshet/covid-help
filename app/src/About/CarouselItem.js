@@ -4,11 +4,14 @@ import { Typography, Card } from '@material-ui/core'
 
 const useStyles = makeStyles(theme => ({
     base: {
-      padding: 15,
-      height: 500,
-      maxHeight: 500,
-      maxWidth: '100%',
-      overflow: 'auto',
+        padding: 15,
+        height: 500,
+        maxHeight: 500,
+        maxWidth: '100%',
+    },
+    child: {
+        height: '85%',
+        overflow: 'auto',
     }
 }));
 
@@ -19,7 +22,9 @@ export default function CarouselItem(props) {
             <Card elevation={0} className={classes.base}>
                 <Typography color="primary" variant="h4">{props.title}</Typography>
                 <hr/>
-                {props.children}
+                <div className={classes.child}>
+                    {props.children}
+                </div>
             </Card>
         </div>
     )

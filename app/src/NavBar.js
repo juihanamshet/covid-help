@@ -17,8 +17,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: 'transparent',
         boxShadow: 'none',
     },
-    title: {
+    titleDiv: {
         flexGrow: 1,
+    },
+    title: {
         "&:hover": {
             textDecoration: 'none',
         }
@@ -115,13 +117,16 @@ const NavBar = (props) => {
     return (
         <AppBar className={props.alt ? classes.appBarAlt : classes.appBar} position="sticky">
             <Toolbar>
-                <Link
-                    className={classes.title}
-                    to="/">
-                    <Typography className={props.alt ? classes.titleTextAlt : classes.titleText} variant="h5" >
-                        <span role="img" aria-label="house with garden">🏡</span> Project Student Relief
-                    </Typography>
-                </Link>
+                <div className={classes.titleDiv}>
+                    <Link
+                        className={classes.title}
+                        to="/">
+                        <Typography className={props.alt ? classes.titleTextAlt : classes.titleText} variant="h5" >
+                            <span role="img" aria-label="house with garden">🏡</span> Project Student Relief
+                        </Typography>
+                    </Link>
+                </div>
+                <div className={classes.titleDiv}></div>
                 <Link
                     className={props.alt ? classes.tabAlt : classes.tab}
                     to="/">
