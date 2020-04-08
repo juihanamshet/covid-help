@@ -82,6 +82,14 @@ class FindOffer extends Component {
         this.setState({ snackBarOpen: false });
     }
 
+    toggleDrawer = (open) => e => {
+        this.setState({ drawerOpen: open });
+    };
+
+    closeDrawer = () => {
+        this.setState({ drawerOpen: false });
+    }
+
     componentDidMount() {
         const accessToken = this.props.authState.accessToken;
         var config = {
@@ -163,14 +171,6 @@ class FindOffer extends Component {
                 console.log(error);
         });
     }
-
-    toggleDrawer = (open) => e => {
-        console.log("toggling drawer");
-        if (e && e.type === 'keydown' && (e.key === 'Tab' || e.key === 'Shift')) {
-            return;
-        }
-        this.setState({ drawerOpen: open });
-    };
 
     render() {
         // for styling
@@ -268,6 +268,7 @@ class FindOffer extends Component {
                         <ListingDetails
                             // if this is user owned listing
                             isOwner={!this.state.find}
+                            disabledListing={this.state.currListing.disabledListing}
                             // info for the housing
                             listingId = {this.state.currListing.listingID}
                             key={this.state.currListing.listingID + Math.random()}
@@ -297,7 +298,7 @@ class FindOffer extends Component {
                             // for snackbar and reload
                             openSnackBar={this.openSnackBar}
                             refreshOffers={this.getUserListings}
-                            handleClose={() => this.toggleDrawer(false)}
+                            handleClose={this.closeDrawer}
                         >
                         </ListingDetails>
                     </Suspense>

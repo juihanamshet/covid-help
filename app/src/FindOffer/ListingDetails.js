@@ -53,6 +53,12 @@ const useStyles = makeStyles(theme => ({
             backgroundColor: "rgba(255, 196, 0, 0.04)"
         }
     },
+    enableButton: {
+        color: "#32CD32",
+        "&:hover": {
+            backgroundColor: "rgba(50,205,50,0.04)"
+        }
+    },
     confirmClick: {
         borderColor: "#32CD32",
         color: "#32CD32",
@@ -73,6 +79,7 @@ function ListingDetails(props) {
     const accessToken = props.authState.accessToken;
     const [clickedDelete, setClickedDelete] = useState(false);
     const [clickedDisable, setClickedDisable] = useState(false);
+    const [clickedEnable, setClickedEnable] = useState(false);
 
     // accesibility
     var accessibilityFriendly = props.accessibilityFriendly ? "Yes" : "No";
@@ -97,7 +104,7 @@ function ListingDetails(props) {
         }
     });
 
-    const submitDeleteReq = () => {
+    const submitDeleteReq = async() => {
         console.log('submitted delete request')
         var config = {
             headers: {
@@ -114,7 +121,7 @@ function ListingDetails(props) {
                 console.log("deleted the listing");
                 setClickedDelete(!clickedDelete)
                 props.openSnackBar({severity: 'success', message: 'Succesfully deleted listing!'});
-                props.handleClose();
+                props.handleClose(false);
                 props.refreshOffers();
             })
             .catch(function (error) {
@@ -123,7 +130,7 @@ function ListingDetails(props) {
             });
     }
 
-    const submitDisableReq = () => {
+    const submitDisableReq = async() => {
         console.log('submitted disable request')
         var data = {
             listingID: props.listingId
@@ -149,6 +156,32 @@ function ListingDetails(props) {
             });
     }
 
+    const submitEnableReq = async() => {
+        console.log('submitted disable request')
+        var data = {
+            listingID: props.listingId
+        };
+        var config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        };
+        var self = this;
+        axios.put(BASE_URL + '/enableListing', data, config)
+            .then(function (response) {
+                console.log("disabled the listing");
+                setClickedDisable(!clickedDisable)
+                props.handleClose();
+                props.openSnackBar({severity: 'success', message: 'Succesfully enabled listing!'});
+                props.refreshOffers();
+            })
+            .catch(function (error) {
+                console.log(error);
+                props.openSnackBar({severity: 'error', message: 'Unable to enable listing, please try again.'});                
+            });
+    }
+
     const clearClicks = (e) => {
         e.preventDefault();
         setClickedDisable(false);
@@ -162,7 +195,9 @@ function ListingDetails(props) {
     if(props.isOwner){
         cancelButton = (clickedDelete || clickedDisable) ? <Button className={classes.cancelButton} onClick={clearClicks}>Cancel</Button> : '';
         deleteButton = <Button onClick={clickedDelete ? submitDeleteReq : () => setClickedDelete(!clickedDelete)} variant={clickedDelete ? 'outlined': 'text'} className={clickedDelete ? classes.confirmClick : classes.deleteButton} style={{marginLeft:10, float:'right'}}>{clickedDelete ? 'Confirm' : 'Delete'}</Button>
-        disableButton = <Button onClick={clickedDisable ? submitDisableReq : () => setClickedDisable(!clickedDisable)} variant={clickedDisable ? 'outlined': 'text'} className={clickedDisable ? classes.confirmClick : classes.disableButton} style={{float:'right'}}>{clickedDisable? 'Confirm' : 'Disable'}</Button>
+        
+        disableButton = props.disabledListing ? <Button onClick={clickedEnable ? submitEnableReq : () => setClickedEnable(!clickedEnable)} variant={clickedEnable ? 'outlined': 'text'} className={clickedEnable ? classes.confirmClick : classes.enableButton} style={{float:'right'}}>{clickedEnable? 'Confirm' : 'Enable'}</Button>        : 
+        <Button onClick={clickedDisable ? submitDisableReq : () => setClickedDisable(!clickedDisable)} variant={clickedDisable ? 'outlined': 'text'} className={clickedDisable ? classes.confirmClick : classes.disableButton} style={{float:'right'}}>{clickedDisable? 'Confirm' : 'Disable'}</Button>
     }
 
 

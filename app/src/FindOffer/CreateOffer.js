@@ -24,6 +24,9 @@ const useStyles = makeStyles(theme => ({
     },
     dropzone: {
         height: 10
+    },
+    submit: {
+        color: "white",
     }
 }));
 
