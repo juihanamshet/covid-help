@@ -188,6 +188,7 @@ class FindOffer extends Component {
             listings.forEach(listing => {
                 var name = listing.listingName ? listing.listingName : "Unnamed Listing"
                 var location = listing.city + ", " + listing.state + " " + listing.zipCode;
+                // TODO: get first image from listing
                 if(listing.disabledListing){ // if the listing is disabled we add to disabled listing, all else (undefined, null, false) go in currListings
                     disabledListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>)
                 }else{

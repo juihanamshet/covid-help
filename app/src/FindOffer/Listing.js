@@ -26,14 +26,14 @@ const useStyles = makeStyles(theme => ({
 function Listing(props) {
   const classes = useStyles();
 
-  var listingName = "default"
-  listingName = props.listingName.length > 16 ? props.listingName.substring(0, 15)+ "..." : props.listingName;
+  const listingName = props.listingName.length > 16 ? props.listingName.substring(0, 15)+ "..." : props.listingName;
+  
+  const listingDetail = props.listingLocation;
 
-  var listingDetail = "default";
-  listingDetail = props.listingLocation;
+  const lgbtqpFriendly = props.lgbtqpFriendly ? "🏳️‍🌈" : "";
+  const accessFriendly = props.accessibilityFriendly ? "♿" : "";
 
-  var lgbtqpFriendly = props.lgbtqpFriendly ? "🏳️‍🌈" : "";
-  var accessFriendly = props.accessibilityFriendly ? "♿" : "";
+  const defaultImage = 'noListingDefault' + (Math.floor(Math.random() * (6)) + 1) + '.jpg'
 
   return (
     <div className={classes.base}>
@@ -41,7 +41,7 @@ function Listing(props) {
         <CardActionArea onClick={() => props.onClick(props.listingId)}>
           <CardMedia
             className={classes.media}
-            image={require("../img/noListingImages.jpg")}
+            image={props.listingImages ? require(props.listingImages) : require("../img/" + defaultImage)}
             title="Location Not Found"
           />
           <CardContent>
