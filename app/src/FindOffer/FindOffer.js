@@ -188,6 +188,7 @@ class FindOffer extends Component {
             listings.forEach(listing => {
                 var name = listing.listingName ? listing.listingName : "Unnamed Listing"
                 var location = listing.city + ", " + listing.state + " " + listing.zipCode;
+                // TODO: add props.ListingImage (for both disabled and curr)
                 if(listing.disabledListing){ // if the listing is disabled we add to disabled listing, all else (undefined, null, false) go in currListings
                     disabledListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>)
                 }else{
@@ -298,6 +299,7 @@ class FindOffer extends Component {
                             houseRules={this.state.currListing.housingRules}
                             access={this.state.currListing.accessbilityInfo}
                             housingInfo={this.state.currListing.housingInfo}
+                            //TODO: add props.listingImages
 
                             // info for the owner
                             ownerName={this.state.currListing.firstName + " " + this.state.currListing.lastName}
