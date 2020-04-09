@@ -41,7 +41,7 @@ function Listing(props) {
         <CardActionArea onClick={() => props.onClick(props.listingId)}>
           <CardMedia
             className={classes.media}
-            image={props.listingImages ? require(props.listingImages) : require("../img/" + defaultImage)}
+            image={props.listingImage ? require(props.listingImage) : require("../img/" + defaultImage)}
             title="Location Not Found"
           />
           <CardContent>
