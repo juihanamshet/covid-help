@@ -218,6 +218,7 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
     // form.append('stream', fs.createReadStream('file path'))
 
     //then
+    
     const userEmail = req.jwt.claims.sub;
     var eLim = userEmail.indexOf("@");
     var emailName = userEmail.substring(0, eLim);
@@ -233,7 +234,8 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
         await createContainer(containerClient);
     }
     
-    var li = await showBlobNames(aborter, containerClient);
+    var li = await showBlobNames(aborter, containerClient).catch(() => res.send("Internal\
+    server error"));
                 
     console.log("Got ALl the blob Names")
     for (var string of li){
@@ -242,15 +244,18 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
             const blobClient = containerClient.getBlobClient(string);
             const blockBlobClient = blobClient.getBlockBlobClient();
 
-            await blockBlobClient.delete(aborter);
+            await blockBlobClient.delete(aborter).catch(() => res.send("Internal\
+            server error"));;
 
         }
     }
-    await addPhoto(containerClient, stream.path, path.extname(stream.name), aborter);
+    await addPhoto(containerClient, stream.path, path.extname(stream.name), aborter)
+    .catch(() => res.send("Internal server error"));;
 
     console.log("Profile Photo has successfully been updated");
 
     res.statusCode = 200;
+    res.json({});
 
 })
 
@@ -300,7 +305,8 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
 
     //GE THE BLOB NAME
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    var namesList = await showBlobNames(aborter, containerClient);
+    var namesList = await showBlobNames(aborter, containerClient).catch(() => res.send("Internal\
+    server error"));
 
     const generalBlobForListing = listingID + "container"
     for (var str of namesList){
