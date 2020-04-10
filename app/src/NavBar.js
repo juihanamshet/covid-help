@@ -98,6 +98,23 @@ const NavBar = (props) => {
             setOpen(false);
         }
     }
+
+    const onLogoHover = (e) => {
+        let cur = e.target.querySelector('img');
+        console.log('cur on Hover: ', cur)
+        if(cur){
+            cur.src = props.alt ? (process.env.PUBLIC_URL + "/home.png") : (process.env.PUBLIC_URL + "/home-hover.png")
+        }
+    }
+
+    const onLogoOut = (e) => {
+        let cur = e.target.querySelector('img');
+        console.log('cur on Out: ', cur)
+        if(cur){
+            cur.src = !props.alt ? (process.env.PUBLIC_URL + "/home.png") : (process.env.PUBLIC_URL + "/home-hover.png")
+        }
+    }
+
     
       // useEffect works by taking the second argument (open), and only applying the function when that given value changes
     const prevOpen = React.useRef(open);
@@ -125,9 +142,15 @@ const NavBar = (props) => {
                 <div className={classes.titleDiv}>
                     <Link
                         className={classes.title}
-                        to="/">
-                        <Typography className={props.alt ? classes.titleTextAlt : classes.titleText} variant="h5" >
-                            <img className={classes.icon} alt="logo" src={props.alt ? process.env.PUBLIC_URL + "/home-alt.png" : process.env.PUBLIC_URL + "/home.png"}/>&nbsp;Project Student Relief
+                        to="/"
+                        onMouseOver={onLogoHover}
+                        onMouseOut={onLogoOut}
+                        >
+                        <Typography className={props.alt ? classes.titleTextAlt : classes.titleText} variant="h5">
+                            <img className={classes.icon}
+                            alt="logo"
+                            src={props.alt ? process.env.PUBLIC_URL + "/home-alt.png" : process.env.PUBLIC_URL + "/home.png"}
+                            />&nbsp;Project Student Relief
                         </Typography>
                     </Link>
                 </div>
