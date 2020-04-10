@@ -144,7 +144,6 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getUsersListings', config)
             .then(function (response) {
-                console.log(response.data)
                 self.setState({ offerListings: response.data, find: false});
             })
             .catch(function (error) {

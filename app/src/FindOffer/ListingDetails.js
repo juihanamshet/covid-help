@@ -105,7 +105,6 @@ function ListingDetails(props) {
     });
 
     const submitDeleteReq = async() => {
-        console.log('submitted delete request')
         var config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -117,7 +116,6 @@ function ListingDetails(props) {
         };
         axios.delete(BASE_URL + '/deleteListing', config)
             .then(function (response) {
-                console.log("deleted the listing");
                 setClickedDelete(!clickedDelete)
                 props.openSnackBar({severity: 'success', message: 'Succesfully deleted listing!'});
                 props.handleClose(false);
@@ -130,7 +128,6 @@ function ListingDetails(props) {
     }
 
     const submitDisableReq = async() => {
-        console.log('submitted disable request')
         var data = {
             listingID: props.listingId
         };
@@ -142,7 +139,6 @@ function ListingDetails(props) {
         };
         axios.put(BASE_URL + '/disableListing', data, config)
             .then(function (response) {
-                console.log("disabled the listing");
                 setClickedDisable(!clickedDisable)
                 props.handleClose();
                 props.openSnackBar({severity: 'success', message: 'Succesfully disabled listing!'});
@@ -155,7 +151,6 @@ function ListingDetails(props) {
     }
 
     const submitEnableReq = async() => {
-        console.log('submitted disable request')
         var data = {
             listingID: props.listingId
         };
@@ -167,7 +162,6 @@ function ListingDetails(props) {
         };
         axios.put(BASE_URL + '/enableListing', data, config)
             .then(function (response) {
-                console.log("disabled the listing");
                 setClickedDisable(!clickedDisable)
                 props.handleClose();
                 props.openSnackBar({severity: 'success', message: 'Succesfully enabled listing!'});

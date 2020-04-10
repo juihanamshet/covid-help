@@ -101,7 +101,6 @@ const NavBar = (props) => {
 
     const onLogoHover = (e) => {
         let cur = e.target.querySelector('img');
-        console.log('cur on Hover: ', cur)
         if(cur){
             cur.src = props.alt ? (process.env.PUBLIC_URL + "/home.png") : (process.env.PUBLIC_URL + "/home-hover.png")
         }
@@ -109,9 +108,8 @@ const NavBar = (props) => {
 
     const onLogoOut = (e) => {
         let cur = e.target.querySelector('img');
-        console.log('cur on Out: ', cur)
         if(cur){
-            cur.src = !props.alt ? (process.env.PUBLIC_URL + "/home.png") : (process.env.PUBLIC_URL + "/home-hover.png")
+            cur.src = !props.alt ? (process.env.PUBLIC_URL + "/home.png") : (process.env.PUBLIC_URL + "/home-alt.png")
         }
     }
 

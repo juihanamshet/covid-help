@@ -7,6 +7,7 @@ import { withOktaAuth } from '@okta/okta-react';
 
 
 import axios from 'axios';
+import { grey } from '@material-ui/core/colors';
 
 const BASE_URL = 'http://localhost:8080'
 
@@ -22,8 +23,12 @@ const useStyles = makeStyles(theme => ({
             color: "#42a5f5!important"
         }
     },
-    dropzone: {
-        height: 10
+    zone: {
+        "& p": {
+            fontSize: 16,
+            fontFamily: 'Roboto',
+            color: 'gray',
+        }
     },
     submit: {
         color: "white",
@@ -54,6 +59,14 @@ function CreateOffer(props) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const fd = new FormData();
+        images.forEach(image => {
+            fd.append('stream', image);
+        });
+
+        console.log("Form Data on CreateListing: ", fd);
+
         var data = {
             listingInfo: {
                 listingName: listingName,
@@ -69,7 +82,7 @@ function CreateOffer(props) {
                 accessibilityInfo: accessibilityInfo,
                 livingSituation: livingSituation,
                 housingInfo: description,
-                // images: images
+                images: fd,
             }
         };
         var config = {
@@ -92,7 +105,6 @@ function CreateOffer(props) {
 
     const handleFile = (files) => {
         setImages(files);
-        console.log(images);
     }
 
     return (
@@ -254,15 +266,16 @@ function CreateOffer(props) {
                                         rows="4"
                                         label="Housing Rules"
                                         id="housingRules"
-                                        helperText="I.e. 'Quiet hours @10pm, please do not eat the cat's filet mignon.'"
+                                        helperText="I.e. 'Quiet hours @10pm, please do not eat the cat's tuna salad.'"
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} className={classes.zone}>
                                     <DropzoneArea
-                                        acceptedFiles={['image/*']}
+                                        acceptedFiles={['image/jpg, image/png, image/jpeg']}
                                         filesLimit={4}
                                         onChange={handleFile}
-                                        dropzoneText="Add some images of your listing space"
+                                        dropzoneClass={classes.zone}
+                                        dropzoneText="Pictures of your space help users better identify it and are recommended."
                                     />
                                 </Grid>
                             </Grid>
