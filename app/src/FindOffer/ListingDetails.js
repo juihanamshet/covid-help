@@ -11,12 +11,11 @@ import jordad from '../img/jordad.png';
 const BASE_URL = 'http://localhost:8080'
 const GOOGLE_MAPS = process.env.REACT_APP_GOOGLE_MAPS_API;
 
-const GREETINGS = ["Hey!", "Hello!", "Bonjour!", "Howdy!", "Nice to meet you!"]
 const MEDIA_ICONS = {Email: <MailOutline></MailOutline>, Facebook: <Facebook></Facebook>, LinkedIn: <LinkedIn></LinkedIn>, Instagram: <Instagram></Instagram>}
 
 const useStyles = makeStyles(theme => ({
     root: {
-        maxWidth: 475
+        maxWidth: 475,
     },
     listingDeets: {
         paddingTop: 10,
@@ -26,8 +25,8 @@ const useStyles = makeStyles(theme => ({
         marginBottom: 10,
     },
     fieldsDiv: {
-        paddingLeft: 10,
-        paddingRight: 10,
+        paddingLeft: 15,
+        paddingRight: 15,
         paddingBottom: 15
     },
     fieldDiv: {
@@ -85,9 +84,18 @@ function ListingDetails(props) {
     var accessibilityFriendly = props.accessibilityFriendly ? "Yes" : "No";
     var lgbtqpFriendly = props.lgbtqpFriendly ? "Yes" : "No";
 
+    // location
+    var location;
+    location = props.neighborhood ? props.neighborhood + ', ' + props.city + ', ' + props.state + ' (' + props.zipcode + ')' : props.city + ', ' + props.state + ' (' + props.zipcode + ')'
+
     // form a default bio if the user is unavailable
     var school = props.org.replace(/^\w/, c => c.toUpperCase());
-    var aboutMeDefault = props.bio ? props.bio : GREETINGS[Math.floor(Math.random() * 5)] + " I'm " + school + " " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
+    var aboutMeDefault = '';
+    if(props.gradYear && props.gradYear === "faculty"){ // if faculty
+        aboutMeDefault = props.bio ? props.bio : "Howdy! I'm a " + school + " " + props.gradYear + " member. I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
+    }else if(props.gradYear){ // if alumni or student
+        aboutMeDefault = props.bio ? props.bio : "Howdy! I'm " + school + " class of " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
+    }
     // TODO: once user has personalBio, provide option to switch between the two
     var aboutMe = aboutMeDefault;
 
@@ -190,8 +198,6 @@ function ListingDetails(props) {
         disableButton = props.disabledListing ? <Button onClick={clickedEnable ? submitEnableReq : () => setClickedEnable(!clickedEnable)} variant={clickedEnable ? 'outlined': 'text'} className={clickedEnable ? classes.confirmClick : classes.enableButton} style={{float:'right'}}>{clickedEnable? 'Confirm' : 'Enable'}</Button>        : 
         <Button onClick={clickedDisable ? submitDisableReq : () => setClickedDisable(!clickedDisable)} variant={clickedDisable ? 'outlined': 'text'} className={clickedDisable ? classes.confirmClick : classes.disableButton} style={{float:'right'}}>{clickedDisable? 'Confirm' : 'Disable'}</Button>
     }
-
-
     // avatar profile photos
 
 
@@ -215,7 +221,7 @@ function ListingDetails(props) {
                     <span role="img" aria-label="pin emoji">📍</span> Location:&nbsp;
                     </Typography>
                     <Typography className={classes.fieldInfo} variant="inherit">
-                        {props.location}
+                        {location}
                     </Typography>
                 </div>
                 <div className={classes.fieldDiv}>
@@ -278,8 +284,7 @@ function ListingDetails(props) {
                 <Card elevation={3} style={{paddingTop: 10}} className={classes.fieldsDiv}>
                     <Grid container spacing={1}>
                         <Grid item xs={2} style={{display: 'flex', alignItems:'center'}}>
-                            <Avatar style={{ width: 60, height: 60}} src={jordad}></Avatar>
-                            {/* <Avatar style={{ width: 60, height: 60}} src={props.avatarPhoto} src={jordad}></Avatar> */}
+                            <Avatar style={{ width: 60, height: 60}} src={props.ownerPhoto}></Avatar>
                         </Grid>
                         <Grid item xs={10}>
                         <div>

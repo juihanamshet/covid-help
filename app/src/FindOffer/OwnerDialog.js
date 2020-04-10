@@ -62,7 +62,7 @@ function OwnerDialog(props) {
                 <DialogTitle disableTypography={true} id="alert-dialog-title">
                     <Grid container direction="column" alignItems="center">
                         <Grid item sm={12} style={{ textAlign: 'center' }}>
-                            <Avatar className={classes.pp} sizes="large" src={props.avatarPhoto}></Avatar>
+                            <Avatar className={classes.pp} sizes="large" src={props.ownerPhoto}></Avatar>
                         </Grid>
                         <Grid item sm={12}>
                             <Typography variant="h4">{props.name}</Typography>
