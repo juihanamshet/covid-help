@@ -97,7 +97,7 @@ class AboutUs extends Component {
                                     Project Student Relief
                                 </Typography>
                                 <Typography className={classes.bannerDescription} variant='h5'>
-                                    Connecting open doors with students in need.
+                                    A faculty, alumni, and student housing search network.
                                 </Typography>
                             </div>
                         </Grid>

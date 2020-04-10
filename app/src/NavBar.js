@@ -10,6 +10,11 @@ const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
     },
+    icon: {
+        height: 20,
+        width: 20,
+        verticalAlign: "inherit",
+    },
     appBar: {
         backgroundColor: 'white',
     },
@@ -122,7 +127,7 @@ const NavBar = (props) => {
                         className={classes.title}
                         to="/">
                         <Typography className={props.alt ? classes.titleTextAlt : classes.titleText} variant="h5" >
-                            <span role="img" aria-label="house with garden">🏡</span> Project Student Relief
+                            <img className={classes.icon} alt="logo" src={props.alt ? process.env.PUBLIC_URL + "/home-alt.png" : process.env.PUBLIC_URL + "/home.png"}/>&nbsp;Project Student Relief
                         </Typography>
                     </Link>
                 </div>

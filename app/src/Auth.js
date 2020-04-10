@@ -4,9 +4,6 @@ import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
 import { useOktaAuth } from '@okta/okta-react';
 import { Redirect } from 'react-router-dom';
 import NavBar from './NavBar.js'
-
-
-
 import config from './config';
 
 const Auth = () => {
@@ -15,7 +12,7 @@ const Auth = () => {
 
     useEffect(() => {
         const { pkce, issuer, clientId, scopes } = config.oidc;
-        const widget = new OktaSignIn({
+        let configuration = {
             /**
              * Note: when using the Sign-In Widget for an OIDC flow, it still
              * needs to be configured with the base URL for your Okta Org. Here
@@ -31,7 +28,7 @@ const Auth = () => {
             features: {
                 registration: true
             },
-            // logo: '../public/logo192.png',
+            logo: '../public/home.png',
             i18n: {
                 en: {
                     'primaryauth.title': 'Sign in',
@@ -43,7 +40,9 @@ const Auth = () => {
                 display: 'page',
                 scopes,
             },
-        });
+        };
+
+        const widget = new OktaSignIn(configuration);
 
         widget.renderEl(
             { el: '#sign-in-widget' },
@@ -57,10 +56,13 @@ const Auth = () => {
                 throw err;
             },
         );
+        // on unmount, remove the widget
+        return () => {
+            widget.remove();
+        }
     }, []);
 
     if (authState.isAuthenticated) {
-        // authService.logout("/")
         return (<Redirect to="/offers"></Redirect>)
     }
 
