@@ -299,24 +299,22 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
     const userSchool = extractSchool(userEmail);
     console.log("/getListing: Getting - \n\tListing: " + listingID + "\n\tUser: " + userEmail + "\n\tSchool: " + userSchool)
   
-    
+    var eLim = userEmail.indexOf("@");
+    var emailName = userEmail.substring(0, eLim);
 
     const containerName = "container" + emailName;
 
     //GE THE BLOB NAME
+    console.log(containerName);
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    var namesList = await showBlobNames(aborter, containerClient).catch(() => res.send("Internal\
-    server error"));
 
-    const generalBlobForListing = listingID + "container"
-    for (var str of namesList){
-        if (str.includes(generalBlobForListing)){
-            console.log("hello");
-        }
+    if (!(await containerClient.exists())){
+        await containerClient.create();
     }
 
-    var eLim = userEmail.indexOf("@");
-    var emailName = userEmail.substring(0, eLim);
+    var namesList = await showBlobNames(aborter, containerClient);
+
+
 
     var startDate = new Date();
     var expiryDate = new Date(startDate);
@@ -330,19 +328,26 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
         Expiry: expiryDate
     }
     };
+
     console.log("Check 1")
-    var token = blobService.generateSharedAccessSignature(containerName, blobName, sharedAccessPolicy);
-    console.log("Check 2")
 
-    var tempUrl = blobService.getUrl(containerName, blobName, token);
-
-    console.log(tempUrl)
+    const generalBlobForListing = listingID + "container"
+    var listOfUrls = [];
+    // console.log(namesList.length());
+    for (var str of namesList){
+        if (str.includes(generalBlobForListing)){
+            var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
+            var tempUrl = blobService.getUrl(containerName, blobName, token);
+            listOfUrls.push(tempUrl);
+        }
+    }
 
 
     sqltools.getListing(userEmail, listingID, userSchool, (sqlResult, status) => {
         if (status === 200) {
             console.log("/getListing SQL Returned Successfully");
-            sqlResult['']
+            sqlResult[0]['photoUrls'] = listOfUrls;
+            console.log(sqlResult);
             res.json(sqlResult);
         } else {
             res.statusCode = 500;
@@ -365,7 +370,12 @@ async function uploadLocalFile(aborter, containerClient, filePath,
     const blobClient = containerClient.getBlobClient(blobName);
     const blockBlobClient = blobClient.getBlockBlobClient();
 
-    return await blockBlobClient.uploadFile(filePath, aborter);
+    await blockBlobClient.uploadFile(filePath, aborter);
+
+    const content_type = "image/" + path.extname(filePath)
+    blobClient.setHTTPHeaders({
+        blobContentType: content_type
+    })
 }
 
 async function createContainer(containerClient) {
@@ -384,8 +394,7 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
 
     var files = req.files.files;
     //SHould be a maximum of four
-    console.log(listingInfo.city);
-    console.log(listingInfo.userID);
+    
 
     let containerName = "container" + emailName;
     const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -397,10 +406,10 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
     const aborter = AbortController.timeout(30 * 60 * 1000);
 
     files.forEach(async function (file, i) {
-        await uploadLocalFile(aborter, containerClient, file.path, listingID, file.name, i);
+        await uploadLocalFile(aborter, containerClient, file.path, listingID, file.name, i)
+        .catch(() => res.send("internal servor Error"));
     });
     
-
 
     console.log("/createListing: Creating Listing for " + userEmail)
 
