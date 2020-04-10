@@ -198,6 +198,12 @@ async function addPhoto(containerClient, filePath, extname, aborter) {
     const fileName = "profilePhoto" + extname;
 
     const blobClient = containerClient.getBlobClient(fileName);
+
+    const content_type = "image/" + extname;
+    
+    await blobClient.setHTTPHeaders({
+        blobContentType: "image/png",
+    });
     const blockBlobClient = blobClient.getBlockBlobClient();
 
 
