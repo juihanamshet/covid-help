@@ -69,7 +69,7 @@ const useStyles = makeStyles(theme => ({
     menuLink: {
         color: theme.palette.primary.main,
         "&:hover": {
-            color: 'black',
+            color: theme.palette.primary.dark,
             textDecoration: 'none'
         }
     },
