@@ -90,6 +90,7 @@ function Alert(props) {
 }
 
 function User(props) {
+    const accessToken = props.authState.accessToken;
     const classes = useStyles();
     // refs for the contact information
     const prefEmail = useRef('')
@@ -159,7 +160,7 @@ function User(props) {
         // console.log('newLI: ', li.current)
     }
 
-    // state for disabling account: TODO (future builds)
+    // state for disabling account: TODO (future version)
     // const [disabledAct, setDisabledAct] = useState('')
 
     const [user, setUser] = useState({});
@@ -170,7 +171,6 @@ function User(props) {
     const [snackBarMessage, setSnackBarMessage] = useState({severity:'success', message:'successfully updated profile!'})
 
     React.useEffect(() => {
-        const accessToken = props.authState.accessToken;
         let config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -198,10 +198,9 @@ function User(props) {
             .catch(function (error) {
                 console.log(error);
             });
-    }, [user, editDisabled, profilePhoto, props.authState.accessToken]);
+    }, [user, editDisabled, profilePhoto, accessToken]);
 
     const saveChanges = async() => {
-        const accessToken = props.authState.accessToken;
         var data = {
             userInfo: {
                 userID: user.userID,
@@ -247,17 +246,13 @@ function User(props) {
     const onProfilePhotoChange = async(e) =>{
         let image = e.target.files[0];
         let imageURL = URL.createObjectURL(e.target.files[0])
+        // temporary
+        setProfilePhotoURL(imageURL);
         
         if(!image){ // catch all non uploads
             return;
         };
-
-        setProfilePhoto(image);
-        setProfilePhotoURL(imageURL);
-        console.log('image file: ', image);
-        
-        const accessToken = props.authState.accessToken;
-        
+                
         const fd = new FormData();
         fd.append('stream', image);
 

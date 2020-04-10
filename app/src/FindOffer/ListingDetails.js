@@ -75,8 +75,8 @@ const useStyles = makeStyles(theme => ({
 
 // props: listingTitle, coordinates, location, livingSitch, houseRules, details (additional details), ownerName, ownerAvatar, ownerDeets
 function ListingDetails(props) {
-    const classes = useStyles();
     const accessToken = props.authState.accessToken;
+    const classes = useStyles();
     const [clickedDelete, setClickedDelete] = useState(false);
     const [clickedDisable, setClickedDisable] = useState(false);
     const [clickedEnable, setClickedEnable] = useState(false);
