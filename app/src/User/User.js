@@ -90,6 +90,7 @@ function Alert(props) {
 }
 
 function User(props) {
+    const accessToken = props.authState.accessToken;
     const classes = useStyles();
     // refs for the contact information
     const prefEmail = useRef('')
@@ -159,18 +160,16 @@ function User(props) {
         // console.log('newLI: ', li.current)
     }
 
-    // state for disabling account: TODO (future builds)
+    // state for disabling account: TODO (future version)
     // const [disabledAct, setDisabledAct] = useState('')
 
     const [user, setUser] = useState({});
-    const [profilePhoto, setProfilePhoto] = useState(null);
-    const [profilePhotoURL, setProfilePhotoURL] = useState('');
+    const [profilePhoto, setProfilePhoto] = useState('');
     const [editDisabled, setEditDisabled] = useState(true);
     const [snackBar, setSnackBar] = useState(false);
     const [snackBarMessage, setSnackBarMessage] = useState({severity:'success', message:'successfully updated profile!'})
 
     React.useEffect(() => {
-        const accessToken = props.authState.accessToken;
         let config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -179,10 +178,12 @@ function User(props) {
         };
         axios.get(BASE_URL + '/getUser', config)
             .then(function (response) {
+                console.log(response.data[0]);
                 if(_.isEqual(response.data[0], user)){
                     return;
                 }
                 setUser({...response.data[0]});
+                setProfilePhoto(response.data[0].photoUrl)
                 //set our refs
                 setPrefEmail(response.data[0].prefEmail)
                 setPhoneNumber(response.data[0].phoneNumber)
@@ -198,10 +199,9 @@ function User(props) {
             .catch(function (error) {
                 console.log(error);
             });
-    }, [user, editDisabled, profilePhoto, props.authState.accessToken]);
+    }, [user, editDisabled, profilePhoto, accessToken]);
 
     const saveChanges = async() => {
-        const accessToken = props.authState.accessToken;
         var data = {
             userInfo: {
                 userID: user.userID,
@@ -246,22 +246,16 @@ function User(props) {
 
     const onProfilePhotoChange = async(e) =>{
         let image = e.target.files[0];
-        let imageURL = URL.createObjectURL(e.target.files[0])
+        setProfilePhoto(URL.createObjectURL(image));
         
         if(!image){ // catch all non uploads
             return;
         };
-
-        setProfilePhoto(image);
-        setProfilePhotoURL(imageURL);
-        console.log('image file: ', image);
-        
-        const accessToken = props.authState.accessToken;
-        
+                
         const fd = new FormData();
         fd.append('stream', image);
 
-        console.log("form data: ", fd.get('stream'));
+        // console.log("form data: ", fd.get('stream'));
         
         const config = {
             headers: {
@@ -283,11 +277,9 @@ function User(props) {
                 setSnackBarMessage({severity: 'error', message: 'Unable to update profile.'});                
             });
     }
-
+    // some logic
     var school = user.org ? user.org.toUpperCase() : '';
-
     const cancelButton = editDisabled ? '' : <Link className={classes.cancel} onClick={() => setEditDisabled(!editDisabled)}><Typography variant='inherit'>Cancel</Typography></Link>
-
     return (
         <div>
             <Prompt
@@ -302,23 +294,23 @@ function User(props) {
                 alignItems="center"
                 justify="center" >
                 <Grid item>
-                    <Paper style={{ paddingRight: 50, paddingLeft: 50, paddingTop: 25, paddingBottom: 25 }}>
+                    <Paper style={{ paddingRight: 50, paddingLeft: 50, paddingTop: 25, paddingBottom: 25, borderTop: '5px solid cornflowerblue' }}>
                         {user.userID ? (
                         <Grid container direction="column" alignItems="center">
-                            <Grid item sm={12} className={classes.section}>
+                            <Grid item sm={12}>
                                 <input type="file" accept="image/jpg,image/png,image/jpeg" className={classes.input} id="icon-button-file" onChange={onProfilePhotoChange}/>
                                     <BootstrapTooltip title="Update profile photo" aria-label="Update profile photo">
                                     <label htmlFor="icon-button-file">
                                         <IconButton component="span">
-                                            <Avatar style={{ height: 150, width: 150 }} src={profilePhotoURL}></Avatar>
+                                            <Avatar style={{ height: 150, width: 150 }} src={profilePhoto}></Avatar>
                                         </IconButton>
                                     </label>
                                     </BootstrapTooltip>
                             </Grid>
-                            <Grid item sm={12} className={classes.section}>
+                            <Grid item sm={12}>
                                 <Typography variant="h4">{user.firstName + " " + user.lastName}</Typography>
                             </Grid>
-                            <Grid item sm={12} style={{ marginTop: 5 }}>
+                            <Grid item sm={12}>
                                 <Typography className={classes.text} variant="body1">{school + " // " + user.grad_year}</Typography>
                             </Grid>
                             <Grid item sm={12} className={classes.section} style={{ maxWidth: 600 }}>

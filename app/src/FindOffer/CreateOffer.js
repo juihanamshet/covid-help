@@ -31,6 +31,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function CreateOffer(props) {
+    const accessToken = props.authState.accessToken;
     const classes = useStyles();
 
     const [lgbtq, setLgbtq] = useState(false);
@@ -53,7 +54,6 @@ function CreateOffer(props) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const accessToken = props.authState.accessToken;
         var data = {
             listingInfo: {
                 listingName: listingName,

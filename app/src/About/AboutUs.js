@@ -36,7 +36,7 @@ const styles = theme => ({
         borderBottomLeftRadius: 0,
         borderTopRightRadius: 5,
         borderBottomRightRadius: 5,
-        backgroundColor: 'rgba(255, 166, 102, 0.85)',
+        backgroundColor: 'rgba(255, 166, 102, 0.9)',
         paddingTop: 20,
         paddingRight: 20,
         paddingBottom: 20,
