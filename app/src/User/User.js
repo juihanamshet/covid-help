@@ -178,7 +178,6 @@ function User(props) {
         };
         axios.get(BASE_URL + '/getUser', config)
             .then(function (response) {
-                console.log(response.data[0]);
                 if(_.isEqual(response.data[0], user)){
                     return;
                 }
@@ -232,7 +231,6 @@ function User(props) {
         };
         axios.post(BASE_URL + '/updateUser', data, config)
             .then(function (response) {
-                console.log(response)
                 setEditDisabled(!editDisabled)
                 setSnackBar(true);
                 setSnackBarMessage({severity: 'success', message: 'Successfully updated profile!'})
@@ -254,8 +252,6 @@ function User(props) {
                 
         const fd = new FormData();
         fd.append('stream', image);
-
-        // console.log("form data: ", fd.get('stream'));
         
         const config = {
             headers: {

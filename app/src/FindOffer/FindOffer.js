@@ -144,7 +144,6 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getUsersListings', config)
             .then(function (response) {
-                console.log(response.data)
                 self.setState({ offerListings: response.data, find: false});
             })
             .catch(function (error) {
@@ -166,7 +165,7 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListing', config)
             .then(function (response) {
-                console.log(response.data[0])
+                console.log("getListing call:", response.data[0])
                 self.setState({ currListing : response.data[0],
                                 drawerOpen: true });
             })
