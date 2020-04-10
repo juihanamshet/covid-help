@@ -165,29 +165,23 @@ app.get("/getUser", authenticationRequired, async function (req, res, next) {
     var sasUrl = "";
     console.log("corr 2");
     if (exists){
+        console.log("The blob does exist")
         var token = blobService.generateSharedAccessSignature(containerName, profilePhotoBlobName, sharedAccessPolicy);
         console.log("Corret 1");
         sasUrl = blobService.getUrl(containerName, profilePhotoBlobName, token);
 
         console.log(sasUrl);
     }
-    
     sqltools.getUser(userEmail, (sqlResult, status) => {
         if (status === 200) {
             console.log("/getUser was succcessfully called")
-            sqlResult['photoUrl'] = sasUrl;
+            sqlResult[0]['photoUrl'] = sasUrl;
             res.json(sqlResult);
         } else {
             res.statusCode = 500;
             res.send("Internal Server Error");
         }
     });
-
-
-    
-       
-    
-
     
 })
 
@@ -197,14 +191,11 @@ async function addPhoto(containerClient, filePath, extname, aborter) {
     // const fileName = "profilePhoto" + path.extname(filePath)
     const fileName = "profilePhoto" + extname;
 
-    const blobClient = containerClient.getBlobClient(fileName);
-
+    const blobClient = await containerClient.getBlobClient(fileName);
+    console.log("got blobClient");
     const content_type = "image/" + extname;
-    
-    await blobClient.setHTTPHeaders({
-        blobContentType: "image/png",
-    });
-    const blockBlobClient = blobClient.getBlockBlobClient();
+
+    const blockBlobClient = await blobClient.getBlockBlobClient();
 
 
     // return await blockBlobClient.uploadStream(
@@ -212,7 +203,12 @@ async function addPhoto(containerClient, filePath, extname, aborter) {
     //                 uploadOptions.bufferSize, 
     //                 uploadOptions.maxBuffers,
     //                 aborter);
-    return await blockBlobClient.uploadFile(filePath, aborter);
+    await blockBlobClient.uploadFile(filePath, aborter);
+
+    await blobClient.setHTTPHeaders({
+        blobContentType: "image/png",
+    });
+
 }
 
 app.post("/updateProfilePhoto", authenticationRequired, async function (req, res, next) {
@@ -239,9 +235,10 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
     
     var li = await showBlobNames(aborter, containerClient);
                 
-
+    console.log("Got ALl the blob Names")
     for (var string of li){
         if (string.includes("profilePhoto")){
+            console.log("it includes!!!")
             const blobClient = containerClient.getBlobClient(string);
             const blockBlobClient = blobClient.getBlockBlobClient();
 
@@ -291,12 +288,27 @@ app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
     })
 })
 
-app.get("/getListing", authenticationRequired, function (req, res, next) {
+app.get("/getListing", authenticationRequired, async function (req, res, next) {
     const listingID = req.query.listingID;
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
     console.log("/getListing: Getting - \n\tListing: " + listingID + "\n\tUser: " + userEmail + "\n\tSchool: " + userSchool)
   
+    
+
+    const containerName = "container" + emailName;
+
+    //GE THE BLOB NAME
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    var namesList = await showBlobNames(aborter, containerClient);
+
+    const generalBlobForListing = listingID + "container"
+    for (var str of namesList){
+        if (str.includes(generalBlobForListing)){
+            console.log("hello");
+        }
+    }
+
     var eLim = userEmail.indexOf("@");
     var emailName = userEmail.substring(0, eLim);
 
@@ -304,10 +316,6 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     var expiryDate = new Date(startDate);
     expiryDate.setMinutes(startDate.getMinutes() + 100);
     startDate.setMinutes(startDate.getMinutes() - 100);
-
-    const containerName = "container" + emailName;
-
-    //GE THE BLOB NAME
 
     var sharedAccessPolicy = {
     AccessPolicy: {
@@ -337,15 +345,18 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     })
 })
 
-async function uploadLocalFile(aborter, containerClient, filePath) {
+async function uploadLocalFile(aborter, containerClient, filePath, 
+    listingID, fileName, iteration) {
+
     filePath = path.resolve(filePath);
 
-    const fileName = path.basename(filePath);
+    const blobName = listingID + "listingPhoto" + iteration + path.extname(fileName);
 
-    console.log(fileName)
+    console.log(blobName)
     console.log(path.extname(filePath))
 
-    const blobClient = containerClient.getBlobClient(fileName);
+
+    const blobClient = containerClient.getBlobClient(blobName);
     const blockBlobClient = blobClient.getBlockBlobClient();
 
     return await blockBlobClient.uploadFile(filePath, aborter);
@@ -358,7 +369,7 @@ async function createContainer(containerClient) {
 app.post("/createListing", authenticationRequired, async function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const listingInfo = req.fields.listingInfo;
-
+    const listingId = listingInfo.listingID;
     // let images = ["",""];
     // let userID = "5";
     // If you call data.append('file', file) multiple times your request will contain an array of your files...
@@ -366,6 +377,7 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
     var emailName = userEmail.substring(0, eLim);
 
     var files = req.files.files;
+    //SHould be a maximum of four
     console.log(listingInfo.city);
     console.log(listingInfo.userID);
 
@@ -378,10 +390,10 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
     }
     const aborter = AbortController.timeout(30 * 60 * 1000);
 
-    for (file of files) {
-
-        await uploadLocalFile(aborter, containerClient, file.path);
-    }
+    files.forEach(async function (file, i) {
+        await uploadLocalFile(aborter, containerClient, file.path, listingID, file.name, i);
+    });
+    
 
 
     console.log("/createListing: Creating Listing for " + userEmail)
