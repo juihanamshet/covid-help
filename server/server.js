@@ -333,12 +333,18 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
 
     const generalBlobForListing = listingID + "container"
     var listOfUrls = [];
+    var ownerPhoto = "";
     // console.log(namesList.length());
     for (var str of namesList){
         if (str.includes(generalBlobForListing)){
             var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
             var tempUrl = blobService.getUrl(containerName, blobName, token);
             listOfUrls.push(tempUrl);
+        }
+        else if (str.includes("profilePhoto")){
+            var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
+            var tempUrl = blobService.getUrl(containerName, blobName, token);
+            ownerPhoto = tempUrl;
         }
     }
 
@@ -347,6 +353,7 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
         if (status === 200) {
             console.log("/getListing SQL Returned Successfully");
             sqlResult[0]['photoUrls'] = listOfUrls;
+            sqlResult[0]['ownerPhotoUrl'] = ownerPhoto;
             console.log(sqlResult);
             res.json(sqlResult);
         } else {
