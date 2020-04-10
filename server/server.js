@@ -338,12 +338,12 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
     for (var str of namesList){
         if (str.includes(generalBlobForListing)){
             var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
-            var tempUrl = blobService.getUrl(containerName, blobName, token);
+            var tempUrl = blobService.getUrl(containerName, str, token);
             listOfUrls.push(tempUrl);
         }
         else if (str.includes("profilePhoto")){
             var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
-            var tempUrl = blobService.getUrl(containerName, blobName, token);
+            var tempUrl = blobService.getUrl(containerName, str, token);
             ownerPhoto = tempUrl;
         }
     }
@@ -390,12 +390,15 @@ async function createContainer(containerClient) {
 }
 
 app.post("/createListing", authenticationRequired, async function (req, res, next) {
+    console.log("createListing has been called.")
     const userEmail = req.jwt.claims.sub;
     const listingInfo = req.fields.listingInfo;
     const listingId = listingInfo.listingID;
     // let images = ["",""];
     // let userID = "5";
     // If you call data.append('file', file) multiple times your request will contain an array of your files...
+    
+    console.log(listingInfo.images);
     var eLim = userEmail.indexOf("@");
     var emailName = userEmail.substring(0, eLim);
 
