@@ -249,6 +249,7 @@ function getListing(email, listing, school, callback) {
         for (var name in columns) {
             listing[name] = columns[name].value
         }
+        
         result.push(listing)
     });
 

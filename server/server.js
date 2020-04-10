@@ -9,6 +9,8 @@ const {
     StorageSharedKeyCredential,
     BlobServiceClient
 } = require('@azure/storage-blob');
+
+const azure = require('azure-storage');
 const { AbortController } = require('@azure/abort-controller');
 const fs = require("fs");
 const path = require("path");
@@ -25,6 +27,8 @@ const ACCOUNT_ACCESS_KEY = process.env.AZURE_STORAGE_ACCOUNT_ACCESS_KEY;
 const credentials = new StorageSharedKeyCredential(STORAGE_ACCOUNT_NAME, ACCOUNT_ACCESS_KEY);
 
 const blobServiceClient = new BlobServiceClient(`https://${STORAGE_ACCOUNT_NAME}.blob.core.windows.net`, credentials);
+var blobService = azure.createBlobService(STORAGE_ACCOUNT_NAME, ACCOUNT_ACCESS_KEY);
+
 
 const ONE_MEGABYTE = 1024 * 1024;
 
@@ -33,6 +37,20 @@ const client = new okta.Client({
     token: process.env.OKTA_TOKEN
 });
 
+const aborter = AbortController.timeout(30 * 60 * 1000);
+
+var startDate = new Date();
+var expiryDate = new Date(startDate);
+expiryDate.setMinutes(startDate.getMinutes() + 100);
+startDate.setMinutes(startDate.getMinutes() - 100);
+
+var sharedAccessPolicy = {
+AccessPolicy: {
+    Permissions: azure.BlobUtilities.SharedAccessPermissions.READ,
+    Start: startDate,
+    Expiry: expiryDate
+}
+};
 
 const oktaJwtVerifier = new OktaJwtVerifier({
     issuer: process.env.OKTA_BASE_URL + '/oauth2/default',
@@ -88,6 +106,8 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
     const userSchool = extractSchool(userEmail);
     console.log('/getListings: getting Listings for\n\t User: ' + userEmail + '\n\tSchool: ' + userSchool);
 
+
+
     sqltools.getSchoolListings(userEmail, userSchool, (sqlResult, status) => {
         if (status === 200) {
             resultSize = Object.keys(sqlResult).length
@@ -100,19 +120,75 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
     })
 })
 
-app.get("/getUser", authenticationRequired, function (req, res, next) {
+async function showBlobNames(aborter, containerClient) {
+    // console.log("this bad boy");
+    let iter = await containerClient.listBlobsFlat(aborter);
+    // console.log(iter);
+    let list = [];
+    for await (const blob of iter) {
+        list.push(blob.name);
+        console.log(` - ${blob.name}`);
+    }
+    return list;
+}
+
+app.get("/getUser", authenticationRequired, async function (req, res, next) {
     console.log('/getUsers called. HOPE THIS WORKSSSS')
     const userEmail = req.jwt.claims.sub;
 
+    var eLim = userEmail.indexOf("@");
+    var emailName = userEmail.substring(0, eLim);
+    console.log(emailName);
+    const containerName = "container" + emailName;
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+
+    if (await containerClient.exists()){
+        //If the container doesn't exists, then create one
+        console.log("Already exists");
+    }
+    else{
+        console.log("please work");
+        await createContainer(containerClient);
+    }
+
+    var blobNamesList = await showBlobNames(aborter, containerClient);
+                
+    var profilePhotoBlobName = "";
+    console.log(blobNamesList);
+    var exists = false;
+    for (var string of blobNamesList){
+        if (string.includes("profilePhoto")){
+            profilePhotoBlobName = string;
+            exists = true;
+        };
+    }
+    var sasUrl = "";
+    console.log("corr 2");
+    if (exists){
+        var token = blobService.generateSharedAccessSignature(containerName, profilePhotoBlobName, sharedAccessPolicy);
+        console.log("Corret 1");
+        sasUrl = blobService.getUrl(containerName, profilePhotoBlobName, token);
+
+        console.log(sasUrl);
+    }
+    
     sqltools.getUser(userEmail, (sqlResult, status) => {
         if (status === 200) {
             console.log("/getUser was succcessfully called")
+            sqlResult['photoUrl'] = sasUrl;
             res.json(sqlResult);
         } else {
             res.statusCode = 500;
             res.send("Internal Server Error");
         }
-    })
+    });
+
+
+    
+       
+    
+
+    
 })
 
 async function addPhoto(containerClient, filePath, extname, aborter) {
@@ -133,7 +209,7 @@ async function addPhoto(containerClient, filePath, extname, aborter) {
     return await blockBlobClient.uploadFile(filePath, aborter);
 }
 
-app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next) {
+app.post("/updateProfilePhoto", authenticationRequired, async function (req, res, next) {
     console.log("/updateProfilePhoto is called. Hope this works");
 
     // he should do form.append('name', FILE_NAME)
@@ -141,21 +217,33 @@ app.post("/updateProfilePhoto", authenticationRequired, function (req, res, next
 
     //then
     const userEmail = req.jwt.claims.sub;
+    var eLim = userEmail.indexOf("@");
+    var emailName = userEmail.substring(0, eLim);
+
     const stream = req.files.stream;
     console.log(path.extname(stream.name));
     // fs.readFile(stream.path)
-    const containerName = "container5";
+    const containerName = "container" + emailName;
 
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    if (!containerClient.exists()) {
+    if (! (await containerClient.exists())) {
         //If the container doesn't exists, then create one
-        createContainer(containerClient).then(() => console.log("container \
-        creation success")).catch((e) => console.log(e));
+        await createContainer(containerClient);
     }
-    const aborter = AbortController.timeout(30 * 60 * 1000);
+    
+    var li = await showBlobNames(aborter, containerClient);
+                
 
-    addPhoto(containerClient, stream.path, path.extname(stream.name), aborter).then(() => console.log("success"))
-        .catch((e) => console.log(e))
+    for (var string of li){
+        if (string.includes("profilePhoto")){
+            const blobClient = containerClient.getBlobClient(string);
+            const blockBlobClient = blobClient.getBlockBlobClient();
+
+            await blockBlobClient.delete(aborter);
+
+        }
+    }
+    await addPhoto(containerClient, stream.path, path.extname(stream.name), aborter);
 
     console.log("Profile Photo has successfully been updated");
 
@@ -202,10 +290,39 @@ app.get("/getListing", authenticationRequired, function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
     console.log("/getListing: Getting - \n\tListing: " + listingID + "\n\tUser: " + userEmail + "\n\tSchool: " + userSchool)
+  
+    var eLim = userEmail.indexOf("@");
+    var emailName = userEmail.substring(0, eLim);
+
+    var startDate = new Date();
+    var expiryDate = new Date(startDate);
+    expiryDate.setMinutes(startDate.getMinutes() + 100);
+    startDate.setMinutes(startDate.getMinutes() - 100);
+
+    const containerName = "container" + emailName;
+
+    //GE THE BLOB NAME
+
+    var sharedAccessPolicy = {
+    AccessPolicy: {
+        Permissions: azure.BlobUtilities.SharedAccessPermissions.READ,
+        Start: startDate,
+        Expiry: expiryDate
+    }
+    };
+    console.log("Check 1")
+    var token = blobService.generateSharedAccessSignature(containerName, blobName, sharedAccessPolicy);
+    console.log("Check 2")
+
+    var tempUrl = blobService.getUrl(containerName, blobName, token);
+
+    console.log(tempUrl)
+
 
     sqltools.getListing(userEmail, listingID, userSchool, (sqlResult, status) => {
         if (status === 200) {
             console.log("/getListing SQL Returned Successfully");
+            sqlResult['']
             res.json(sqlResult);
         } else {
             res.statusCode = 500;
@@ -232,31 +349,32 @@ async function createContainer(containerClient) {
     return await containerClient.create()
 }
 
-app.post("/createListing", authenticationRequired, function (req, res, next) {
+app.post("/createListing", authenticationRequired, async function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const listingInfo = req.fields.listingInfo;
 
     // let images = ["",""];
     // let userID = "5";
     // If you call data.append('file', file) multiple times your request will contain an array of your files...
+    var eLim = userEmail.indexOf("@");
+    var emailName = userEmail.substring(0, eLim);
+
     var files = req.files.files;
     console.log(listingInfo.city);
     console.log(listingInfo.userID);
 
-    let containerName = "container" + userID;
+    let containerName = "container" + emailName;
     const containerClient = blobServiceClient.getContainerClient(containerName);
     console.log(containerName)
-    if (!containerClient.exists()) {
+    if (!(await containerClient.exists())) {
         //If the container doesn't exists, then create one
-        createContainer(containerClient).then(() => console.log("container \
-        creation success")).catch((e) => console.log(e));
+        await createContainer(containerClient);
     }
     const aborter = AbortController.timeout(30 * 60 * 1000);
 
     for (file of files) {
 
-        uploadLocalFile(aborter, containerClient, file.path).then(() => console.log("sucess\
-        of image upload ")).catch((e) => console.log(e));
+        await uploadLocalFile(aborter, containerClient, file.path);
     }
 
 
@@ -282,6 +400,10 @@ app.post("/createUser", authenticationRequired, async function (req, res, next) 
     userInfo['org'] = userSchool;
     console.log("/createUser called for User: " + userEmail);
 
+    var eLim = userEmail.indexOf("@");
+    var emailName = userEmail.substring(0, eLim);
+    const containerName = "container" + emailName;
+
     await client.getUser(userEmail)
         .then(user => {
             console.log("/createUser: Retrieved Okta User Info")
@@ -290,7 +412,12 @@ app.post("/createUser", authenticationRequired, async function (req, res, next) 
             userInfo['phoneNumber'] = user.profile.mobilePhone
             userInfo['orgEmail'] = user.profile.email
         });
-
+    
+    // const containerClient = blobServiceClient.getContainerClient(containerName);
+    // await createContainer(containerClient)
+    //     .then(() =>
+    //         console.log("success in creation"));
+    
     sqltools.createUser(userInfo, (sqlResult, status) => {
         if (status === 200) {
             console.log("/createUser User Inserted into DB");
