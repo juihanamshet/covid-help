@@ -7,7 +7,6 @@ import { withOktaAuth } from '@okta/okta-react';
 
 
 import axios from 'axios';
-import { grey } from '@material-ui/core/colors';
 
 const BASE_URL = 'http://localhost:8080'
 
@@ -61,37 +60,36 @@ function CreateOffer(props) {
         e.preventDefault();
 
         const fd = new FormData();
+        
+        var key = 0
         images.forEach(image => {
-            fd.append('stream', image);
+            let imageKey = 'image' + key 
+            fd.append(imageKey, image);
+            key++
         });
+        
+        fd.append('listingName', listingName)
+        fd.append('addressLineOne', addressOne)
+        fd.append('addressLineTwo', addressTwo)
+        fd.append('city', city)
+        fd.append('state', state)
+        fd.append('zipCode', zipcode)
+        fd.append('neighborhood', neighborhood)
+        fd.append('housingRules', housingRules)
+        fd.append('lgbtqpFriendly', lgbtq)
+        fd.append('accessibilityFriendly', accessibility)
+        fd.append('accessibilityInfo', accessibilityInfo)
+        fd.append('livingSituation', livingSituation)
+        fd.append('housingInfo', description)
 
-        console.log("Form Data on CreateListing: ", fd);
-
-        var data = {
-            listingInfo: {
-                listingName: listingName,
-                addressLineOne: addressOne,
-                addressLineTwo: addressTwo,
-                city: city,
-                state: state,
-                zipCode: zipcode,
-                neighborhood: neighborhood,
-                housingRules: housingRules,
-                lgbtqpFriendly: lgbtq,
-                accessibilityFriendly: accessibility,
-                accessibilityInfo: accessibilityInfo,
-                livingSituation: livingSituation,
-                housingInfo: description,
-                images: fd,
-            }
-        };
         var config = {
             headers: {
+                "Content-type": "multipart/form-data",
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': `Bearer ${accessToken}`,
             },
         };
-        axios.post(BASE_URL + '/createListing', data, config)
+        axios.post(BASE_URL + '/createListing', fd, config)
             .then(function (response) {
                 props.openSnackBar({severity: 'success', message: 'Succesfully created new listing!'});
                 props.handleClose();

@@ -289,9 +289,11 @@ class FindOffer extends Component {
                             // info for the housing
                             listingId = {this.state.currListing.listingID}
                             key={this.state.currListing.listingID + Math.random()}
+                            neighborhood={this.state.currListing.neighborhood}
+                            city={this.state.currListing.city}
+                            state={this.state.currListing.state}
                             zipcode={this.state.currListing.zipCode}
                             listingTitle={this.state.currListing.listingName}
-                            location={this.state.currListing.neighborhood + ", " + this.state.currListing.city + ", " + this.state.currListing.state + " (" + this.state.currListing.zipCode + ")"}
                             lgbtqpFriendly={this.state.currListing.lgbtqpFriendly}
                             accessibilityFriendly={this.state.currListing.accessibilityFriendly}
                             livingSitch={this.state.currListing.livingSituation}
@@ -301,6 +303,7 @@ class FindOffer extends Component {
                             //TODO: add props.listingImages
 
                             // info for the owner
+                            ownerPhoto={this.state.currListing.ownerPhotoUrl}
                             ownerName={this.state.currListing.firstName + " " + this.state.currListing.lastName}
                             org={this.state.currListing.org}
                             gradYear={this.state.currListing.grad_year}
@@ -326,6 +329,7 @@ class FindOffer extends Component {
                         open={this.state.ownerDialogOpen}
                         handleClose={this.closeOwnerDialog}
                         name={this.state.currListing.firstName + " " + this.state.currListing.lastName}
+                        ownerPhoto={this.state.currListing.ownerPhotoUrl}
                         gradYear={this.state.currListing.grad_year}
                         gender={this.state.currListing.gender}
                         pronouns={this.state.currListing.preferred_pronouns}
