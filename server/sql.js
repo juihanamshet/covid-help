@@ -217,6 +217,10 @@ function getUser(email, callback) {
     });
 }
 
+function getEmail(listingID, school, callback){
+
+}
+
 function getListing(email, listing, school, callback) {
     connection = new Connection(config);
     var result = []
@@ -588,5 +592,5 @@ module.exports = {
     getSchoolListings, getUsersListings,
     getListing, createListingHandler,
     createUser, getUser, updateUser,
-    disableListing, deleteListing, enableListing
+    disableListing, deleteListing, enableListing, getEmail
 }
