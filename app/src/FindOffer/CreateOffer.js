@@ -4,7 +4,7 @@ import { Dialog, DialogTitle, DialogContent, Paper, Grid, TextField, Button, Typ
 import { useInput } from '../hooks/input-hook';
 import { DropzoneArea } from 'material-ui-dropzone';
 import { withOktaAuth } from '@okta/okta-react';
-
+import FormData from 'form-data'
 
 import axios from 'axios';
 
