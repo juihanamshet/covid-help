@@ -217,8 +217,52 @@ function getUser(email, callback) {
     });
 }
 
-function getEmail(listingID, school, callback){
+async function getListerID(listingID, callback){
+    connection = await new Connection(config);
+    console.log("GET CHECK 1")
+    var result = "";
+    var code = 200
 
+    sqlQuery = "select userID from listingTable where \
+            listingTable.listingID = @ListingID;"
+
+    request = await new Request(sqlQuery, function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+        if (rowCount == 0) {
+            console.error("userEmail associated with" + listingID)
+            result = "User Not Found";
+            code = 500;
+        }
+    });
+    console.log("GET CHECK 2")
+
+    await request.addParameter('ListingID', TYPES.Int, listingID);
+
+    await request.on('row', function (columns) {
+        result = columns['userID'].value;
+    });
+
+    await request.on('requestCompleted', function () {
+        connection.close();
+        callback(result, code)
+    });
+
+    await request.on('error', (err) => {
+        console.error(err);
+        listingData = "Internal Server Error"
+        code = 500;
+    })
+    console.log("GET CHECK 3")
+
+    await connection.on('connect', function (err) {
+        console.log("/getListerID Connected Successfully");
+        connection.execSql(request);
+    });
+    
 }
 
 function getListing(email, listing, school, callback) {
@@ -592,5 +636,5 @@ module.exports = {
     getSchoolListings, getUsersListings,
     getListing, createListingHandler,
     createUser, getUser, updateUser,
-    disableListing, deleteListing, enableListing, getEmail
+    disableListing, deleteListing, enableListing, getListerID, getUserID
 }
