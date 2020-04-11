@@ -1,16 +1,18 @@
 import React, {useState, useRef} from 'react'
-import NavBar from '../NavBar.js'
-import InlineEdit from './InlineEdit.js'
 import axios from 'axios'
 import { withOktaAuth } from '@okta/okta-react';
-import MuiAlert from '@material-ui/lab/Alert';
-import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar, IconButton, Tooltip, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import { Grid, Paper, Avatar, Typography, Divider, List, ListItem, Link, Snackbar, IconButton, Tooltip, CircularProgress } from '@material-ui/core'
+import MuiAlert from '@material-ui/lab/Alert';
 import { Prompt } from 'react-router'
-import bgImage from '../img/house.jpg'
+import LoadingOverlay from 'react-loading-overlay';
 import _ from 'lodash'
 import sanitizeHtml from 'sanitize-html-react'
 import FormData from 'form-data'
+import bgImage from '../img/house.jpg'
+
+import NavBar from '../NavBar.js'
+import InlineEdit from './InlineEdit.js'
 
 const BASE_URL = 'http://localhost:8080'
 
@@ -242,14 +244,17 @@ function User(props) {
         });
     }
 
+    const [updating, setUpdating] = useState(false);
     const onProfilePhotoChange = async(e) =>{
+        // set state of updating to true
+        setUpdating(true);
         let image = e.target.files[0];
         setProfilePhoto(URL.createObjectURL(image));
         
         if(!image){ // catch all non uploads
             return;
         };
-                
+
         const fd = new FormData();
         fd.append('stream', image);
         
@@ -264,6 +269,7 @@ function User(props) {
         };
         axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
             .then(function (response) {
+                setUpdating(false);
                 setSnackBar(true);
                 setSnackBarMessage({severity: 'success', message: 'Succesfully updated profile!'});
             })
@@ -279,7 +285,7 @@ function User(props) {
     return (
         <div>
             <Prompt
-                when={!editDisabled}
+                when={!editDisabled || updating}
                 message='You have unsaved changes, are you sure you want to leave?'
             />
             <NavBar></NavBar>
@@ -298,7 +304,9 @@ function User(props) {
                                     <BootstrapTooltip title="Update profile photo" aria-label="Update profile photo">
                                     <label htmlFor="icon-button-file">
                                         <IconButton component="span">
-                                            <Avatar style={{ height: 150, width: 150 }} src={profilePhoto}></Avatar>
+                                            <LoadingOverlay active={updating} classNamePrefix="loading" spinner>
+                                                <Avatar style={{ height: 150, width: 150 }} src={profilePhoto}></Avatar>
+                                            </LoadingOverlay>
                                         </IconButton>
                                     </label>
                                     </BootstrapTooltip>
