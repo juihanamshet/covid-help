@@ -23,7 +23,7 @@ var config = {
 var connection;
 
 
-function getUserID(email, callback) {
+async function getUserID(email, callback) {
     connection = new Connection(config);
 
     var result = "";
@@ -212,7 +212,7 @@ function getUser(email, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/getListing SQL DB Connected Successfully");
+        console.log("/getUser SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }

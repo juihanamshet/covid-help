@@ -134,7 +134,7 @@ async function showBlobNames(aborter, containerClient) {
 }
 
 app.get("/getUser", authenticationRequired, async function (req, res, next) {
-    console.log('/getUsers called. HOPE THIS WORKSSSS')
+    console.log('/getUser has been called. HOPE THIS WORKSSSS')
     const userEmail = req.jwt.claims.sub;
 
 
@@ -230,7 +230,7 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
     console.log("/updateProfilePhoto is called. Hope this works");
     
     const userEmail = req.jwt.claims.sub;
-    sqltools.getUserID(userEmail, async (sqlResults, status) => {
+    await sqltools.getUserID(userEmail, async (sqlResults, status) => {
         if (status == 200){
             const userID = sqlResults;
             const stream = req.files.stream;
@@ -421,37 +421,51 @@ async function uploadLocalFile(aborter, containerClient, filePath,
 app.post("/createListing", authenticationRequired, async function (req, res, next) {
     console.log("createListing has been called.")
     const userEmail = req.jwt.claims.sub;
-    const listingInfo = req.fields.listingInfo;
-    const listingId = listingInfo.listingID;
+    // const listingInfo = req.fields.listingInfo;
+    var listingInfo = {};
+    listingInfo['listingName'] = req.fields.listingName;
+    listingInfo['addressLineOne'] = req.fields.addressLineOne;
+    listingInfo['addressLineTwo'] = req.fields.addressLineTwo;
+    listingInfo['city'] = req.fields.city;
+    listingInfo['state'] = req.fields.state;
+    listingInfo['zipCode'] = req.fields.zipCode;
+    listingInfo['neighborhood'] = req.fields.neighborhood;
+    listingInfo['housingRules'] = req.fields.housingRules;
+    listingInfo['lgbtqpFriendly'] = req.fields.lgbtqpFriendly;
+    listingInfo['accessibilityFriendly'] = req.fields.accessibilityFriendly;
+    listingInfo['accessibilityInfo'] = req.fields.accessibilityInfo;
+    listingInfo['livingSituation'] = req.fields.livingSituation;
+    listingInfo['housingInfo'] = req.fields.housingInfo;
+
+    console.log(listingInfo);
     // let images = ["",""];
     // let userID = "5";
     // If you call data.append('file', file) multiple times your request will contain an array of your files...
     sqltools.getUserID(userEmail, async (sqlResults, status) => {
         if (status === 200) {
-            const userID = sqlResults
-            console.log(listingInfo.images);
+            // const userID = sqlResults
 
-            var files = req.files.images;
-            //SHould be a maximum of four
-            console.log(files.length, files);
+            // var files = req.files.images;
+            // //SHould be a maximum of four
+            // console.log(files);
 
-            let containerName = "container" + userID;
+            // let containerName = "container" + userID;
 
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-            console.log(containerName)
-            if (!(await containerClient.exists())) {
-                //If the container doesn't exists, then create one
-                await containerClient.create()
-            }
-            const aborter = AbortController.timeout(30 * 60 * 1000);
+            // const containerClient = blobServiceClient.getContainerClient(containerName);
+            // console.log(containerName)
+            // if (!(await containerClient.exists())) {
+            //     //If the container doesn't exists, then create one
+            //     await containerClient.create()
+            // }
+            // const aborter = AbortController.timeout(30 * 60 * 1000);
 
-            files.forEach(async function (file, i) {
-                await uploadLocalFile(aborter, containerClient, file.path, listingID, file.name, i)
-                .catch(() => res.send("internal servor Error"));
-            });
+            // files.forEach(async function (file, i) {
+            //     await uploadLocalFile(aborter, containerClient, file.path, listingID, file.name, i)
+            //     .catch(() => res.send("internal servor Error"));
+            // });
             
 
-            console.log("/createListing: Creating Listing for " + userEmail)
+            // console.log("/createListing: Creating Listing for " + userEmail)
 
 
             sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
