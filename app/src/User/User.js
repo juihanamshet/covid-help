@@ -172,6 +172,7 @@ function User(props) {
     const [snackBarMessage, setSnackBarMessage] = useState({severity:'success', message:'successfully updated profile!'})
 
     React.useEffect(() => {
+        console.log('component mounted!');
         let config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -200,7 +201,7 @@ function User(props) {
             .catch(function (error) {
                 console.log(error);
             });
-    }, [user, editDisabled, profilePhoto, accessToken]);
+    }, [user, editDisabled, accessToken]);
 
     const saveChanges = async() => {
         var data = {
@@ -224,7 +225,6 @@ function User(props) {
                 Instagram: ig.current,
             }
         };
-        console.log(data);
         var config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
