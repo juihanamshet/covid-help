@@ -4,9 +4,9 @@ import { Grid, Typography, Card, Avatar, Link, Button, IconButton } from '@mater
 import { MailOutline, Facebook, LinkedIn, Instagram } from '@material-ui/icons';
 import {  StaticGoogleMap as Map, Marker } from 'react-static-google-map';
 import { withOktaAuth } from '@okta/okta-react';
+import Carousel from 'react-material-ui-carousel'
+import ModalImage from "react-modal-image";
 import axios from 'axios'
-//temp import
-import jordad from '../img/jordad.png';
 
 const BASE_URL = 'http://localhost:8080'
 const GOOGLE_MAPS = process.env.REACT_APP_GOOGLE_MAPS_API;
@@ -70,15 +70,41 @@ const useStyles = makeStyles(theme => ({
             textDecoration: "underline"
         }
     },
+    photoContainer: {
+        width: 475,
+        height: 300,
+    },
+    listingPhoto: {
+        width: '100%',
+        maxHeight: '300px!important',
+        objectFit:'cover' 
+    }
 }));
 
-// props: listingTitle, coordinates, location, livingSitch, houseRules, details (additional details), ownerName, ownerAvatar, ownerDeets
+// props: listingTitle, coordinates, location, livingSitch, houseRules, details (additional details), ownerName, ownerAvatar, ownerDeets, listingPhotos
 function ListingDetails(props) {
     const accessToken = props.authState.accessToken;
     const classes = useStyles();
     const [clickedDelete, setClickedDelete] = useState(false);
     const [clickedDisable, setClickedDisable] = useState(false);
     const [clickedEnable, setClickedEnable] = useState(false);
+
+    // listing photos
+    var listingPhotos = [];
+    var keyCount = 0;
+    props.listingPhotos.forEach((photoURL) => {
+        listingPhotos.push(
+        <div className={classes.photoContainer} key={keyCount}>
+            <ModalImage
+            className={classes.listingPhoto}
+            small={photoURL}
+            large={photoURL}
+            hideDownload
+            >
+            </ModalImage>
+        </div>);
+        keyCount++;
+    })
 
     // accesibility
     var accessibilityFriendly = props.accessibilityFriendly ? "Yes" : "No";
@@ -89,21 +115,18 @@ function ListingDetails(props) {
     location = props.neighborhood ? props.neighborhood + ', ' + props.city + ', ' + props.state + ' (' + props.zipcode + ')' : props.city + ', ' + props.state + ' (' + props.zipcode + ')'
 
     // form a default bio if the user is unavailable
+    var aboutMe = '';
     var school = props.org.replace(/^\w/, c => c.toUpperCase());
-    var aboutMeDefault = '';
     if(props.gradYear && props.gradYear === "faculty"){ // if faculty
-        aboutMeDefault = props.bio ? props.bio : "Howdy! I'm a " + school + " " + props.gradYear + " member. I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
+        aboutMe = props.bio ? props.bio : "Howdy! I'm a " + school + " " + props.gradYear + " member. I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
     }else if(props.gradYear){ // if alumni or student
-        aboutMeDefault = props.bio ? props.bio : "Howdy! I'm " + school + " class of " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
+        aboutMe = props.bio ? props.bio : "Howdy! I'm " + school + " class of " + props.gradYear + ". I am best reached by " + props.preferredContactMethod + ". Can't wait to get to know you. " 
     }
-    // TODO: once user has personalBio, provide option to switch between the two
-    var aboutMe = aboutMeDefault;
 
     // set up list of buttons that can be used for contact
     var buttonList = [];
-    var keyCount = 0;
     const contacts = Object.entries(props.contacts);
-    contacts.forEach(function (contact) {
+    contacts.forEach((contact) => {
         // if the social media url isn't null or undefined
         if(contact[1]){
             // key creation
@@ -112,6 +135,7 @@ function ListingDetails(props) {
         }
     });
 
+    /* LOGIC FOR ENABLE AND DISABLE BUTTONS */
     const submitDeleteReq = async() => {
         var config = {
             headers: {
@@ -181,18 +205,17 @@ function ListingDetails(props) {
             });
     }
 
-    const clearClicks = (e) => {
+    const cancelRequest = (e) => {
         e.preventDefault();
         setClickedDisable(false);
         setClickedDelete(false);
     }
-
     // if listing is owned by user, provide delete and disable options
     var deleteButton = '';
     var disableButton = '';
     var cancelButton = '';
     if(props.isOwner){
-        cancelButton = (clickedDelete || clickedDisable) ? <Button className={classes.cancelButton} onClick={clearClicks}>Cancel</Button> : '';
+        cancelButton = (clickedDelete || clickedDisable) ? <Button className={classes.cancelButton} onClick={cancelRequest}>Cancel</Button> : '';
         deleteButton = <Button onClick={clickedDelete ? submitDeleteReq : () => setClickedDelete(!clickedDelete)} variant={clickedDelete ? 'outlined': 'text'} className={clickedDelete ? classes.confirmClick : classes.deleteButton} style={{marginLeft:10, float:'right'}}>{clickedDelete ? 'Confirm' : 'Delete'}</Button>
         
         disableButton = props.disabledListing ? <Button onClick={clickedEnable ? submitEnableReq : () => setClickedEnable(!clickedEnable)} variant={clickedEnable ? 'outlined': 'text'} className={clickedEnable ? classes.confirmClick : classes.enableButton} style={{float:'right'}}>{clickedEnable? 'Confirm' : 'Enable'}</Button>        : 
@@ -203,9 +226,13 @@ function ListingDetails(props) {
 
     return (
         <div className={classes.root}>
-            <Map center={props.zipcode} zoom={13} size="475x300" apiKey={GOOGLE_MAPS}>
-                <Marker location={props.zipcode}></Marker>
-            </Map>
+            <Carousel autoPlay={false}>
+                <Map center={props.zipcode} zoom={13} size="475x300" apiKey={GOOGLE_MAPS}>
+                    <Marker location={props.zipcode}></Marker>
+                </Map>
+                {listingPhotos}
+            </Carousel>
+            
             <div className={classes.listingDeets} style={{textAlign:'center'}}>
                 <Typography color="secondary" align="center" variant="overline"> Listing Details </Typography>
             </div>

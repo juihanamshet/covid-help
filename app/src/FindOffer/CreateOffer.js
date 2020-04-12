@@ -5,7 +5,7 @@ import { useInput } from '../hooks/input-hook';
 import { DropzoneArea } from 'material-ui-dropzone';
 import { withOktaAuth } from '@okta/okta-react';
 
-
+import Resizer from 'react-image-file-resizer';
 import axios from 'axios';
 
 const BASE_URL = 'http://localhost:8080'

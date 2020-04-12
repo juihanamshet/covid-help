@@ -9,8 +9,9 @@ import LoadingOverlay from 'react-loading-overlay';
 import _ from 'lodash'
 import sanitizeHtml from 'sanitize-html-react'
 import FormData from 'form-data'
-import bgImage from '../img/house.jpg'
+import Resizer from 'react-image-file-resizer';
 
+import bgImage from '../img/house.jpg'
 import NavBar from '../NavBar.js'
 import InlineEdit from './InlineEdit.js'
 
@@ -248,14 +249,33 @@ function User(props) {
     const onProfilePhotoChange = async(e) =>{
         // set state of updating to true
         setUpdating(true);
+        // set image
         let image = e.target.files[0];
-        setProfilePhoto(URL.createObjectURL(image));
-        
-        if(!image){ // catch all non uploads
+         // catch all non uploads
+        if(!image){
             return;
         };
-
+        // set up a form data
         const fd = new FormData();
+
+        // resize image first
+        Resizer.imageFileResizer(
+            image,
+            400,
+            400,
+            'JPEG',
+            90,
+            0,
+            uri => {
+                let encodedUri = encodeURI(uri);
+                // console.log("resized base64 uri", encodedUri)
+                // add this when our backend base64 uri conversion works
+                fd.append('stream', image);
+                setProfilePhoto(encodedUri);
+            },
+            'base64'
+        );
+        // get rid of this when our conversion works
         fd.append('stream', image);
         
         const config = {
