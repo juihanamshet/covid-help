@@ -5,6 +5,7 @@ import { useInput } from '../hooks/input-hook';
 import { DropzoneArea } from 'material-ui-dropzone';
 import { withOktaAuth } from '@okta/okta-react';
 import FormData from 'form-data'
+import GooglePlacesAutocomplete, { geocodeByAddress } from 'react-google-places-autocomplete';
 
 import axios from 'axios';
 
@@ -43,12 +44,12 @@ function CreateOffer(props) {
     const [images, setImages] = useState([]);
 
     const { value: listingName, bind: bindListingName } = useInput('');
-    const { value: addressOne, bind: bindAddressOne } = useInput('');
+    const { value: addressOne, setValue: setAddy1, bind: bindAddressOne } = useInput('');
     const { value: addressTwo, bind: bindAddressTwo } = useInput('');
-    const { value: neighborhood, bind: bindNeighborhood } = useInput('');
-    const { value: city, bind: bindCity } = useInput('');
-    const { value: state, bind: bindState } = useInput('');
-    const { value: zipcode, bind: bindZipcode } = useInput('');
+    const { value: neighborhood, setValue: setNeighborhood, bind: bindNeighborhood } = useInput('');
+    const { value: city, setValue: setCity, bind: bindCity } = useInput('');
+    const { value: state, setValue: setState, bind: bindState } = useInput('');
+    const { value: zipcode, setValue: setZip, bind: bindZipcode } = useInput('');
     const { value: accessibilityInfo, bind: bindAccesibilityInfo } = useInput('');
     const { value: livingSituation, bind: bindLivingSituation } = useInput('');
     const { value: description, bind: bindDescription } = useInput('');
@@ -60,14 +61,13 @@ function CreateOffer(props) {
         e.preventDefault();
 
         const fd = new FormData();
-        
         var key = 0
         images.forEach(image => {
-            let imageKey = 'image' + key 
+            let imageKey = 'image' + key
             fd.append(imageKey, image);
             key++
         });
-        
+
         fd.append('listingName', listingName)
         fd.append('addressLineOne', addressOne)
         fd.append('addressLineTwo', addressTwo)
@@ -91,19 +91,63 @@ function CreateOffer(props) {
         };
         axios.post(BASE_URL + '/createListing', fd, config)
             .then(function (response) {
-                props.openSnackBar({severity: 'success', message: 'Succesfully created new listing!'});
+                props.openSnackBar({ severity: 'success', message: 'Succesfully created new listing!' });
                 props.handleClose();
                 props.refreshOffers();
             })
             .catch(function (error) {
                 console.log(error);
-                props.openSnackBar({severity: 'error', message: 'Unable to create new listing, please try again.'});                
+                props.openSnackBar({ severity: 'error', message: 'Unable to create new listing, please try again.' });
             });
     };
 
     const handleFile = (files) => {
         setImages(files);
     }
+
+    const clearLocation = () => {
+        setNeighborhood('')
+        setCity('')
+        setState('')
+        setAddy1('')
+        setZip('')
+    }
+
+    const handleLocationAutoComplete = (listingLocation) => {
+        clearLocation();
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            neighborhood: 'long_name',
+            locality: 'short_name',
+            administrative_area_level_1: 'short_name',
+            postal_code: 'short_name'
+        };
+        var results = {}
+        for (var i = 0; i < listingLocation.address_components.length; i++) {
+            var addressType = listingLocation.address_components[i].types[0];
+            if (componentForm[addressType]) {
+                var val = listingLocation.address_components[i][componentForm[addressType]];
+                results[addressType] = val;
+            }
+        }
+        if (results['neighborhood']) {
+            setNeighborhood(results['neighborhood'])
+        }
+        if (results['locality']) {
+            setCity(results['locality'])
+        }
+        if (results['administrative_area_level_1']) {
+            setState(results['administrative_area_level_1'])
+        }
+        if (results['postal_code']) {
+            setZip(results['postal_code'])
+        }
+        if (results['street_number'] && results['route']) {
+            setAddy1(results['street_number'] + " " + results['route'])
+        }
+    }
+
 
     return (
         <React.Fragment>
@@ -137,17 +181,30 @@ function CreateOffer(props) {
                                         autoFocus
                                         helperText="Please provide a short description name for your listing. (i.e. 'My Couch')"
                                     />
+
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <TextField
-                                        {...bindAddressOne}
-                                        autoComplete="street-address"
-                                        name="addyOne"
-                                        variant="outlined"
+                                    {/* <input
+                                        // {...bindAddressOne}
+                                        // autoComplete="street-address"
+                                        // name="addyOne"
+                                        // variant="outlined"
+                                        // className="input-field"
+                                        ref={textInput}
                                         required
-                                        fullWidth
-                                        id="addyOne"
-                                        label="Address 1"
+                                        // fullWidth
+                                        id="autocomplete"
+                                        // label="Address 1"
+                                        type="text"
+                                    /> */}
+                                    <GooglePlacesAutocomplete id="addyOne" name="addyOne"
+                                        apiKey={process.env.REACT_APP_GOOGLE_MAPS_API}
+                                        onSelect={({ description }) => {
+                                            console.log(description);
+                                            geocodeByAddress(description)
+                                                .then(results => handleLocationAutoComplete(results[0]))
+                                                .catch(error => console.error(error));
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>

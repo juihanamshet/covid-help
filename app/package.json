@@ -27,6 +27,7 @@
     "react-card-flip": "^1.0.10",
     "react-contenteditable": "^3.3.4",
     "react-dom": "^16.13.0",
+    "react-google-places-autocomplete": "^2.0.3",
     "react-inline-editing": "^1.0.10",
     "react-loading-overlay": "^1.0.1",
     "react-material-ui-carousel": "^1.1.1",
