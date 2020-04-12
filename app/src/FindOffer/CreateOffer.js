@@ -62,12 +62,14 @@ function CreateOffer(props) {
         const fd = new FormData();
         
         var key = 0
-        images.forEach(image => {
-            console.log(image);
-            let imageKey = 'image' + key 
-            fd.append(imageKey, image);
-            key++
-        });
+        if(images){
+            images.forEach(image => {
+                console.log(image);
+                let imageKey = 'image' + key 
+                fd.append(imageKey, image);
+                key++
+            });
+        }
         
         fd.append('listingName', listingName)
         fd.append('addressLineOne', addressOne)
