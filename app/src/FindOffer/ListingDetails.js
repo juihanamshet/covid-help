@@ -226,12 +226,18 @@ function ListingDetails(props) {
 
     return (
         <div className={classes.root}>
+            { listingPhotos.length ? 
             <Carousel autoPlay={false}>
                 <Map center={props.zipcode} zoom={13} size="475x300" apiKey={GOOGLE_MAPS}>
                     <Marker location={props.zipcode}></Marker>
                 </Map>
                 {listingPhotos}
             </Carousel>
+            :
+            <Map center={props.zipcode} zoom={13} size="475x300" apiKey={GOOGLE_MAPS}>
+                <Marker location={props.zipcode}></Marker>
+            </Map>
+            }
             
             <div className={classes.listingDeets} style={{textAlign:'center'}}>
                 <Typography color="secondary" align="center" variant="overline"> Listing Details </Typography>
