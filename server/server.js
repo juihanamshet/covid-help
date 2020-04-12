@@ -160,7 +160,7 @@ app.get("/getUser", authenticationRequired, async function (req, res, next) {
             var blobNamesList = await showBlobNames(aborter, containerClient);
                         
             var profilePhotoBlobName = "";
-            console.log(blobNamesList);
+            // console.log(blobNamesList);
             var exists = false;
             for (var string of blobNamesList){
                 if (string.includes("profilePhoto")){
@@ -169,14 +169,14 @@ app.get("/getUser", authenticationRequired, async function (req, res, next) {
                 };
             }
             var sasUrl = "";
-            console.log("corr 2");
+            // console.log("corr 2");
             if (exists){
-                console.log("The blob does exist")
+                // console.log("The blob does exist")
                 var token = blobService.generateSharedAccessSignature(containerName, profilePhotoBlobName, sharedAccessPolicy);
-                console.log("Corret 1");
+                // console.log("Corret 1");
                 sasUrl = blobService.getUrl(containerName, profilePhotoBlobName, token);
         
-                console.log(sasUrl);
+                // console.log(sasUrl);
             }
             sqltools.getUser(userEmail, (sqlResult, status) => {
                 if (status === 200) {
@@ -221,7 +221,7 @@ async function addPhoto(containerClient, filePath, extname, aborter) {
     await blockBlobClient.uploadFile(filePath, aborter);
 
     await blobClient.setHTTPHeaders({
-        blobContentType: "image/png",
+        blobContentType: content_type,
     });
 
 }
@@ -234,7 +234,7 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
         if (status == 200){
             const userID = sqlResults;
             const stream = req.files.stream;
-            console.log(path.extname(stream.name));
+            // console.log(path.extname(stream.name));
             // fs.readFile(stream.path)
             const containerName = "container" + userID;
 
@@ -247,10 +247,10 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
             var li = await showBlobNames(aborter, containerClient).catch(() => res.send("Internal\
             server error"));
                         
-            console.log("Got ALl the blob Names")
+            // console.log("Got ALl the blob Names")
             for (var string of li){
                 if (string.includes("profilePhoto")){
-                    console.log("it includes!!!")
+                    // console.log("it includes!!!")
                     const blobClient = containerClient.getBlobClient(string);
                     const blockBlobClient = blobClient.getBlockBlobClient();
 
@@ -321,7 +321,7 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
     await sqltools.getListerID(listingID,  async (sqlResult, status) => {
         if (status === 200) {
             console.log("email successfully retreived");
-            console.log(sqlResult);
+            
             listerID = sqlResult;
 
             const containerName = "container" + listerID;
@@ -411,9 +411,10 @@ async function uploadLocalFile(aborter, containerClient, filePath,
     await blockBlobClient.uploadFile(filePath, aborter);
 
     const content_type = "image/" + path.extname(filePath)
-    blobClient.setHTTPHeaders({
-        blobContentType: content_type
-    })
+
+    await blobClient.setHTTPHeaders({
+        blobContentType: content_type,
+    });
 }
 
 
@@ -437,40 +438,48 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
     listingInfo['livingSituation'] = req.fields.livingSituation;
     listingInfo['housingInfo'] = req.fields.housingInfo;
 
-    console.log(listingInfo);
+    // console.log(listingInfo);
+    // console.log(req.files);
     // let images = ["",""];
     // let userID = "5";
     // If you call data.append('file', file) multiple times your request will contain an array of your files...
     sqltools.getUserID(userEmail, async (sqlResults, status) => {
         if (status === 200) {
-            // const userID = sqlResults
+            const userID = sqlResults
+            listingInfo['userID'] = userID;
 
-            // var files = req.files.images;
-            // //SHould be a maximum of four
-            // console.log(files);
-
-            // let containerName = "container" + userID;
-
-            // const containerClient = blobServiceClient.getContainerClient(containerName);
-            // console.log(containerName)
-            // if (!(await containerClient.exists())) {
-            //     //If the container doesn't exists, then create one
-            //     await containerClient.create()
-            // }
-            // const aborter = AbortController.timeout(30 * 60 * 1000);
-
-            // files.forEach(async function (file, i) {
-            //     await uploadLocalFile(aborter, containerClient, file.path, listingID, file.name, i)
-            //     .catch(() => res.send("internal servor Error"));
-            // });
-            
-
-            // console.log("/createListing: Creating Listing for " + userEmail)
+            console.log("/createListing: Creating Listing for " + userEmail)
 
 
-            sqltools.createListingHandler(userEmail, listingInfo, (sqlResult, status) => {
+            sqltools.createListing(listingInfo, async (sqlResult, status) => {
                 if (status === 200) {
-                    console.log("/createListing Listing Inserted into DB")
+                    console.log("/createListing Listing Inserted into DB");
+
+                    const listingID = sqlResult[0][''];
+                    console.log(listingID);
+
+                    var fileKeys = Object.keys(req.files);
+                    console.log(fileKeys);
+                    //SHould be a maximum of four
+                    // console.log(files);
+
+                    let containerName = "container" + userID;
+
+                    const containerClient = blobServiceClient.getContainerClient(containerName);
+                    console.log(containerName)
+                    if (!(await containerClient.exists())) {
+                        //If the container doesn't exists, then create one
+                        await containerClient.create()
+                    }
+                    const aborter = AbortController.timeout(30 * 60 * 1000);
+                    var i = 0;
+                    fileKeys.forEach(async function (key) {
+
+                        await uploadLocalFile(aborter, containerClient, req.files[key].path, listingID, req.files[key].name, i)
+                        .catch(() => res.send("Internal Server Error"));
+                        i++;
+                    });
+                    
                     res.json(status);
                 } else {
                     res.statusCode = 500;
@@ -478,6 +487,11 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
                 }
             })
 
+
+            
+
+
+            
         } else {
             res.statusCode = 500;
             res.send("Internal Server Error");
