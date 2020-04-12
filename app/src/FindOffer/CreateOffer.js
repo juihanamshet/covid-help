@@ -40,7 +40,7 @@ function CreateOffer(props) {
 
     const [lgbtq, setLgbtq] = useState(false);
     const [accessibility, setAccessibility] = useState(false);
-    const [images, setImages] = useState([]);
+    const [images, setImages] = useState();
 
     const { value: listingName, bind: bindListingName } = useInput('');
     const { value: addressOne, bind: bindAddressOne } = useInput('');
@@ -63,6 +63,7 @@ function CreateOffer(props) {
         
         var key = 0
         images.forEach(image => {
+            console.log(image);
             let imageKey = 'image' + key 
             fd.append(imageKey, image);
             key++
