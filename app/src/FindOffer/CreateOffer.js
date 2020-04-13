@@ -7,7 +7,7 @@ import { withOktaAuth } from '@okta/okta-react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import FormData from 'form-data'
-import GooglePlacesAutocomplete, { geocodeByAddress } from 'react-google-places-autocomplete';
+import { geocodeByAddress } from 'react-google-places-autocomplete';
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
 
@@ -295,7 +295,7 @@ function CreateOffer(props) {
                                     /> */}
                                     <Autocomplete
                                         id="google-map-demo"
-                                        style={{ width: 300 }}
+                                        style={{ width: '100%' }}
                                         getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
                                         filterOptions={(x) => x}
                                         options={options}
