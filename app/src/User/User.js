@@ -257,6 +257,16 @@ function User(props) {
         };
         // set up a form data
         const fd = new FormData();
+        // set up configs for axios
+        const config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+                'accept': 'application/json',
+                'Accept-Language': 'en-US,en;q=0.8',
+                'Content-Type': `multipart/form-data; boundary=${fd._boundary}`,
+            },
+        };
 
         // resize image first
         Resizer.imageFileResizer(
@@ -268,36 +278,25 @@ function User(props) {
             0,
             uri => {
                 let encodedUri = encodeURI(uri);
-                // console.log("resized base64 uri", encodedUri)
+                console.log("in resize function", uri)
                 // add this when our backend base64 uri conversion works
-                fd.append('stream', image);
+                fd.append('stream', uri);
                 setProfilePhoto(encodedUri);
+
+                axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
+                .then(function (response) {
+                    setUpdating(false);
+                    setSnackBar(true);
+                    setSnackBarMessage({severity: 'success', message: 'Succesfully updated profile!'});
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    setSnackBar(true);
+                    setSnackBarMessage({severity: 'error', message: 'Unable to update profile.'});                
+                });
             },
             'base64'
         );
-        // get rid of this when our conversion works
-        fd.append('stream', image);
-        
-        const config = {
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${accessToken}`,
-                'accept': 'application/json',
-                'Accept-Language': 'en-US,en;q=0.8',
-                'Content-Type': `multipart/form-data; boundary=${fd._boundary}`,
-            },
-        };
-        axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
-            .then(function (response) {
-                setUpdating(false);
-                setSnackBar(true);
-                setSnackBarMessage({severity: 'success', message: 'Succesfully updated profile!'});
-            })
-            .catch(function (error) {
-                console.log(error);
-                setSnackBar(true);
-                setSnackBarMessage({severity: 'error', message: 'Unable to update profile.'});                
-            });
     }
     // some logic
     var school = user.org ? user.org.toUpperCase() : '';
