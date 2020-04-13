@@ -89,15 +89,15 @@ function CreateOffer(props) {
         const fd = new FormData();
         var key = 0
 
-        if(images){
+        if (images) {
             images.forEach(image => {
                 console.log(image);
-                let imageKey = 'image' + key 
+                let imageKey = 'image' + key
                 fd.append(imageKey, image);
                 key++
             });
         }
-        
+
         fd.append('listingName', listingName)
         fd.append('addressLineOne', addressOne)
         fd.append('addressLineTwo', addressTwo)
@@ -148,7 +148,9 @@ function CreateOffer(props) {
     };
 
     const handleLocationClick = (location) => {
-        geocodeByAddress(location)
+        console.log(location.structured_formatting.main_text)
+        setInputValue(location.structured_formatting.main_text)
+        geocodeByAddress(location.description)
             .then(results => handleLocationAutoComplete(results[0]))
             .catch(error => console.error(error));
     }
@@ -295,6 +297,7 @@ function CreateOffer(props) {
                                     /> */}
                                     <Autocomplete
                                         id="google-map-demo"
+                                        value={addressOne}
                                         style={{ width: '100%' }}
                                         getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
                                         filterOptions={(x) => x}
@@ -312,6 +315,7 @@ function CreateOffer(props) {
                                         )}
                                         renderOption={(option) => {
                                             const matches = option.structured_formatting.main_text_matched_substrings;
+
                                             const parts = parse(
                                                 option.structured_formatting.main_text,
                                                 matches.map((match) => [match.offset, match.offset + match.length]),
@@ -322,7 +326,7 @@ function CreateOffer(props) {
                                                     <Grid item>
                                                         <LocationOnIcon className={classes.icon} />
                                                     </Grid>
-                                                    <Grid item xs onClick={() => handleLocationClick(option.description)}>
+                                                    <Grid item xs onClick={() => handleLocationClick(option)}>
                                                         {parts.map((part, index) => (
                                                             <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
                                                                 {part.text}
