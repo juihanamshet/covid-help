@@ -23,7 +23,7 @@ var config = {
 var connection;
 
 
-function getUserID(email, callback) {
+async function getUserID(email, callback) {
     connection = new Connection(config);
 
     var result = "";
@@ -212,7 +212,7 @@ function getUser(email, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/getListing SQL DB Connected Successfully");
+        console.log("/getUser SQL DB Connected Successfully");
         connection.execSql(request);
     });
 }
@@ -322,6 +322,7 @@ function getListing(email, listing, school, callback) {
 function createListing(listingInfo, callback) {
     connection = new Connection(config);
     code = 200;
+    var result = [];
 
     sqlQuery =
         "INSERT INTO listingTable \
@@ -333,7 +334,8 @@ function createListing(listingInfo, callback) {
             @UserID, @AddressLineOne, @AddressLineTwo, @City, \
             @State, @ZipCode, @Neighborhood, @HousingRules, \
             @LGBTQPFRD, @ACCESSFRD, @AccessInfo, @ListingName, \
-            @LivingSituation, @HousingInfo, 0);"
+            @LivingSituation, @HousingInfo, 0);\
+        SELECT @@identity"
 
     request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
@@ -358,11 +360,20 @@ function createListing(listingInfo, callback) {
     request.addParameter('LivingSituation', TYPES.VarChar, listingInfo.livingSituation);
     request.addParameter('HousingInfo', TYPES.VarChar, listingInfo.housingInfo);
 
+    request.on('row', function (columns) {
+        listing = {}
+        for (var name in columns) {
+            listing[name] = columns[name].value
+        }
+        console.log(listing);
+        result.push(listing)
+    });
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback("Success", code)
+        callback(result, code)
     });
+    
 
     request.on('error', (err) => {
         console.error(err);
@@ -634,7 +645,7 @@ function deleteListing(listingID, userEmail, callback) {
 
 module.exports = {
     getSchoolListings, getUsersListings,
-    getListing, createListingHandler,
+    getListing, createListingHandler, createListing,
     createUser, getUser, updateUser,
     disableListing, deleteListing, enableListing, getListerID, getUserID
 }

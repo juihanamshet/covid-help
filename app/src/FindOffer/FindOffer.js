@@ -302,7 +302,7 @@ class FindOffer extends Component {
                             houseRules={this.state.currListing.housingRules}
                             access={this.state.currListing.accessbilityInfo}
                             housingInfo={this.state.currListing.housingInfo}
-                            //TODO: add props.listingImages
+                            listingPhotos={this.state.currListing.photoUrls}
 
                             // info for the owner
                             ownerPhoto={this.state.currListing.ownerPhotoUrl}

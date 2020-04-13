@@ -11,6 +11,7 @@ import GooglePlacesAutocomplete, { geocodeByAddress } from 'react-google-places-
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
 
+import Resizer from 'react-image-file-resizer';
 import axios from 'axios';
 
 const BASE_URL = 'http://localhost:8080'
@@ -87,12 +88,16 @@ function CreateOffer(props) {
 
         const fd = new FormData();
         var key = 0
-        images.forEach(image => {
-            let imageKey = 'image' + key
-            fd.append(imageKey, image);
-            key++
-        });
 
+        if(images){
+            images.forEach(image => {
+                console.log(image);
+                let imageKey = 'image' + key 
+                fd.append(imageKey, image);
+                key++
+            });
+        }
+        
         fd.append('listingName', listingName)
         fd.append('addressLineOne', addressOne)
         fd.append('addressLineTwo', addressTwo)

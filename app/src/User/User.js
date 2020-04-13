@@ -9,8 +9,9 @@ import LoadingOverlay from 'react-loading-overlay';
 import _ from 'lodash'
 import sanitizeHtml from 'sanitize-html-react'
 import FormData from 'form-data'
-import bgImage from '../img/house.jpg'
+import Resizer from 'react-image-file-resizer';
 
+import bgImage from '../img/house.jpg'
 import NavBar from '../NavBar.js'
 import InlineEdit from './InlineEdit.js'
 
@@ -248,16 +249,15 @@ function User(props) {
     const onProfilePhotoChange = async(e) =>{
         // set state of updating to true
         setUpdating(true);
+        // set image
         let image = e.target.files[0];
-        setProfilePhoto(URL.createObjectURL(image));
-        
-        if(!image){ // catch all non uploads
+         // catch all non uploads
+        if(!image){
             return;
         };
-
+        // set up a form data
         const fd = new FormData();
-        fd.append('stream', image);
-        
+        // set up configs for axios
         const config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -267,17 +267,36 @@ function User(props) {
                 'Content-Type': `multipart/form-data; boundary=${fd._boundary}`,
             },
         };
-        axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
-            .then(function (response) {
-                setUpdating(false);
-                setSnackBar(true);
-                setSnackBarMessage({severity: 'success', message: 'Succesfully updated profile!'});
-            })
-            .catch(function (error) {
-                console.log(error);
-                setSnackBar(true);
-                setSnackBarMessage({severity: 'error', message: 'Unable to update profile.'});                
-            });
+
+        // resize image first
+        Resizer.imageFileResizer(
+            image,
+            400,
+            400,
+            'JPEG',
+            90,
+            0,
+            uri => {
+                let encodedUri = encodeURI(uri);
+                console.log("in resize function", uri)
+                // add this when our backend base64 uri conversion works
+                fd.append('stream', uri);
+                setProfilePhoto(encodedUri);
+
+                axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
+                .then(function (response) {
+                    setUpdating(false);
+                    setSnackBar(true);
+                    setSnackBarMessage({severity: 'success', message: 'Succesfully updated profile!'});
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    setSnackBar(true);
+                    setSnackBarMessage({severity: 'error', message: 'Unable to update profile.'});                
+                });
+            },
+            'base64'
+        );
     }
     // some logic
     var school = user.org ? user.org.toUpperCase() : '';
