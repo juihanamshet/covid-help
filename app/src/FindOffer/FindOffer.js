@@ -112,6 +112,7 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
+                this.openSnackBar({severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again'})
             });
     }
 
@@ -130,6 +131,8 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
+                this.openSnackBar({severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again'})
+
             });
     }
 
@@ -148,6 +151,7 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
+                this.openSnackBar({severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again'})
             });
     }
 
@@ -173,6 +177,7 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
+                this.openSnackBar({severity: 'error', message: 'Oops! we ran into a problem loading your listing, please refresh the page and try again'})
             });
     }
 
@@ -266,7 +271,6 @@ class FindOffer extends Component {
                                 {this.state.find || !listings.length ? '' : <div><hr /></div>}
                                 {this.state.find || !listings.length ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Active</Typography></div>}
                                 <div className={classes.sidebar}>{currListings}</div>
-                                {this.state.find || !listings.length ? '' : <div><hr /></div>}
                                 {this.state.find || !disabledListings.length ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Disabled</Typography></div>}
                                 <div className={classes.sidebar}>{disabledListings}</div>
                                 {this.state.find || !disabledListings.length ? '' : <div><hr /></div>}
