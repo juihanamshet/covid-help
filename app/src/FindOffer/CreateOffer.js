@@ -4,6 +4,12 @@ import { Dialog, DialogTitle, DialogContent, Paper, Grid, TextField, Button, Typ
 import { useInput } from '../hooks/input-hook';
 import { DropzoneArea } from 'material-ui-dropzone';
 import { withOktaAuth } from '@okta/okta-react';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import LocationOnIcon from '@material-ui/icons/LocationOn';
+import FormData from 'form-data'
+import GooglePlacesAutocomplete, { geocodeByAddress } from 'react-google-places-autocomplete';
+import parse from 'autosuggest-highlight/parse';
+import throttle from 'lodash/throttle';
 
 import Resizer from 'react-image-file-resizer';
 import axios from 'axios';
@@ -31,8 +37,26 @@ const useStyles = makeStyles(theme => ({
     },
     submit: {
         color: "white",
-    }
+    },
+    icon: {
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(2),
+    },
 }));
+
+function loadScript(src, position, id) {
+    if (!position) {
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.setAttribute('async', '');
+    script.setAttribute('id', id);
+    script.src = src;
+    position.appendChild(script);
+}
+
+const autocompleteService = { current: null };
 
 function CreateOffer(props) {
     const accessToken = props.authState.accessToken;
@@ -40,15 +64,18 @@ function CreateOffer(props) {
 
     const [lgbtq, setLgbtq] = useState(false);
     const [accessibility, setAccessibility] = useState(false);
-    const [images, setImages] = useState();
+    const [images, setImages] = useState([]);
+    const [inputValue, setInputValue] = React.useState('');
+    const [options, setOptions] = React.useState([]);
+    const loaded = React.useRef(false);
 
     const { value: listingName, bind: bindListingName } = useInput('');
-    const { value: addressOne, bind: bindAddressOne } = useInput('');
+    const { value: addressOne, setValue: setAddy1, bind: bindAddressOne } = useInput('');
     const { value: addressTwo, bind: bindAddressTwo } = useInput('');
-    const { value: neighborhood, bind: bindNeighborhood } = useInput('');
-    const { value: city, bind: bindCity } = useInput('');
-    const { value: state, bind: bindState } = useInput('');
-    const { value: zipcode, bind: bindZipcode } = useInput('');
+    const { value: neighborhood, setValue: setNeighborhood, bind: bindNeighborhood } = useInput('');
+    const { value: city, setValue: setCity, bind: bindCity } = useInput('');
+    const { value: state, setValue: setState, bind: bindState } = useInput('');
+    const { value: zipcode, setValue: setZip, bind: bindZipcode } = useInput('');
     const { value: accessibilityInfo, bind: bindAccesibilityInfo } = useInput('');
     const { value: livingSituation, bind: bindLivingSituation } = useInput('');
     const { value: description, bind: bindDescription } = useInput('');
@@ -60,8 +87,8 @@ function CreateOffer(props) {
         e.preventDefault();
 
         const fd = new FormData();
-        
         var key = 0
+
         if(images){
             images.forEach(image => {
                 console.log(image);
@@ -94,19 +121,120 @@ function CreateOffer(props) {
         };
         axios.post(BASE_URL + '/createListing', fd, config)
             .then(function (response) {
-                props.openSnackBar({severity: 'success', message: 'Succesfully created new listing!'});
+                props.openSnackBar({ severity: 'success', message: 'Succesfully created new listing!' });
                 props.handleClose();
                 props.refreshOffers();
             })
             .catch(function (error) {
                 console.log(error);
-                props.openSnackBar({severity: 'error', message: 'Unable to create new listing, please try again.'});                
+                props.openSnackBar({ severity: 'error', message: 'Unable to create new listing, please try again.' });
             });
     };
+
+    if (typeof window !== 'undefined' && !loaded.current) {
+        if (!document.querySelector('#google-maps')) {
+            loadScript(
+                'https://maps.googleapis.com/maps/api/js?key=' + process.env.REACT_APP_GOOGLE_MAPS_API + '&libraries=places',
+                document.querySelector('head'),
+                'google-maps',
+            );
+        }
+
+        loaded.current = true;
+    }
+
+    const handleChange = (event) => {
+        setInputValue(event.target.value);
+    };
+
+    const handleLocationClick = (location) => {
+        geocodeByAddress(location)
+            .then(results => handleLocationAutoComplete(results[0]))
+            .catch(error => console.error(error));
+    }
 
     const handleFile = (files) => {
         setImages(files);
     }
+
+    const clearLocation = () => {
+        setNeighborhood('')
+        setCity('')
+        setState('')
+        setAddy1('')
+        setZip('')
+    }
+
+    const handleLocationAutoComplete = (listingLocation) => {
+        clearLocation();
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            neighborhood: 'long_name',
+            locality: 'short_name',
+            administrative_area_level_1: 'short_name',
+            postal_code: 'short_name'
+        };
+        var results = {}
+        for (var i = 0; i < listingLocation.address_components.length; i++) {
+            var addressType = listingLocation.address_components[i].types[0];
+            if (componentForm[addressType]) {
+                var val = listingLocation.address_components[i][componentForm[addressType]];
+                results[addressType] = val;
+            }
+        }
+        if (results['neighborhood']) {
+            setNeighborhood(results['neighborhood'])
+        }
+        if (results['locality']) {
+            setCity(results['locality'])
+        }
+        if (results['administrative_area_level_1']) {
+            setState(results['administrative_area_level_1'])
+        }
+        if (results['postal_code']) {
+            setZip(results['postal_code'])
+        }
+        if (results['street_number'] && results['route']) {
+            setAddy1(results['street_number'] + " " + results['route'])
+        }
+    }
+
+    const fetch = React.useMemo(
+        () =>
+            throttle((request, callback) => {
+                autocompleteService.current.getPlacePredictions(request, callback);
+            }, 200),
+        [],
+    );
+
+    React.useEffect(() => {
+        let active = true;
+
+        if (!autocompleteService.current && window.google) {
+            autocompleteService.current = new window.google.maps.places.AutocompleteService();
+        }
+        if (!autocompleteService.current) {
+            return undefined;
+        }
+
+        if (inputValue === '') {
+            setOptions([]);
+            return undefined;
+        }
+
+        fetch({ input: inputValue }, (results) => {
+            if (active) {
+                setOptions(results || []);
+            }
+        });
+
+        return () => {
+            active = false;
+        };
+    }, [inputValue, fetch]);
+
+
 
     return (
         <React.Fragment>
@@ -140,17 +268,74 @@ function CreateOffer(props) {
                                         autoFocus
                                         helperText="Please provide a short description name for your listing. (i.e. 'My Couch')"
                                     />
+
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <TextField
-                                        {...bindAddressOne}
-                                        autoComplete="street-address"
-                                        name="addyOne"
-                                        variant="outlined"
+                                    {/* <input
+                                        // {...bindAddressOne}
+                                        // autoComplete="street-address"
+                                        // name="addyOne"
+                                        // variant="outlined"
+                                        // className="input-field"
+                                        ref={textInput}
                                         required
-                                        fullWidth
-                                        id="addyOne"
-                                        label="Address 1"
+                                        // fullWidth
+                                        id="autocomplete"
+                                        // label="Address 1"
+                                        type="text"
+                                    /> */}
+                                    {/* <GooglePlacesAutocomplete id="addyOne" name="addyOne"
+                                        apiKey={process.env.REACT_APP_GOOGLE_MAPS_API}
+                                        onSelect={({ description }) => {
+                                            console.log(description);
+                                            geocodeByAddress(description)
+                                                .then(results => handleLocationAutoComplete(results[0]))
+                                                .catch(error => console.error(error));
+                                        }}
+                                    /> */}
+                                    <Autocomplete
+                                        id="google-map-demo"
+                                        style={{ width: 300 }}
+                                        getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
+                                        filterOptions={(x) => x}
+                                        options={options}
+                                        autoComplete
+                                        includeInputInList
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Add a location"
+                                                variant="outlined"
+                                                fullWidth
+                                                onChange={handleChange}
+                                            />
+                                        )}
+                                        renderOption={(option) => {
+                                            const matches = option.structured_formatting.main_text_matched_substrings;
+                                            const parts = parse(
+                                                option.structured_formatting.main_text,
+                                                matches.map((match) => [match.offset, match.offset + match.length]),
+                                            );
+
+                                            return (
+                                                <Grid container alignItems="center">
+                                                    <Grid item>
+                                                        <LocationOnIcon className={classes.icon} />
+                                                    </Grid>
+                                                    <Grid item xs onClick={() => handleLocationClick(option.description)}>
+                                                        {parts.map((part, index) => (
+                                                            <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                                                                {part.text}
+                                                            </span>
+                                                        ))}
+
+                                                        <Typography variant="body2" color="textSecondary">
+                                                            {option.structured_formatting.secondary_text}
+                                                        </Typography>
+                                                    </Grid>
+                                                </Grid>
+                                            );
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
