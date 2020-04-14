@@ -500,7 +500,7 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
                             var type = imageData[1];
                             var extName = type.split('/')[1]
                             var buffer = Buffer.from(imageData[2], 'base64');
-                            await blobService.createBlockBlobFromText(containerName , 'profilePhoto' + extName, buffer, 
+                            await blobService.createBlockBlobFromText(containerName , listingId + 'listingPhoto' + i + extName, buffer, 
                             {
                                 contentSettings: {
                                     contentType: type,
@@ -510,7 +510,7 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
                                 if (error) {
                                     console.log(error);
                                 }else{
-                                    console.log(result);
+                                    console.log("Success in Uploading");
                                 }
                             });
 
