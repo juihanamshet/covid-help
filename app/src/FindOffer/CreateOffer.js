@@ -29,6 +29,8 @@ const useStyles = makeStyles(theme => ({
         }
     },
     zone: {
+        borderRadius: 5,
+        paddingTop: 15,
         "& p": {
             fontSize: 16,
             fontFamily: 'Roboto',
