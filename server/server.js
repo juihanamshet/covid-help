@@ -109,11 +109,40 @@ app.get("/getListings", authenticationRequired, function (req, res, next) {
 
 
 
-    sqltools.getSchoolListings(userEmail, userSchool, (sqlResult, status) => {
+    sqltools.getSchoolListings(userEmail, userSchool, async (sqlResult, status) => {
         if (status === 200) {
-            resultSize = Object.keys(sqlResult).length
-            console.log("/getListings: Successfully Returned Listings with Size: " + resultSize);
-            res.json(sqlResult);
+            try{
+                for (var i in sqlResult){
+                    var listingInfo = sqlResult[i];
+                    
+                    const containerName = "container" + listingInfo['userID'];
+                    const containerClient = blobServiceClient.getContainerClient(containerName);
+    
+                    var blobNamesList = await showBlobNames(aborter, containerClient);
+                    var tempUrl = '';
+                    for (var image of blobNamesList){
+                        var lookingFor = listingInfo['listingID'] + "listing";
+                        if (image.includes(lookingFor)){
+                            var token = blobService.generateSharedAccessSignature(containerName, image, sharedAccessPolicy);
+                            tempUrl = blobService.getUrl(containerName, image, token);
+                            
+                            break;
+                        }
+                    }
+                    sqlResult[i]['frontUrl'] = tempUrl;
+                }     
+                console.log(sqlResult);  
+                resultSize = Object.keys(sqlResult).length
+                console.log("/getListings: Successfully Returned Listings with Size: " + resultSize);     
+                res.json(sqlResult);
+            }
+            catch (e){
+                console.log(e);
+                console.log("failure in getting listings");
+                res.statusCode = 500;
+                res.send("Internal Server Error");
+            }
+            
         } else {
             res.statusCode = 500;
             res.send("Internal Server Error");
@@ -326,10 +355,42 @@ app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
     const userSchool = extractSchool(userEmail);
     console.log("/getUsersListings: Getting Personal Listings for\n\t User: " + userEmail + "\n\tSchool: " + userSchool);
 
-    sqltools.getUsersListings(userEmail, userSchool, (sqlResult, status) => {
+    sqltools.getUsersListings(userEmail, userSchool, async (sqlResult, status) => {
         if (status === 200) {
-            console.log("/getUsersListings SQL DB Returned Successfully");
-            res.json(sqlResult);
+            try{
+                for (var i in sqlResult){
+                    var listingInfo = sqlResult[i];
+                    
+                    const containerName = "container" + listingInfo['userID'];
+                    console.log(containerName);
+                    const containerClient = blobServiceClient.getContainerClient(containerName);
+    
+                    var blobNamesList = await showBlobNames(aborter, containerClient);
+                    var tempUrl = '';
+                    var lookingFor = listingInfo['listingID'] + "listing";
+                    for (var image of blobNamesList){
+                        console.log(lookingFor);
+                        if (image.includes(lookingFor)){
+                            var token = blobService.generateSharedAccessSignature(containerName, image, sharedAccessPolicy);
+                            tempUrl = blobService.getUrl(containerName, image, token);
+                            
+                            break;
+                        }
+                    }
+                    sqlResult[i]['frontUrl'] = tempUrl;
+                }     
+                console.log(sqlResult);     
+                console.log("/getUsersListings SQL DB Returned Successfully");
+                res.json(sqlResult);
+            }
+            catch (e){
+                console.log(e);
+                console.log("failure in getting USERS listings");
+                res.statusCode = 500;
+                res.send("Internal Server Error");
+            }
+
+
         } else {
             res.statusCode = 500;
             res.send("Internal Server Error");
@@ -417,28 +478,28 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
     
 })
 
-async function uploadLocalFile(aborter, containerClient, filePath, 
-    listingID, fileName, iteration) {
+// async function uploadLocalFile(aborter, containerClient, filePath, 
+//     listingID, fileName, iteration) {
 
-    filePath = path.resolve(filePath);
+//     filePath = path.resolve(filePath);
 
-    const blobName = listingID + "listingPhoto" + iteration + path.extname(fileName);
+//     const blobName = listingID + "listingPhoto" + iteration + path.extname(fileName);
 
-    console.log(blobName)
-    console.log(path.extname(filePath))
+//     console.log(blobName)
+//     console.log(path.extname(filePath))
 
 
-    const blobClient = containerClient.getBlobClient(blobName);
-    const blockBlobClient = blobClient.getBlockBlobClient();
+//     const blobClient = containerClient.getBlobClient(blobName);
+//     const blockBlobClient = blobClient.getBlockBlobClient();
 
-    await blockBlobClient.uploadFile(filePath, aborter);
+//     await blockBlobClient.uploadFile(filePath, aborter);
 
-    const content_type = "image/" + path.extname(filePath)
+//     const content_type = "image/" + path.extname(filePath)
 
-    await blobClient.setHTTPHeaders({
-        blobContentType: content_type,
-    });
-}
+//     await blobClient.setHTTPHeaders({
+//         blobContentType: content_type,
+//     });
+// }
 
 
 
