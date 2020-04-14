@@ -270,14 +270,16 @@ function User(props) {
                 let encodedUri = encodeURI(uri);
                 // console.log("resized base64 uri", encodedUri)
                 // add this when our backend base64 uri conversion works
-                fd.append('stream', image);
+                fd.append('stream', uri);
+                console.log(uri);
+
                 setProfilePhoto(encodedUri);
             },
             'base64'
         );
         // get rid of this when our conversion works
-        fd.append('stream', image);
-        
+        // fd.append('stream', image);
+        console.log(fd.get('stream'));
         const config = {
             headers: {
                 'Access-Control-Allow-Origin': '*',

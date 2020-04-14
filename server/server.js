@@ -233,6 +233,9 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
     await sqltools.getUserID(userEmail, async (sqlResults, status) => {
         if (status == 200){
             const userID = sqlResults;
+            console.log(req.fields, req.files);
+            console.log(req.fields.stream);
+            console.log(req.files.stream);
             const stream = req.files.stream;
             // console.log(path.extname(stream.name));
             // fs.readFile(stream.path)
