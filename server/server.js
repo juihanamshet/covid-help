@@ -128,7 +128,7 @@ async function showBlobNames(aborter, containerClient) {
     let list = [];
     for await (const blob of iter) {
         list.push(blob.name);
-        console.log(` - ${blob.name}`);
+        // console.log(` - ${blob.name}`);
     }
     return list;
 }
@@ -140,43 +140,46 @@ app.get("/getUser", authenticationRequired, async function (req, res, next) {
 
     sqltools.getUserID(userEmail, async (sqlResults, status) => {
         if(status == 200){
-            const userID = sqlResults
+            try{
+                const userID = sqlResults;
 
+                const containerName = "container" + userID;
+                const containerClient = blobServiceClient.getContainerClient(containerName);
             
-
-
-            const containerName = "container" + userID;
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-        
-            if (await containerClient.exists()){
-                //If the container doesn't exists, then create one
-                console.log("Already exists");
+                if (await containerClient.exists()){
+                    console.log("Already exists");
+                }
+                else{
+                    console.log("please work");
+                    await containerClient.create()
+                }
+            
+                var blobNamesList = await showBlobNames(aborter, containerClient);
+                            
+                var profilePhotoBlobName = "";
+                // console.log(blobNamesList);
+                var exists = false;
+                for (var string of blobNamesList){
+                    if (string.includes("profilePhoto")){
+                        profilePhotoBlobName = string;
+                        exists = true;
+                    };
+                }
+                var sasUrl = "";
+                // console.log("corr 2");
+                if (exists){
+                    // console.log("The blob does exist")
+                    var token = blobService.generateSharedAccessSignature(containerName, profilePhotoBlobName, sharedAccessPolicy);
+                    // console.log("Corret 1");
+                    sasUrl = blobService.getUrl(containerName, profilePhotoBlobName, token);
+            
+                    // console.log(sasUrl);
+                }
             }
-            else{
-                console.log("please work");
-                await containerClient.create()
-            }
-        
-            var blobNamesList = await showBlobNames(aborter, containerClient);
-                        
-            var profilePhotoBlobName = "";
-            // console.log(blobNamesList);
-            var exists = false;
-            for (var string of blobNamesList){
-                if (string.includes("profilePhoto")){
-                    profilePhotoBlobName = string;
-                    exists = true;
-                };
-            }
-            var sasUrl = "";
-            // console.log("corr 2");
-            if (exists){
-                // console.log("The blob does exist")
-                var token = blobService.generateSharedAccessSignature(containerName, profilePhotoBlobName, sharedAccessPolicy);
-                // console.log("Corret 1");
-                sasUrl = blobService.getUrl(containerName, profilePhotoBlobName, token);
-        
-                // console.log(sasUrl);
+            catch (e){
+                console.log(e);
+                res.statusCode = 500;
+                res.send("internal Server Error");
             }
             sqltools.getUser(userEmail, (sqlResult, status) => {
                 if (status === 200) {
@@ -200,31 +203,31 @@ app.get("/getUser", authenticationRequired, async function (req, res, next) {
     
 })
 
-async function addPhoto(containerClient, filePath, extname, aborter) {
-    filePath = path.resolve(filePath);
+// async function addPhoto(containerClient, filePath, extname, aborter) {
+//     filePath = path.resolve(filePath);
 
-    // const fileName = "profilePhoto" + path.extname(filePath)
-    const fileName = "profilePhoto" + extname;
+//     // const fileName = "profilePhoto" + path.extname(filePath)
+//     const fileName = "profilePhoto" + extname;
 
-    const blobClient = await containerClient.getBlobClient(fileName);
-    console.log("got blobClient");
-    const content_type = "image/" + extname;
+//     const blobClient = await containerClient.getBlobClient(fileName);
+//     console.log("got blobClient");
+//     const content_type = "image/" + extname;
 
-    const blockBlobClient = await blobClient.getBlockBlobClient();
+//     const blockBlobClient = await blobClient.getBlockBlobClient();
 
 
-    // return await blockBlobClient.uploadStream(
-    //                 fs.createReadStream(stream, 
-    //                 uploadOptions.bufferSize, 
-    //                 uploadOptions.maxBuffers,
-    //                 aborter);
-    await blockBlobClient.uploadFile(filePath, aborter);
+//     // return await blockBlobClient.uploadStream(
+//     //                 fs.createReadStream(stream, 
+//     //                 uploadOptions.bufferSize, 
+//     //                 uploadOptions.maxBuffers,
+//     //                 aborter);
+//     await blockBlobClient.uploadFile(filePath, aborter);
 
-    await blobClient.setHTTPHeaders({
-        blobContentType: content_type,
-    });
+//     await blobClient.setHTTPHeaders({
+//         blobContentType: content_type,
+//     });
 
-}
+// }
 
 app.post("/updateProfilePhoto", authenticationRequired, async function (req, res, next) {
     console.log("/updateProfilePhoto is called. Hope this works");
@@ -234,13 +237,15 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
         if (status == 200){
             try{
                 const userID = sqlResults;
-                console.log(req.fields.stream);
+                // console.log(req.fields.stream);
                 const stream = req.fields.stream;
                 // console.log(path.extname(stream.name));
                 // fs.readFile(stream.path)
-                let base64Image = stream.split(';base64,').pop();
-
-
+                var imageData = stream.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+                var type = imageData[1];
+                var extName = type.split('/')[1];
+                // console.log(imageData[1]);
+                var buffer = Buffer.from(imageData[2], 'base64');
                 const containerName = "container" + userID;
 
                 const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -249,9 +254,8 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
                     await containerClient.create();
                 }
                 
-                var li = await showBlobNames(aborter, containerClient).catch(() => res.send("Internal\
-                server error"));
-                            
+                var li = await showBlobNames(aborter, containerClient);
+
                 // console.log("Got ALl the blob Names")
                 for (var string of li){
                     if (string.includes("profilePhoto")){
@@ -264,14 +268,25 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
                     }
                 }
                 
-                await addPhoto(containerClient, stream.path, path.extname(stream.name), aborter);
-                
-                console.log("Profile Photo has successfully been updated");
+                await blobService.createBlockBlobFromText(containerName , 'profilePhoto' + extName, buffer, 
+                {
+                    contentSettings: {
+                        contentType: type,
+                    }
+                },
+                function(error, result, response) {
+                    if (error) {
+                        console.log(error);
+                    }else{
+                        console.log("Added ProfilePhoto")
+                    }
+                });
 
                 res.statusCode = 200;
                 res.json({});
             }
             catch (e){
+                console.log(e);
                 console.log("Something wrong happened in trying to upload ProfilePhoto");
                 res.statusCode = 500;
                 res.send("Internal Server Error");
@@ -458,38 +473,69 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
         if (status === 200) {
             const userID = sqlResults
             listingInfo['userID'] = userID;
-
+            let containerName = "container" + userID;
             console.log("/createListing: Creating Listing for " + userEmail)
 
 
             sqltools.createListing(listingInfo, async (sqlResult, status) => {
                 if (status === 200) {
-                    console.log("/createListing Listing Inserted into DB");
-
                     const listingID = sqlResult[0][''];
-                    console.log(listingID);
+                    // console.log(listingID);
 
-                    var fileKeys = Object.keys(req.files);
-                    console.log(fileKeys);
-                    //SHould be a maximum of four
-                    // console.log(files);
-
-                    let containerName = "container" + userID;
-
+                    console.log("/createListing Listing Inserted into DB");
                     const containerClient = blobServiceClient.getContainerClient(containerName);
-                    console.log(containerName)
                     if (!(await containerClient.exists())) {
                         //If the container doesn't exists, then create one
                         await containerClient.create()
                     }
-                    const aborter = AbortController.timeout(30 * 60 * 1000);
-                    var i = 0;
-                    fileKeys.forEach(async function (key) {
+                    try{
+                        console.log("Listing Photos Added");
+                        var streams = req.fields.images;
+                        var i = 0;
 
-                        await uploadLocalFile(aborter, containerClient, req.files[key].path, listingID, req.files[key].name, i)
-                        .catch(() => res.send("Internal Server Error"));
-                        i++;
-                    });
+
+                        for (var stream of streams){
+                            var imageData = stream.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+                            //imageData[0] is the raw one include data:(), 1 is the type, 2 is the actual data
+                            var type = imageData[1];
+                            var extName = type.split('/')[1]
+                            var buffer = Buffer.from(imageData[2], 'base64');
+                            await blobService.createBlockBlobFromText(containerName , 'profilePhoto' + extName, buffer, 
+                            {
+                                contentSettings: {
+                                    contentType: type,
+                                }
+                            },
+                            function(error, result, response) {
+                                if (error) {
+                                    console.log(error);
+                                }else{
+                                    console.log(result);
+                                }
+                            });
+
+                            i += 1;
+                            
+                        }
+                    }
+                    catch (e){
+                        console.log(e);
+                        
+                    }
+
+                    
+
+                
+                    // const aborter = AbortController.timeout(30 * 60 * 1000);
+                    // var i = 0;
+                    // fileKeys.forEach(async function (key) {
+
+                    //     await uploadLocalFile(aborter, containerClient, req.files[key].path, listingID, req.files[key].name, i)
+                    //     .catch(() => res.send("Internal Server Error"));
+                    //     i++;
+                    // });
+
+
                     
                     res.json(status);
                 } else {
