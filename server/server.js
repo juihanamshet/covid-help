@@ -232,43 +232,51 @@ app.post("/updateProfilePhoto", authenticationRequired, async function (req, res
     const userEmail = req.jwt.claims.sub;
     await sqltools.getUserID(userEmail, async (sqlResults, status) => {
         if (status == 200){
-            const userID = sqlResults;
-            console.log(req.fields, req.files);
-            console.log(req.fields.stream);
-            console.log(req.files.stream);
-            const stream = req.files.stream;
-            // console.log(path.extname(stream.name));
-            // fs.readFile(stream.path)
-            const containerName = "container" + userID;
+            try{
+                const userID = sqlResults;
+                console.log(req.fields.stream);
+                const stream = req.fields.stream;
+                // console.log(path.extname(stream.name));
+                // fs.readFile(stream.path)
+                let base64Image = stream.split(';base64,').pop();
 
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-            if (! (await containerClient.exists())) {
-                //If the container doesn't exists, then create one
-                await containerClient.create();
+
+                const containerName = "container" + userID;
+
+                const containerClient = blobServiceClient.getContainerClient(containerName);
+                if (! (await containerClient.exists())) {
+                    //If the container doesn't exists, then create one
+                    await containerClient.create();
+                }
+                
+                var li = await showBlobNames(aborter, containerClient).catch(() => res.send("Internal\
+                server error"));
+                            
+                // console.log("Got ALl the blob Names")
+                for (var string of li){
+                    if (string.includes("profilePhoto")){
+                        // console.log("it includes!!!")
+                        const blobClient = containerClient.getBlobClient(string);
+                        const blockBlobClient = blobClient.getBlockBlobClient();
+
+                        await blockBlobClient.delete(aborter);
+
+                    }
+                }
+                
+                await addPhoto(containerClient, stream.path, path.extname(stream.name), aborter);
+                
+                console.log("Profile Photo has successfully been updated");
+
+                res.statusCode = 200;
+                res.json({});
+            }
+            catch (e){
+                console.log("Something wrong happened in trying to upload ProfilePhoto");
+                res.statusCode = 500;
+                res.send("Internal Server Error");
             }
             
-            var li = await showBlobNames(aborter, containerClient).catch(() => res.send("Internal\
-            server error"));
-                        
-            // console.log("Got ALl the blob Names")
-            for (var string of li){
-                if (string.includes("profilePhoto")){
-                    // console.log("it includes!!!")
-                    const blobClient = containerClient.getBlobClient(string);
-                    const blockBlobClient = blobClient.getBlockBlobClient();
-
-                    await blockBlobClient.delete(aborter).catch(() => res.send("Internal\
-                    server error"));;
-
-                }
-            }
-            await addPhoto(containerClient, stream.path, path.extname(stream.name), aborter)
-            .catch(() => res.send("Internal server error"));;
-
-            console.log("Profile Photo has successfully been updated");
-
-            res.statusCode = 200;
-            res.json({});
         }
         else{
             res.statusCode = 500;
