@@ -489,18 +489,19 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
                         await containerClient.create()
                     }
                     try{
-                        console.log("Listing Photos Added");
                         var streams = req.fields.images;
                         var i = 0;
+                        console.log(req.fields);
 
 
                         for (var stream of streams){
+                            
                             var imageData = stream.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
                             //imageData[0] is the raw one include data:(), 1 is the type, 2 is the actual data
                             var type = imageData[1];
                             var extName = type.split('/')[1]
                             var buffer = Buffer.from(imageData[2], 'base64');
-                            await blobService.createBlockBlobFromText(containerName , listingId + 'listingPhoto' + i + extName, buffer, 
+                            await blobService.createBlockBlobFromText(containerName , listingId + 'listing' + i + extName, buffer, 
                             {
                                 contentSettings: {
                                     contentType: type,
@@ -520,21 +521,10 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
                     }
                     catch (e){
                         console.log(e);
-                        
+                        console.log("complete failure");
+                        res.statusCode = 500;
+                        res.send("internal server error");
                     }
-
-                    
-
-                
-                    // const aborter = AbortController.timeout(30 * 60 * 1000);
-                    // var i = 0;
-                    // fileKeys.forEach(async function (key) {
-
-                    //     await uploadLocalFile(aborter, containerClient, req.files[key].path, listingID, req.files[key].name, i)
-                    //     .catch(() => res.send("Internal Server Error"));
-                    //     i++;
-                    // });
-
 
                     
                     res.json(status);

@@ -89,8 +89,8 @@ function CreateOffer(props) {
         e.preventDefault();
 
         const fd = new FormData();
-        if (images) {
-            fd.append('images', images)
+        for(var image of images) {
+            fd.append('images', image);
         }
 
         fd.append('listingName', listingName)
@@ -108,7 +108,7 @@ function CreateOffer(props) {
         fd.append('housingInfo', description)
 
         console.log('4 - appended all other field')
-
+        console.log(fd.get('images')[0]);
         var config = {
             headers: {
                 "Content-type": "multipart/form-data",
