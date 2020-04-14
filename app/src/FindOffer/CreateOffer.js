@@ -88,15 +88,16 @@ function CreateOffer(props) {
 
         const fd = new FormData();
         var key = 0
-
         if (images) {
+            console.log(images);
             images.forEach(image => {
-                console.log(image);
                 let imageKey = 'image' + key
                 fd.append(imageKey, image);
                 key++
             });
         }
+
+
 
         fd.append('listingName', listingName)
         fd.append('addressLineOne', addressOne)
@@ -111,6 +112,8 @@ function CreateOffer(props) {
         fd.append('accessibilityInfo', accessibilityInfo)
         fd.append('livingSituation', livingSituation)
         fd.append('housingInfo', description)
+
+        console.log('4 - appended all other field')
 
         var config = {
             headers: {
@@ -156,7 +159,27 @@ function CreateOffer(props) {
     }
 
     const handleFile = (files) => {
-        setImages(files);
+        let resizedImages = [];
+        if(files){
+            files.forEach( file => {
+                Resizer.imageFileResizer(
+                    file,
+                    1500,
+                    1500,
+                    'JPEG',
+                    90,
+                    0,
+                    uri => {
+                        let encodedUri = encodeURI(uri);
+                        resizedImages.push(encodedUri)
+                        setImages(resizedImages);
+                    },
+                    'base64'
+                );
+            })
+        }else{
+            return;
+        }
     }
 
     const clearLocation = () => {
@@ -307,6 +330,7 @@ function CreateOffer(props) {
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
+                                                required
                                                 label="Add a location"
                                                 variant="outlined"
                                                 fullWidth

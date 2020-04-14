@@ -280,7 +280,7 @@ function User(props) {
                 let encodedUri = encodeURI(uri);
                 console.log("in resize function", uri)
                 // add this when our backend base64 uri conversion works
-                fd.append('stream', uri);
+                fd.append('stream', encodedUri);
                 setProfilePhoto(encodedUri);
 
                 axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
