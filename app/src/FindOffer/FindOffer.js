@@ -18,8 +18,8 @@ const CreateOffer = React.lazy(() => import('./CreateOffer.js'));
 const BASE_URL = 'http://localhost:8080'
 
 const styles = theme => ({
-    root: { 
-        
+    root: {
+
     },
     sidebar: {
         display: 'flex',
@@ -55,7 +55,7 @@ class FindOffer extends Component {
             currListingID: -1,
             // SNACKBAR severity: error, warning, success
             snackBarOpen: false,
-            snackBar: {severity:'success', message:'action was a success!'},
+            snackBar: { severity: 'success', message: 'action was a success!' },
         }
     };
 
@@ -78,7 +78,7 @@ class FindOffer extends Component {
 
     //given an object {severity: '', message: ''}
     openSnackBar = (newSnackBar) => {
-        this.setState({ snackBarOpen: true, snackBar: newSnackBar});
+        this.setState({ snackBarOpen: true, snackBar: newSnackBar });
     }
 
     closeSnackBar = () => {
@@ -104,18 +104,19 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getListings', config)
             .then(function (response) {
-                if(self.state.find){
+                if (self.state.find) {
                     self.setState({ findListings: response.data });
-                }else{
+                } else {
                     self.setState({ offerListings: response.data });
                 }
             })
             .catch(function (error) {
                 console.log(error);
+                this.openSnackBar({severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again'})
             });
     }
 
-    getListings = async() => {
+    getListings = async () => {
         const accessToken = this.props.authState.accessToken;
         var config = {
             headers: {
@@ -130,10 +131,12 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
+                this.openSnackBar({severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again'})
+
             });
     }
 
-    getUserListings = async() => {
+    getUserListings = async () => {
         const accessToken = this.props.authState.accessToken;
         var config = {
             headers: {
@@ -144,14 +147,15 @@ class FindOffer extends Component {
         var self = this;
         axios.get(BASE_URL + '/getUsersListings', config)
             .then(function (response) {
-                self.setState({ offerListings: response.data, find: false});
+                self.setState({ offerListings: response.data, find: false });
             })
             .catch(function (error) {
                 console.log(error);
-        });
+                this.openSnackBar({severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again'})
+            });
     }
 
-    getCurrentListing = async(listingId) => {
+    getCurrentListing = async (listingId) => {
         const accessToken = this.props.authState.accessToken;
         var config = {
             params: {
@@ -166,12 +170,15 @@ class FindOffer extends Component {
         axios.get(BASE_URL + '/getListing', config)
             .then(function (response) {
                 console.log("getListing call:", response.data[0])
-                self.setState({ currListing : response.data[0],
-                                drawerOpen: true });
+                self.setState({
+                    currListing: response.data[0],
+                    drawerOpen: true
+                });
             })
             .catch(function (error) {
                 console.log(error);
-        });
+                this.openSnackBar({severity: 'error', message: 'Oops! we ran into a problem loading your listing, please refresh the page and try again'})
+            });
     }
 
     render() {
@@ -183,23 +190,23 @@ class FindOffer extends Component {
         var currListings = [];
         var disabledListings = []; // we only populate this on the offers page
 
-        if(listings){
+        if (listings) {
             listings.forEach(listing => {
                 var name = listing.listingName ? listing.listingName : "Unnamed Listing"
                 var location = listing.city + ", " + listing.state + " " + listing.zipCode;
                 // TODO: add props.ListingImage (for both disabled and curr)
-                if(listing.disabledListing){ // if the listing is disabled we add to disabled listing, all else (undefined, null, false) go in currListings
-                    disabledListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>)
-                }else{
-                    currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly= {listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
+                if (listing.disabledListing) { // if the listing is disabled we add to disabled listing, all else (undefined, null, false) go in currListings
+                    disabledListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly={listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>)
+                } else {
+                    currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly={listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
                 }
             });
-    
-            if(currListings < 1){
-                currListings.push(<Typography key="error" color="error" style={{margin: 25}}>No Current Listings!</Typography>);
+
+            if (currListings < 1) {
+                currListings.push(<Typography key="error" color="error" style={{ margin: 25 }}>No Current Listings!</Typography>);
             };
         }
-        
+
         /* LOGIC FOR ACTIVE PAGE */
 
         // styling and components for offer page
@@ -209,7 +216,7 @@ class FindOffer extends Component {
         // styling for find page
         var findIsActive = this.state.find ? 'linkIsActive' : '';
 
-        var prefEmail = this.state.currListing.prefEmail ?  this.state.currListing.prefEmail : this.state.currListing.orgEmail;
+        var prefEmail = this.state.currListing.prefEmail ? this.state.currListing.prefEmail : this.state.currListing.orgEmail;
 
         return (
             <div className={classes.root}>
@@ -257,22 +264,21 @@ class FindOffer extends Component {
                     </Grid>
                     <Grid item lg={12}>
                         {listings && listings.length ? listingButton : ''}
-                    </Grid> 
+                    </Grid>
                     <Grid item xs={12}>
-                        { listings  ? 
-                        <Suspense fallback={(<div className={classes.sidebar}>Loading...</div>)}>
-                            { this.state.find || !listings.length ? '' : <div><hr/></div> }
-                            { this.state.find || !listings.length ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Active</Typography></div>}
-                            <div className={classes.sidebar}>{currListings}</div>
-                            { this.state.find || !listings.length ? '' : <div><hr/></div> }
-                            { this.state.find || !disabledListings.length ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Disabled</Typography></div>}
-                            <div className={classes.sidebar}>{disabledListings}</div>
-                            { this.state.find || !disabledListings.length ? '' : <div><hr/></div> }
-                        </Suspense>: 
-                        <div className={classes.sidebar}><CircularProgress size={50}/></div>
+                        {listings ?
+                            <Suspense fallback={(<div className={classes.sidebar}>Loading...</div>)}>
+                                {this.state.find || !listings.length ? '' : <div><hr /></div>}
+                                {this.state.find || !listings.length ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Active</Typography></div>}
+                                <div className={classes.sidebar}>{currListings}</div>
+                                {this.state.find || !disabledListings.length ? '' : <div className={classes.sidebar}><Typography className={classes.labels} color="secondary" variant="h4">Disabled</Typography></div>}
+                                <div className={classes.sidebar}>{disabledListings}</div>
+                                {this.state.find || !disabledListings.length ? '' : <div><hr /></div>}
+                            </Suspense> :
+                            <div className={classes.sidebar}><CircularProgress size={50} /></div>
                         }
                     </Grid>
-                    <Grid item lg={12} style={{ marginBottom:15 }}>
+                    <Grid item lg={12} style={{ marginBottom: 15 }}>
                         {listingButton}
                     </Grid>
                 </Grid>
@@ -287,7 +293,7 @@ class FindOffer extends Component {
                             isOwner={!this.state.find}
                             disabledListing={this.state.currListing.disabledListing}
                             // info for the housing
-                            listingId = {this.state.currListing.listingID}
+                            listingId={this.state.currListing.listingID}
                             key={this.state.currListing.listingID + Math.random()}
                             neighborhood={this.state.currListing.neighborhood}
                             city={this.state.currListing.city}
@@ -309,9 +315,9 @@ class FindOffer extends Component {
                             gradYear={this.state.currListing.grad_year}
                             preferredContactMethod={this.state.currListing.preferredContactMethod}
                             bio={this.state.currListing.bio}
-                            
+
                             // contact info
-                            contacts={{'Email': "mailto:"+ prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
+                            contacts={{ 'Email': "mailto:" + prefEmail, 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram }}
 
                             //learn more about owner button
                             ownerDialogOnClick={this.openOwnerDialog}
@@ -335,7 +341,7 @@ class FindOffer extends Component {
                         pronouns={this.state.currListing.preferred_pronouns}
                         ethnicity={this.state.currListing.ethnicity}
                         bio={this.state.currListing.bio}
-                        socialMedia={{'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram}}
+                        socialMedia={{ 'Facebook': this.state.currListing.Facebook, 'LinkedIn': this.state.currListing.LinkedIn, 'Instagram': this.state.currListing.Instagram }}
                     >
                     </OwnerDialog>
                 </Suspense>

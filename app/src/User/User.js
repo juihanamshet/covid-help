@@ -98,68 +98,68 @@ function User(props) {
     // refs for the contact information
     const prefEmail = useRef('')
     const setPrefEmail = (newVal) => {
-        prefEmail.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        prefEmail.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log("newPrefEmail: ", prefEmail.current)
     }
     const phoneNumber = useRef('')
     const setPhoneNumber = (newVal) => {
-        phoneNumber.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        phoneNumber.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         //  console.log("newPhoneNumber: ", phoneNumber.current)
     }
     const preferredContactMethod = useRef('')
     const setPreferredContactMethod = (newVal) => {
-        preferredContactMethod.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        preferredContactMethod.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log("newContactMethod: ", preferredContactMethod.current)
     }
 
     // refs for the basic information
     const gender = useRef('')
     const setGender = (newVal) => {
-        gender.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        gender.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log('newGender: ', gender.current)
     }
     const ethnicity = useRef('')
     const setEthnicity = (newVal) => {
-        ethnicity.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        ethnicity.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log('newEthnicity: ', ethnicity.current)
     }
     const pp = useRef('')
     const setPp = (newVal) => {
-        pp.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        pp.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log('newPp: ', pp.current)
     }
 
     // ref for bio
     const bio = useRef('')
     const setBio = (newVal) => {
-        bio.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        bio.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log('newBio: ', bio.current);
     }
 
     // refs for socials
     const fb = useRef('')
     const setFb = (newVal) => {
-        fb.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        fb.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log('newFB: ', fb.current)
     }
     const ig = useRef('')
     const setIg = (newVal) => {
-        ig.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        ig.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log('newIG: ', ig.current)
     }
     const li = useRef('')
     const setLi = (newVal) => {
-        li.current = sanitizeHtml(newVal, {allowedTags: [],
-            allowedAttributes: []})
+        li.current = newVal ? sanitizeHtml(newVal, {allowedTags: [],
+            allowedAttributes: []}) : "";
         // console.log('newLI: ', li.current)
     }
 
@@ -257,6 +257,16 @@ function User(props) {
         };
         // set up a form data
         const fd = new FormData();
+        // set up configs for axios
+        const config = {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${accessToken}`,
+                'accept': 'application/json',
+                'Accept-Language': 'en-US,en;q=0.8',
+                'Content-Type': `multipart/form-data; boundary=${fd._boundary}`,
+            },
+        };
 
         // resize image first
         Resizer.imageFileResizer(
@@ -268,38 +278,25 @@ function User(props) {
             0,
             uri => {
                 let encodedUri = encodeURI(uri);
-                // console.log("resized base64 uri", encodedUri)
+                console.log("in resize function", uri)
                 // add this when our backend base64 uri conversion works
                 fd.append('stream', uri);
-                console.log(uri);
-
                 setProfilePhoto(encodedUri);
+
+                axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
+                .then(function (response) {
+                    setUpdating(false);
+                    setSnackBar(true);
+                    setSnackBarMessage({severity: 'success', message: 'Succesfully updated profile!'});
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    setSnackBar(true);
+                    setSnackBarMessage({severity: 'error', message: 'Unable to update profile.'});                
+                });
             },
             'base64'
         );
-        // get rid of this when our conversion works
-        // fd.append('stream', image);
-        console.log(fd.get('stream'));
-        const config = {
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${accessToken}`,
-                'accept': 'application/json',
-                'Accept-Language': 'en-US,en;q=0.8',
-                'Content-Type': `multipart/form-data; boundary=${fd._boundary}`,
-            },
-        };
-        axios.post(BASE_URL + '/updateProfilePhoto', fd, config)
-            .then(function (response) {
-                setUpdating(false);
-                setSnackBar(true);
-                setSnackBarMessage({severity: 'success', message: 'Succesfully updated profile!'});
-            })
-            .catch(function (error) {
-                console.log(error);
-                setSnackBar(true);
-                setSnackBarMessage({severity: 'error', message: 'Unable to update profile.'});                
-            });
     }
     // some logic
     var school = user.org ? user.org.toUpperCase() : '';
