@@ -365,7 +365,7 @@ function createListing(listingInfo, callback) {
         for (var name in columns) {
             listing[name] = columns[name].value
         }
-        // console.log(listing);
+        console.log(listing);
         result.push(listing)
     });
 

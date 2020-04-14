@@ -364,10 +364,7 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
 
 
 
-            var startDate = new Date();
-            var expiryDate = new Date(startDate);
-            expiryDate.setMinutes(startDate.getMinutes() + 100);
-            startDate.setMinutes(startDate.getMinutes() - 100);
+            
 
             var sharedAccessPolicy = {
             AccessPolicy: {
@@ -489,9 +486,9 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
                         await containerClient.create()
                     }
                     try{
-                        var streams = req.fields.images;
+                        var streams = JSON.parse(req.fields.images);
                         var i = 0;
-                        console.log(req.fields);
+                        // console.log(streams);
 
 
                         for (var stream of streams){
@@ -499,9 +496,9 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
                             var imageData = stream.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
                             //imageData[0] is the raw one include data:(), 1 is the type, 2 is the actual data
                             var type = imageData[1];
-                            var extName = type.split('/')[1]
+                            var extName = "." + type.split('/')[1];
                             var buffer = Buffer.from(imageData[2], 'base64');
-                            await blobService.createBlockBlobFromText(containerName , listingId + 'listing' + i + extName, buffer, 
+                            await blobService.createBlockBlobFromText(containerName , listingID + 'listing' + i + extName, buffer, 
                             {
                                 contentSettings: {
                                     contentType: type,

@@ -89,9 +89,10 @@ function CreateOffer(props) {
         e.preventDefault();
 
         const fd = new FormData();
-        for(var image of images) {
-            fd.append('images', image);
-        }
+        // for(var image of images) {
+        //     fd.append('images', image);
+        // }
+        fd.append('images', JSON.stringify(images));
 
         fd.append('listingName', listingName)
         fd.append('addressLineOne', addressOne)
