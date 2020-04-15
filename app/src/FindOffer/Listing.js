@@ -33,7 +33,7 @@ function Listing(props) {
   const lgbtqpFriendly = props.lgbtqpFriendly ? "🏳️‍🌈" : "";
   const accessFriendly = props.accessibilityFriendly ? "♿" : "";
 
-  const defaultImage = '/noListingDefault' + (Math.floor(Math.random() * (6)) + 1) + '.jpg'
+  const defaultImage = '/noListingDefault' + (Math.floor(Math.random() * (6)) + 1) + '.jpg';
 
   return (
     <div className={classes.base}>
@@ -41,7 +41,7 @@ function Listing(props) {
         <CardActionArea onClick={() => props.onClick(props.listingId)}>
           <CardMedia
             className={classes.media}
-            image={props.listingImage ? require(props.listingImage) : require("../img" + defaultImage)}
+            image={props.listingImage ? props.listingImage : require("../img" + defaultImage)}
             title="Location Not Found"
           />
           <CardContent>

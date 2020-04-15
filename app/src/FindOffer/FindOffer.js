@@ -196,9 +196,9 @@ class FindOffer extends Component {
                 var location = listing.city + ", " + listing.state + " " + listing.zipCode;
                 // TODO: add props.ListingImage (for both disabled and curr)
                 if (listing.disabledListing) { // if the listing is disabled we add to disabled listing, all else (undefined, null, false) go in currListings
-                    disabledListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly={listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>)
+                    disabledListings.push(<Listing key={listing.listingID} listingImage={listing.frontUrl} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly={listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>)
                 } else {
-                    currListings.push(<Listing key={listing.listingID} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly={listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
+                    currListings.push(<Listing key={listing.listingID} listingImage={listing.frontUrl} lgbtqpFriendly={listing.lgbtqpFriendly} accessibilityFriendly={listing.accessibilityFriendly} listingId={listing.listingID} listingName={name} listingLocation={location} listingEmail={listing.prefEmail} onClick={this.getCurrentListing}></Listing>);
                 }
             });
 
