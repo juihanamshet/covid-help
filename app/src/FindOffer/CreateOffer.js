@@ -141,22 +141,34 @@ function CreateOffer(props) {
         loaded.current = true;
     }
 
-    const handleChange = (event) => {
+    const handleChange = (event, value, reason) => {
         setInputValue(event.target.value);
     };
 
-    const handleLocationClick = (location) => {
-        console.log(location.structured_formatting.main_text)
-        setInputValue(location.structured_formatting.main_text)
-        geocodeByAddress(location.description)
-            .then(results => handleLocationAutoComplete(results[0]))
-            .catch(error => console.error(error));
+    const handleOnChange = (event, location, reason) => {
+        if (reason === 'select-option') {
+            clearLocation();
+            setInputValue(location.structured_formatting.main_text)
+            setAddy1(location.structured_formatting.main_text)
+            geocodeByAddress(location.description)
+                .then(results => handleLocationAutoComplete(results[0]))
+                .catch(error => console.error(error));
+        }
+        else if (reason === 'clear') {
+            clearLocation();
+        }
+    }
+
+    const handleOnClose = (event) => {
+        if (event.target.value) {
+            setInputValue(event.target.value);
+        }
     }
 
     const handleFile = (files) => {
         let resizedImages = [];
-        if(files){
-            files.forEach( file => {
+        if (files) {
+            files.forEach(file => {
                 Resizer.imageFileResizer(
                     file,
                     1500,
@@ -172,7 +184,7 @@ function CreateOffer(props) {
                     'base64'
                 );
             })
-        }else{
+        } else {
             return;
         }
     }
@@ -186,7 +198,6 @@ function CreateOffer(props) {
     }
 
     const handleLocationAutoComplete = (listingLocation) => {
-        clearLocation();
         var componentForm = {
             street_number: 'short_name',
             route: 'long_name',
@@ -314,7 +325,8 @@ function CreateOffer(props) {
                                         }}
                                     /> */}
                                     <Autocomplete
-                                        id="google-map-demo"
+                                        id="addressLineOne"
+                                        freeSolo
                                         value={addressOne}
                                         style={{ width: '100%' }}
                                         getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
@@ -322,11 +334,13 @@ function CreateOffer(props) {
                                         options={options}
                                         autoComplete
                                         includeInputInList
+                                        onChange={handleOnChange}
+                                        onClose={handleOnClose}
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
                                                 required
-                                                label="Add a location"
+                                                label="Address 1"
                                                 variant="outlined"
                                                 fullWidth
                                                 onChange={handleChange}
@@ -334,7 +348,6 @@ function CreateOffer(props) {
                                         )}
                                         renderOption={(option) => {
                                             const matches = option.structured_formatting.main_text_matched_substrings;
-
                                             const parts = parse(
                                                 option.structured_formatting.main_text,
                                                 matches.map((match) => [match.offset, match.offset + match.length]),
@@ -345,7 +358,7 @@ function CreateOffer(props) {
                                                     <Grid item>
                                                         <LocationOnIcon className={classes.icon} />
                                                     </Grid>
-                                                    <Grid item xs onClick={() => handleLocationClick(option)}>
+                                                    <Grid item xs>
                                                         {parts.map((part, index) => (
                                                             <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
                                                                 {part.text}
