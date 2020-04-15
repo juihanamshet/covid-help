@@ -85,8 +85,8 @@ class FindOffer extends Component {
         this.setState({ snackBarOpen: false });
     }
 
-    toggleDrawer = (open) => e => {
-        this.setState({ drawerOpen: open });
+    openDrawer = () => e => {
+        this.setState({ drawerOpen: true });
     };
 
     closeDrawer = () => {
@@ -254,11 +254,11 @@ class FindOffer extends Component {
                     <Grid item xs={12}>
                         <div className={classes.sidebar}>
                             <div className={classes.sidebarChild}>
-                                <Button id={findIsActive} variant="link" size="lg" onClick={(e) => this.getListings()}>Find</Button>
+                                <Button id={findIsActive} variant="link" size="lg" onClick={this.getListings}>Find</Button>
                             </div>
                             <div className={classes.spacer}></div>
                             <div className={classes.sidebarChild}>
-                                <Button id={offerIsActive} variant="link" size="lg" onClick={(e) => this.getUserListings()}>Offer</Button>
+                                <Button id={offerIsActive} variant="link" size="lg" onClick={this.getUserListings}>Offer</Button>
                             </div>
                         </div>
                     </Grid>
@@ -285,8 +285,8 @@ class FindOffer extends Component {
                 <SwipeableDrawer
                     anchor='right'
                     open={this.state.drawerOpen}
-                    onClose={this.toggleDrawer(false)}
-                    onOpen={this.toggleDrawer(true)}>
+                    onClose={this.closeDrawer}
+                    onOpen={this.openDrawer}>
                     <Suspense fallback={<CircularProgress />}>
                         <ListingDetails
                             // if this is user owned listing
@@ -354,8 +354,8 @@ class FindOffer extends Component {
                     >
                     </CreateOffer>
                 </Suspense>
-                <Snackbar open={this.state.snackBarOpen} autoHideDuration={6000} onClose={() => this.closeSnackBar()}>
-                    <Alert onClose={() => this.closeSnackBar()} severity={this.state.snackBar.severity}>
+                <Snackbar open={this.state.snackBarOpen} autoHideDuration={6000} onClose={this.closeSnackBar}>
+                    <Alert onClose={this.closeSnackBar} severity={this.state.snackBar.severity}>
                         {this.state.snackBar.message}
                     </Alert>
                 </Snackbar>
