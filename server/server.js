@@ -606,6 +606,10 @@ app.post("/createUser", authenticationRequired, async function (req, res, next) 
             userInfo['lastName'] = user.profile.lastName
             userInfo['phoneNumber'] = user.profile.mobilePhone
             userInfo['orgEmail'] = user.profile.email
+
+            user.profile.firstTimer = false;
+            user.update()
+                .then(() => console.log('User is no longer a first Timer'));
         });
 
 
