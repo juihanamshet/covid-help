@@ -189,6 +189,7 @@ function User(props) {
     const [user, setUser] = useState({});
     const [profilePhoto, setProfilePhoto] = useState('');
     const [editDisabled, setEditDisabled] = useState(true);
+    const [createMode, setcreateMode] = useState(false);
     const [snackBar, setSnackBar] = useState(false);
     const [snackBarMessage, setSnackBarMessage] = useState({ severity: 'success', message: 'successfully updated profile!' })
 
@@ -204,6 +205,7 @@ function User(props) {
             .then(function (response) {
                 if (response.data === 'User not found') {
                     setEditDisabled(false)
+                    setcreateMode(true)
                     if (user.orgEmail) {
                         return
                     }
@@ -248,6 +250,7 @@ function User(props) {
     }, [user, accessToken]);
 
     const saveChanges = async () => {
+        const endPoint = createMode ? '/createUser' : '/updateUser'
         var data = {
             userInfo: {
                 userID: user.userID,
@@ -275,7 +278,7 @@ function User(props) {
                 'Authorization': `Bearer ${accessToken}`,
             },
         };
-        axios.post(BASE_URL + '/updateUser', data, config)
+        axios.post(BASE_URL + endPoint, data, config)
             .then(function (response) {
                 setEditDisabled(!editDisabled)
                 setSnackBar(true);
