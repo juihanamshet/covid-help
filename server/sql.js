@@ -40,7 +40,7 @@ async function getUserID(email, callback) {
         if (rowCount == 0) {
             console.error("User with email " + email + " was not Found")
             result = "User Not Found";
-            code = 500;
+            code = 404;
         }
     });
 
@@ -187,6 +187,10 @@ function getUser(email, callback) {
             console.error(err);
             result = "Internal Server E　rror"
             code = 500;
+        } else if (rowCount == 0) {
+            console.log(rowCount)
+            code = 404;
+            result = "User Not Found"
         }
     });
 
@@ -200,24 +204,33 @@ function getUser(email, callback) {
         result.push(listing)
     });
 
+
+    // connection.on('debug', (message) => {
+    //     console.log('getuser', message)
+    // })
+
     request.on('requestCompleted', function () {
         connection.close();
         callback(result, code)
     });
 
     request.on('error', (err) => {
-        console.error(err);
+        console.error("/getUser", err);
         result = "Internal Server Error"
         code = 500;
     })
 
     connection.on('connect', function (err) {
-        console.log("/getUser SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            console.error('Connection error', err);
+        } else {
+            console.log("/getUser SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
     });
 }
 
-async function getListerID(listingID, callback){
+async function getListerID(listingID, callback) {
     connection = await new Connection(config);
     console.log("GET CHECK 1")
     var result = "";
@@ -262,7 +275,7 @@ async function getListerID(listingID, callback){
         console.log("/getListerID Connected Successfully");
         connection.execSql(request);
     });
-    
+
 }
 
 function getListing(email, listing, school, callback) {
@@ -297,7 +310,7 @@ function getListing(email, listing, school, callback) {
         for (var name in columns) {
             listing[name] = columns[name].value
         }
-        
+
         result.push(listing)
     });
 
@@ -373,7 +386,7 @@ function createListing(listingInfo, callback) {
         connection.close();
         callback(result, code)
     });
-    
+
 
     request.on('error', (err) => {
         console.error(err);

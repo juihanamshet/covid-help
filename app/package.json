@@ -27,6 +27,7 @@
     "react-bootstrap": "^1.0.0-beta.17",
     "react-card-flip": "^1.0.10",
     "react-contenteditable": "^3.3.4",
+    "react-cookie": "^4.0.3",
     "react-dom": "^16.13.0",
     "react-google-places-autocomplete": "^2.0.3",
     "react-image-file-resizer": "^0.2.3",
