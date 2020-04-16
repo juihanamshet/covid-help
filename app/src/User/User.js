@@ -386,7 +386,7 @@ function User(props) {
                                     <List>
                                         <ListItem className={classes.editSection} style={{ display: 'block' }}>
                                             {cancelButton}
-                                            <Link className={editDisabled ? classes.edit : classes.save} onClick={!editDisabled ? () => saveChanges() : () => setEditDisabled(!editDisabled)}><Typography variant='inherit'>{editDisabled ? 'Edit' : 'Save'}</Typography></Link>
+                                            <Link className={editDisabled ? classes.edit : classes.save} onClick={!editDisabled ? () => saveChanges() : () => setEditDisabled(!editDisabled)}><Typography variant='inherit'>{editDisabled ? 'Edit' : (createMode ? 'Create' : 'Save')}</Typography></Link>
                                         </ListItem>
                                         <Divider />
                                         <ListItem className={classes.listItem} style={{ display: 'block' }}>
