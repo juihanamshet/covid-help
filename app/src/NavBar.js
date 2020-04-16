@@ -78,7 +78,6 @@ const useStyles = makeStyles(theme => ({
 const NavBar = (props) => {
     const classes = useStyles();
     const { authState, authService } = useOktaAuth();
-    const accessToken = authState.accessToken;
     const anchorRef = React.useRef(null);
     const [open, setOpen] = React.useState(false);
     const [firstTimer = { notLoaded: true }, setFirstTimer] = React.useState(null);
@@ -126,8 +125,8 @@ const NavBar = (props) => {
         }
         prevOpen.current = open;
 
-        if (authState.isAuthenticated && location.pathname != '/user') {
-            const getUserInfo = async () => {
+        if (authState.isAuthenticated && location.pathname !== '/user') {
+            const getUserInfo = () => {
                 authService.getUser()
                     .then(result => {
                         if (result.getFirstTimer) {
