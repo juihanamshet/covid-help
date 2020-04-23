@@ -245,6 +245,8 @@ function User(props) {
                 }
             })
             .catch(function (error) {
+                setSnackBar(true)
+                setSnackBarMessage({ severity: 'error', message: "Oops! Looks like we ran into a problem loading the page. Please refresh and try again." })
                 console.log(error);
             });
     }, [user, accessToken]);

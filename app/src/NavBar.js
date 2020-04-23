@@ -171,7 +171,7 @@ const NavBar = (props) => {
                             <img className={classes.icon}
                                 alt="logo"
                                 src={props.alt ? process.env.PUBLIC_URL + "/home-alt.png" : process.env.PUBLIC_URL + "/home.png"}
-                            />&nbsp;Project Student Relief
+                            />&nbsp;Aiso
                         </Typography>
                     </Link>
                 </div>

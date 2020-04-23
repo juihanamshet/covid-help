@@ -60,7 +60,7 @@ const styles = theme => ({
     
 });
 
-class AboutUs extends Component {
+class About extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -94,7 +94,7 @@ class AboutUs extends Component {
                         <Grid className={classes.titleGrid} item sm={12} md={6}>
                             <div className={classes.titleDiv}>
                                 <Typography className={classes.bannerTitle} variant='h2'>
-                                    Project Student Relief
+                                    Aiso
                                 </Typography>
                                 <Typography className={classes.bannerDescription} variant='h5'>
                                     A faculty, alumni, and student housing search network.
@@ -107,4 +107,4 @@ class AboutUs extends Component {
     }
 }
 
-export default withStyles(styles)(AboutUs);
+export default withStyles(styles)(About);
