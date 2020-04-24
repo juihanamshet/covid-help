@@ -112,7 +112,7 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
-                self.openSnackBar({ severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again' })
+                self.openSnackBar({ severity: 'error', message: 'Oops! Looks like we ran into a problem loading the page. Please refresh and try again.' })
             });
     }
 
@@ -131,7 +131,7 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
-                self.openSnackBar({ severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again' })
+                self.openSnackBar({ severity: 'error', message: 'Oops! Looks like we ran into a problem loading the page. Please refresh and try again.' })
 
             });
     }
@@ -151,7 +151,7 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
-                self.openSnackBar({ severity: 'error', message: 'Oops! we ran into a problem loading the page, please refresh and try again' })
+                self.openSnackBar({ severity: 'error', message: 'Oops! Looks like we ran into a problem loading the page. Please refresh and try again.' })
             });
     }
 
@@ -177,7 +177,7 @@ class FindOffer extends Component {
             })
             .catch(function (error) {
                 console.log(error);
-                self.openSnackBar({ severity: 'error', message: 'Oops! we ran into a problem loading your listing, please refresh the page and try again' })
+                this.openSnackBar({ severity: 'error', message: 'Oops! Looks like we ran into a problem loading your listing. Please refresh the page and try again.' })
             });
     }
 

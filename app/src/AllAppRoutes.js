@@ -1,10 +1,10 @@
 import React from 'react';
 import { Security, LoginCallback, SecureRoute } from '@okta/okta-react';
-import AboutUs from './About/AboutUs.js';
-import FindOffer from './FindOffer/FindOffer.js';
 import Logout from './Logout'
 import Auth from './Auth.js';
-import User from './User/User.js'
+import About from './About';
+import FindOffer from './FindOffer'
+import User from './User'
 import { useHistory, Route } from 'react-router-dom';
 
 
@@ -25,7 +25,7 @@ const AllAppRoutes = () => {
 
     return (
         <Security {...config}>
-            <Route path='/' exact={true} component={AboutUs} />
+            <Route path='/' exact={true} component={About} />
             <SecureRoute path='/offers' exact={true} component={FindOffer} />
             <Route path='/login' exact={true} component={Auth} />
             <SecureRoute path='/logout' exact={true} component={Logout} />
