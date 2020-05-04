@@ -203,6 +203,7 @@ function User(props) {
         };
         axios.get(BASE_URL + '/getUser', config)
             .then(function (response) {
+                console.log(response)
                 if (response.data === 'User not found') {
                     setEditDisabled(false)
                     setcreateMode(true)

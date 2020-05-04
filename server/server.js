@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require('axios');
 const cors = require('cors');
+const util = require('util');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 var sqltools = require("./sql.js");
 const okta = require('@okta/okta-sdk-nodejs');
@@ -74,6 +75,7 @@ function authenticationRequired(req, res, next) {
             next();
         })
         .catch((err) => {
+            console.log(err)
             res.status(401).send(err.message);
         });
 }
@@ -101,49 +103,54 @@ app.get("/getListings", authenticationRequired, async function (req, res, next) 
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
     console.log('/getListings: getting Listings for\n\t User: ' + userEmail + '\n\tSchool: ' + userSchool);
+    var sqlResult, code;
 
+    const getSchoolListings_p = util.promisify(sqltools.getSchoolListings);
+    try {
+        var result = await getSchoolListings_p(userEmail, userSchool)
+            .then(console.log('success'))
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code']
 
+    }
+    catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
 
-    await sqltools.getSchoolListings(userEmail, userSchool, async (sqlResult, status) => {
-        if (status === 200) {
-            try {
-                for (var i in sqlResult) {
-                    var listingInfo = sqlResult[i];
+    try {
+        for (var i in sqlResult) {
+            var listingInfo = sqlResult[i];
 
-                    const containerName = "container" + listingInfo['userID'];
-                    const containerClient = blobServiceClient.getContainerClient(containerName);
+            const containerName = "container" + listingInfo['userID'];
+            const containerClient = blobServiceClient.getContainerClient(containerName);
 
-                    var blobNamesList = await showBlobNames(aborter, containerClient);
-                    var tempUrl = '';
-                    for (var image of blobNamesList) {
-                        var lookingFor = listingInfo['listingID'] + "listing";
-                        if (image.includes(lookingFor)) {
-                            var token = blobService.generateSharedAccessSignature(containerName, image, sharedAccessPolicy);
-                            tempUrl = blobService.getUrl(containerName, image, token);
-
-                            break;
-                        }
-                    }
-                    sqlResult[i]['frontUrl'] = tempUrl;
+            var blobNamesList = await showBlobNames(aborter, containerClient);
+            var tempUrl = '';
+            for (var image of blobNamesList) {
+                var lookingFor = listingInfo['listingID'] + "listing";
+                if (image.includes(lookingFor)) {
+                    var token = blobService.generateSharedAccessSignature(containerName, image, sharedAccessPolicy);
+                    tempUrl = blobService.getUrl(containerName, image, token);
+                    break;
                 }
-                console.log(sqlResult);
-                resultSize = Object.keys(sqlResult).length
-                console.log("/getListings: Successfully Returned Listings with Size: " + resultSize);
-                res.json(sqlResult);
             }
-            catch (e) {
-                console.log(e);
-                console.log("failure in getting listings");
-                res.statusCode = 500;
-                res.send("Internal Server Error");
-            }
-
-        } else {
-            res.statusCode = 500;
-            res.send("Internal Server Error");
+            sqlResult[i]['frontUrl'] = tempUrl;
         }
-    })
+        resultSize = Object.keys(sqlResult).length
+        console.log("/getListings: Successfully Returned Listings with Size: " + resultSize);
+        res.json(sqlResult);
+    }
+    catch (e) {
+        console.error(e);
+        console.error("Failure in getting listings' images");
+        res.statusCode = 500;
+        res.send("Internal Server Error");
+    }
 })
+
 
 async function showBlobNames(aborter, containerClient) {
     // console.log("this bad boy");
@@ -160,76 +167,88 @@ async function showBlobNames(aborter, containerClient) {
 app.get("/getUser", authenticationRequired, async function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     console.log('/getUser with email: ' + userEmail)
+    var sqlResult, code;
 
-
-    await sqltools.getUserID(userEmail, async (sqlResults, status) => {
-        if (status == 200) {
-            try {
-                const userID = sqlResults;
-
-                const containerName = "container" + userID;
-                const containerClient = blobServiceClient.getContainerClient(containerName);
-
-                if (await containerClient.exists()) {
-                    console.log("Already exists");
-                }
-                else {
-                    console.log("please work");
-                    await containerClient.create()
-                }
-
-                var blobNamesList = await showBlobNames(aborter, containerClient);
-
-                var profilePhotoBlobName = "";
-                // console.log(blobNamesList);
-                var exists = false;
-                for (var string of blobNamesList) {
-                    if (string.includes("profilePhoto")) {
-                        profilePhotoBlobName = string;
-                        exists = true;
-                    };
-                }
-                var sasUrl = "";
-                // console.log("corr 2");
-                if (exists) {
-                    // console.log("The blob does exist")
-                    var token = blobService.generateSharedAccessSignature(containerName, profilePhotoBlobName, sharedAccessPolicy);
-                    // console.log("Corret 1");
-                    sasUrl = blobService.getUrl(containerName, profilePhotoBlobName, token);
-
-                    // console.log(sasUrl);
-                }
-            }
-            catch (e) {
-                console.log(e);
-                res.statusCode = 500;
-                res.send("Internal Server Error");
-            }
-            await sqltools.getUser(userEmail, async (sqlResult, status) => {
-                if (status === 200) {
-                    console.log("/getUser was succcessfully called")
-                    sqlResult[0]['photoUrl'] = sasUrl;
-                    res.json(sqlResult);
-                }
-                else {
-                    res.statusCode = 500;
-                    res.send("Internal Server Error");
-                }
-            });
-        }
-        else if (status === 404) {
+    const getUserID_p = util.promisify(sqltools.getUserID);
+    try {
+        var result = await getUserID_p(userEmail)
+            .then(console.log('success'))
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code']
+    } catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        if (res.statusCode != 404) {
+            next(e[1]);
+        } else {
             res.statusCode = 200;
-            res.json("User not found")
+            res.send("User not found")
+        }
+    }
+
+    // get User Profile Picture
+    try {
+        const userID = sqlResult;
+        const containerName = "container" + userID;
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+
+        if (await containerClient.exists()) {
+            console.log("Already exists");
         }
         else {
-            res.statusCode = 500;
-            res.send("Internal Server Error");
+            console.log("please work");
+            await containerClient.create()
         }
 
-    })
+        var blobNamesList = await showBlobNames(aborter, containerClient);
+
+        var profilePhotoBlobName = "";
+        // console.log(blobNamesList);
+        var exists = false;
+        for (var string of blobNamesList) {
+            if (string.includes("profilePhoto")) {
+                profilePhotoBlobName = string;
+                exists = true;
+            };
+        }
+        var sasUrl = "";
+        // console.log("corr 2");
+        if (exists) {
+            // console.log("The blob does exist")
+            var token = blobService.generateSharedAccessSignature(containerName, profilePhotoBlobName, sharedAccessPolicy);
+            // console.log("Corret 1");
+            sasUrl = blobService.getUrl(containerName, profilePhotoBlobName, token);
+
+            // console.log(sasUrl);
+        }
+    }
+    catch (e) {
+        console.log(e);
+        res.statusCode = 500;
+        res.send("Internal Server Error");
+    }
 
 
-
+    const getUser_p = util.promisify(sqltools.getUser);
+    try {
+        var result = await getUser_p(userEmail)
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code']
+        console.log("/getUser was succcessfully called")
+        sqlResult[0]['photoUrl'] = sasUrl;
+        res.json(sqlResult);
+    } catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        if (res.statusCode != 404) {
+            next(e[1]);
+        } else {
+            res.statusCode = 200;
+            res.send("User not found")
+        }
+    }
 })
 
 // async function addPhoto(containerClient, filePath, extname, aborter) {
@@ -259,143 +278,153 @@ app.get("/getUser", authenticationRequired, async function (req, res, next) {
 // }
 
 app.post("/updateProfilePhoto", authenticationRequired, async function (req, res, next) {
-    console.log("/updateProfilePhoto is called. Hope this works");
-
     const userEmail = req.jwt.claims.sub;
-    await sqltools.getUserID(userEmail, async (sqlResults, status) => {
-        if (status == 200) {
-            try {
-                const userID = sqlResults;
-                // console.log(req.fields.stream);
-                const stream = req.fields.stream;
-                // console.log(path.extname(stream.name));
-                // fs.readFile(stream.path)
-                var imageData = stream.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-                var type = imageData[1];
-                var extName = type.split('/')[1];
-                // console.log(imageData[1]);
-                var buffer = Buffer.from(imageData[2], 'base64');
-                const containerName = "container" + userID;
+    console.log("/updateProfilePhoto is called. Hope this works");
+    const getUserID_p = util.promisify(sqltools.getUserID);
+    var sqlResult, code;
 
-                const containerClient = blobServiceClient.getContainerClient(containerName);
-                if (!(await containerClient.exists())) {
-                    //If the container doesn't exists, then create one
-                    await containerClient.create();
-                }
+    try {
+        var result = await getUserID_p(userEmail)
+            .then(console.log('success'))
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code']
+    } catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
 
-                var li = await showBlobNames(aborter, containerClient);
 
-                // console.log("Got ALl the blob Names")
-                for (var string of li) {
-                    if (string.includes("profilePhoto")) {
-                        // console.log("it includes!!!")
-                        const blobClient = containerClient.getBlobClient(string);
-                        const blockBlobClient = blobClient.getBlockBlobClient();
+    const userID = sqlResult;
+    // console.log(req.fields.stream);
+    const stream = req.fields.stream;
+    // console.log(path.extname(stream.name));
+    // fs.readFile(stream.path)
+    var imageData = stream.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    var type = imageData[1];
+    var extName = type.split('/')[1];
+    // console.log(imageData[1]);
+    var buffer = Buffer.from(imageData[2], 'base64');
+    const containerName = "container" + userID;
 
-                        await blockBlobClient.delete(aborter);
-
-                    }
-                }
-
-                await blobService.createBlockBlobFromText(containerName, 'profilePhoto' + extName, buffer,
-                    {
-                        contentSettings: {
-                            contentType: type,
-                        }
-                    },
-                    function (error, result, response) {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            console.log("Added ProfilePhoto")
-                        }
-                    });
-
-                res.statusCode = 200;
-                res.json({});
-            }
-            catch (e) {
-                console.log(e);
-                console.log("Something wrong happened in trying to upload ProfilePhoto");
-                res.statusCode = 500;
-                res.send("Internal Server Error");
-            }
-
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    try {
+        if (!(await containerClient.exists())) {
+            //If the container doesn't exists, then create one
+            await containerClient.create();
         }
-        else {
-            res.statusCode = 500;
-            res.send("Internal Server Error");
+
+        var li = await showBlobNames(aborter, containerClient);
+
+        // console.log("Got ALl the blob Names")
+        for (var string of li) {
+            if (string.includes("profilePhoto")) {
+                // console.log("it includes!!!")
+                const blobClient = containerClient.getBlobClient(string);
+                const blockBlobClient = blobClient.getBlockBlobClient();
+
+                await blockBlobClient.delete(aborter);
+
+            }
         }
-    })
 
 
+        await blobService.createBlockBlobFromText(containerName, 'profilePhoto' + extName, buffer,
+            {
+                contentSettings: {
+                    contentType: type,
+                }
+            },
+            function (error, result, response) {
+                if (error) {
+                    console.log(error);
+                    throw (error);
+                } else {
+                    console.log("Added ProfilePhoto")
+                }
+            });
 
+        res.statusCode = 200;
+        res.json({});
+    } catch (e) {
+        console.error(e)
+        next(new Error("Error Updating Image"))
+    }
 })
 
 
-app.post("/updateUser", authenticationRequired, function (req, res, next) {
+app.post("/updateUser", authenticationRequired, async function (req, res, next) {
     console.log("Update User. Hope this works")
     const userInfo = req.fields.userInfo;
 
+    const updateUser_p = util.promisify(sqltools.updateUser);
 
-    sqltools.updateUser(userInfo, (sqlResult, status) => {
-        if (status === 200) {
-            console.log("/updateUser was succcessfully called")
-            res.json(sqlResult);
-        } else {
-            res.statusCode = 500;
-            res.send("Internal Server Error");
-        }
-    })
+    try {
+        await updateUser_p(userInfo)
+            .then(console.log("/updateUser was succcessfully completed"))
+            .catch(e => { throw (e) })
+    } catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
 
 })
 
-app.get("/getUsersListings", authenticationRequired, function (req, res, next) {
+app.get("/getUsersListings", authenticationRequired, async function (req, res, next) {
     const userEmail = req.jwt.claims.sub;
     const userSchool = extractSchool(userEmail);
     console.log("/getUsersListings: Getting Personal Listings for\n\t User: " + userEmail + "\n\tSchool: " + userSchool);
+    var sqlResult, code;
 
-    sqltools.getUsersListings(userEmail, userSchool, async (sqlResult, status) => {
-        if (status === 200) {
-            try {
-                for (var i in sqlResult) {
-                    var listingInfo = sqlResult[i];
+    const getUsersListings_p = util.promisify(sqltools.getUsersListings);
 
-                    const containerName = "container" + listingInfo['userID'];
-                    console.log(containerName);
-                    const containerClient = blobServiceClient.getContainerClient(containerName);
+    try {
+        var result = await getUsersListings_p(userEmail, userSchool)
+            .then(console.log('success'))
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code'];
+    } catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
 
-                    var blobNamesList = await showBlobNames(aborter, containerClient);
-                    var tempUrl = '';
-                    var lookingFor = listingInfo['listingID'] + "listing";
-                    for (var image of blobNamesList) {
-                        console.log(lookingFor);
-                        if (image.includes(lookingFor)) {
-                            var token = blobService.generateSharedAccessSignature(containerName, image, sharedAccessPolicy);
-                            tempUrl = blobService.getUrl(containerName, image, token);
 
-                            break;
-                        }
-                    }
-                    sqlResult[i]['frontUrl'] = tempUrl;
+    try {
+        for (var i in sqlResult) {
+            var listingInfo = sqlResult[i];
+
+            const containerName = "container" + listingInfo['userID'];
+            console.log(containerName);
+            const containerClient = blobServiceClient.getContainerClient(containerName);
+
+            var blobNamesList = await showBlobNames(aborter, containerClient);
+            var tempUrl = '';
+            var lookingFor = listingInfo['listingID'] + "listing";
+            for (var image of blobNamesList) {
+                console.log(lookingFor);
+                if (image.includes(lookingFor)) {
+                    var token = blobService.generateSharedAccessSignature(containerName, image, sharedAccessPolicy);
+                    tempUrl = blobService.getUrl(containerName, image, token);
+
+                    break;
                 }
-                console.log(sqlResult);
-                console.log("/getUsersListings SQL DB Returned Successfully");
-                res.json(sqlResult);
             }
-            catch (e) {
-                console.log(e);
-                console.log("failure in getting USERS listings");
-                res.statusCode = 500;
-                res.send("Internal Server Error");
-            }
-
-
-        } else {
-            res.statusCode = 500;
-            res.send("Internal Server Error");
+            sqlResult[i]['frontUrl'] = tempUrl;
         }
-    })
+        console.log(sqlResult);
+        console.log("/getUsersListings SQL DB Returned Successfully");
+        res.json(sqlResult);
+    }
+    catch (e) {
+        console.error(e);
+        console.error("/getUsersListings: Failure in getting Images");
+        res.statusCode = 500;
+        res.send("Internal Server Error");
+    }
 })
 
 app.get("/getListing", authenticationRequired, async function (req, res, next) {
@@ -404,75 +433,80 @@ app.get("/getListing", authenticationRequired, async function (req, res, next) {
     const userSchool = extractSchool(userEmail);
     console.log("/getListing: Getting - \n\tListing: " + listingID + "\n\tUser: " + userEmail + "\n\tSchool: " + userSchool)
 
-    var listingEmail = ""
-    await sqltools.getListerID(listingID, async (sqlResult, status) => {
-        if (status === 200) {
-            console.log("email successfully retreived");
-
-            listerID = sqlResult;
-
-            const containerName = "container" + listerID;
-
-            //GE THE BLOB NAME
-            console.log(containerName);
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-
-            if (!(await containerClient.exists())) {
-                await containerClient.create();
-            }
-
-            var namesList = await showBlobNames(aborter, containerClient);
-
-            var sharedAccessPolicy = {
-                AccessPolicy: {
-                    Permissions: azure.BlobUtilities.SharedAccessPermissions.READ,
-                    Start: startDate,
-                    Expiry: expiryDate
-                }
-            };
-
-            console.log("Check 1")
-
-            const generalBlobForListing = listingID + "listing"
-            var listOfUrls = [];
-            var ownerPhoto = "";
-            // console.log(namesList.length());
-            for (var str of namesList) {
-                if (str.includes(generalBlobForListing)) {
-                    var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
-                    var tempUrl = blobService.getUrl(containerName, str, token);
-                    listOfUrls.push(tempUrl);
-                }
-                else if (str.includes("profilePhoto")) {
-                    var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
-                    var tempUrl = blobService.getUrl(containerName, str, token);
-                    ownerPhoto = tempUrl;
-                }
-            }
 
 
-            sqltools.getListing(userEmail, listingID, userSchool, (sqlResult, status) => {
-                if (status === 200) {
-                    console.log("/getListing SQL Returned Successfully");
-                    sqlResult[0]['photoUrls'] = listOfUrls;
-                    sqlResult[0]['ownerPhotoUrl'] = ownerPhoto;
-                    console.log(sqlResult);
-                    res.json(sqlResult);
-                } else {
-                    res.statusCode = 500;
-                    res.send("Internal Server Error");
-                }
-            })
+    // Get Listing ID
+    const getListerID_p = util.promisify(sqltools.getListerID);
+    try {
+        var { sqlResult, code } = await getListerID_p(listingID)
+            .catch(e => { throw (e) });
+    }
+    catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e);
+    }
 
+    // Get Photos Associated with Listing
+    var listerID = sqlResult;
+    const containerName = "container" + listerID;
 
-        } else {
-            res.statusCode = 500;
-            res.send("Internal Server Error");
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+
+    if (!(await containerClient.exists())) {
+        await containerClient.create();
+    }
+
+    var namesList = await showBlobNames(aborter, containerClient);
+
+    var sharedAccessPolicy = {
+        AccessPolicy: {
+            Permissions: azure.BlobUtilities.SharedAccessPermissions.READ,
+            Start: startDate,
+            Expiry: expiryDate
         }
-    })
+    };
+
+    const generalBlobForListing = listingID + "listing"
+    var listOfUrls = [];
+    var ownerPhoto = "";
+    for (var str of namesList) {
+        if (str.includes(generalBlobForListing)) {
+            var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
+            var tempUrl = blobService.getUrl(containerName, str, token);
+            listOfUrls.push(tempUrl);
+        }
+        else if (str.includes("profilePhoto")) {
+            var token = blobService.generateSharedAccessSignature(containerName, str, sharedAccessPolicy);
+            var tempUrl = blobService.getUrl(containerName, str, token);
+            ownerPhoto = tempUrl;
+        }
+    }
+
+    // Get Listing Info
+    const getListing_p = util.promisify(sqltools.getListing);
+    try {
+        var result = await getListing_p(userEmail, listingID, userSchool)
+            .catch(e => { throw (e) })
+        code = result['code']
+        listingResult = result['result']
+
+        console.log("/getListing SQL Returned Successfully");
+        listingResult[0]['photoUrls'] = listOfUrls;
+        listingResult[0]['ownerPhotoUrl'] = ownerPhoto;
+        res.json(listingResult);
+    }
+    catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e);
+    }
+
 
 
 })
+
+
 
 // async function uploadLocalFile(aborter, containerClient, filePath, 
 //     listingID, fileName, iteration) {
@@ -518,76 +552,91 @@ app.post("/createListing", authenticationRequired, async function (req, res, nex
     listingInfo['livingSituation'] = req.fields.livingSituation;
     listingInfo['housingInfo'] = req.fields.housingInfo;
 
-    // console.log(listingInfo);
-    // console.log(req.files);
-    // let images = ["",""];
-    // let userID = "5";
-    // If you call data.append('file', file) multiple times your request will contain an array of your files...
-    sqltools.getUserID(userEmail, async (sqlResults, status) => {
-        if (status === 200) {
-            const userID = sqlResults
-            listingInfo['userID'] = userID;
-            let containerName = "container" + userID;
-            console.log("/createListing: Creating Listing for " + userEmail)
+    const getUserID_p = util.promisify(sqltools.getUserID);
+    const createListing_p = util.promisify(sqltools.createListing);
+    const status = "success";
+    try {
+        var result = await getUserID_p(userEmail)
+            .then(console.log('success'))
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code']
+    } catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
+
+    const userID = sqlResult;
+    listingInfo['userID'] = userID;
+    let containerName = "container" + userID;
+    console.log("/createListing: Creating Listing for " + userEmail)
+
+    try {
+        var result = await createListing_p(listingInfo)
+            .then(console.log("/createListing Listing Inserted into DB"))
+            .catch(e => { throw (e) })
+        sqlResult = result['result'];
+        code = result['code']
+    }
+    catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
 
 
-            sqltools.createListing(listingInfo, async (sqlResult, status) => {
-                if (status === 200) {
-                    const listingID = sqlResult[0][''];
+    const listingID = sqlResult[0][''];
 
-                    console.log("/createListing Listing Inserted into DB");
-                    const containerClient = blobServiceClient.getContainerClient(containerName);
-                    if (!(await containerClient.exists())) {
-                        //If the container doesn't exists, then create one
-                        await containerClient.create()
-                    }
-                    try {
-                        var streams = JSON.parse(req.fields.images);
-                        var i = 0;
-                        // console.log(streams);
-
-                        for (var stream of streams) {
-                            var imageData = stream.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-                            //imageData[0] is the raw one include data:(), 1 is the type, 2 is the actual data
-                            var type = imageData[1];
-                            var extName = "." + type.split('/')[1];
-                            var buffer = Buffer.from(imageData[2], 'base64');
-                            await blobService.createBlockBlobFromText(containerName, listingID + 'listing' + i + extName, buffer,
-                                {
-                                    contentSettings: {
-                                        contentType: type,
-                                    }
-                                },
-                                function (error, result, response) {
-                                    if (error) {
-                                        console.log(error);
-                                    } else {
-                                        console.log("Success in Uploading");
-                                    }
-                                });
-
-                            i += 1;
-
-                        }
-                    }
-                    catch (e) {
-                        console.log(e);
-                        console.log("complete failure");
-                        res.statusCode = 500;
-                        res.send("internal server error");
-                    }
-                    res.json(status);
-                } else {
-                    res.statusCode = 500;
-                    res.send("Internal Server Error");
-                }
-            })
-        } else {
-            res.statusCode = 500;
-            res.send("Internal Server Error");
+    console.log("/createListing Listing Inserted into DB");
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    try {
+        if (!(await containerClient.exists())) {
+            //If the container doesn't exists, then create one
+            await containerClient.create()
         }
-    })
+    } catch (e) {
+        console.error("/createListing: Issue Creating Image Container")
+        console.error(e)
+        next(e)
+    }
 
+    try {
+        var streams = JSON.parse(req.fields.images);
+        var i = 0;
+        // console.log(streams);
+
+        for (var stream of streams) {
+            var imageData = stream.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+            //imageData[0] is the raw one include data:(), 1 is the type, 2 is the actual data
+            var type = imageData[1];
+            var extName = "." + type.split('/')[1];
+            var buffer = Buffer.from(imageData[2], 'base64');
+            await blobService.createBlockBlobFromText(containerName, listingID + 'listing' + i + extName, buffer,
+                {
+                    contentSettings: {
+                        contentType: type,
+                    }
+                },
+                function (error, result, response) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log("Success in Uploading");
+                    }
+                });
+
+            i += 1;
+
+        }
+    }
+    catch (e) {
+        console.error("/createListing: Issue Uploading Image")
+        console.error(e)
+        res.statusCode(500);
+        next(e)
+    }
+    res.json(status);
 })
 
 
@@ -612,17 +661,18 @@ app.post("/createUser", authenticationRequired, async function (req, res, next) 
                 .then(() => console.log('User is no longer a first Timer'));
         });
 
+    const createUser_p = util.promisify(sqltools.createUser);
+    try {
+        var result = await createUser_p(userInfo)
+            .then(console.log("/createUser Successfully created User in DB"))
+            .catch(e => { throw (e) })
+        res.json(200)
+    } catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
 
-
-    sqltools.createUser(userInfo, (sqlResult, status) => {
-        if (status === 200) {
-            console.log("/createUser User Inserted into DB");
-            res.json(status);
-        } else {
-            res.statusCode = 500;
-            res.send("Internal Server Error");
-        }
-    })
 })
 
 app.put("/disableListing", authenticationRequired, function (req, res, next) {
@@ -630,16 +680,22 @@ app.put("/disableListing", authenticationRequired, function (req, res, next) {
     const listingID = req.fields.listingID;
     console.log("/disableListing: disabling Listing for listingID " + listingID + " and user: " + userEmail);
 
-    sqltools.disableListing(listingID, userEmail, (sqlResult, status) => {
-        if (status === 200) {
-            console.log("/disableListing Listing updated DB")
-            res.statusCode = 200;
-            res.send("/disableListing success");
-        } else {
-            res.statusCode = 500;
-            res.send("/disableListing Server Error");
-        }
-    })
+    const disableListing_p = util.promisify(sqltools.disableListing);
+
+    try {
+        var result = await disableListing_p(listingID, userEmail)
+            .then(console.log('/disableListing Listing updated DB'))
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code']
+        res.statusCode = 200;
+        res.send("/disableListing success");
+    }
+    catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
 })
 
 app.put("/enableListing", authenticationRequired, function (req, res, next) {
@@ -647,15 +703,23 @@ app.put("/enableListing", authenticationRequired, function (req, res, next) {
     const listingID = req.fields.listingID;
     console.log("/enableListing: disabling Listing for listingID" + listingID + " and user: " + userEmail);
 
-    sqltools.enableListing(listingID, userEmail, (sqlResult, status) => {
-        if (status === 200) {
-            console.log("/enableListing Listing updated DB")
-            res.json(status);
-        } else {
-            res.statusCode = 500;
-            res.send("/enableListing Server Error");
-        }
-    })
+    const enableListing_p = util.promisify(sqltools.enableListing);
+    try {
+        var result = await enableListing_p(listingID, userEmail)
+            .then(console.log('/enableListing updated DB'))
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code']
+        res.statusCode = 200;
+        res.send("/enable success");
+    }
+    catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
+
+
 })
 
 app.delete("/deleteListing", authenticationRequired, function (req, res, next) {
@@ -663,13 +727,22 @@ app.delete("/deleteListing", authenticationRequired, function (req, res, next) {
     const listingID = req.fields.listingID;
     console.log("/deleteListing: deleting Listing for listingID" + listingID + " and user: " + userEmail);
 
-    sqltools.deleteListing(listingID, userEmail, (sqlResult, status) => {
-        if (status === 200) {
-            console.log("/deleteListing Listing updated DB")
-            res.json(status);
-        } else {
-            res.statusCode = 500;
-            res.send("/deleteListing Server Error");
-        }
-    })
+
+    const deleteListing_p = util.promisify(sqltools.deleteListing);
+    try {
+        var result = await deleteListing_p(listingID, userEmail)
+            .then(console.log('/deleteListing updated DB'))
+            .catch(e => { throw (e) });
+        sqlResult = result['result'];
+        code = result['code']
+        res.statusCode = 200;
+        res.send("/delete success");
+    }
+    catch (e) {
+        console.error(e)
+        res.statusCode = parseInt(e.message.substring(0, 3), 10)
+        next(e[1]);
+    }
+
+
 })

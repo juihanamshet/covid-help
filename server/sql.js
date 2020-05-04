@@ -23,7 +23,7 @@ var config = {
 var connection;
 
 
-async function getUserID(email, callback) {
+function getUserID(email, callback) {
     connection = new Connection(config);
 
     var result = "";
@@ -52,7 +52,15 @@ async function getUserID(email, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback(result, code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -62,8 +70,18 @@ async function getUserID(email, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/getUserID SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/getUserID SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
     });
 }
 
@@ -105,7 +123,15 @@ function getSchoolListings(email, school, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback(result, code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -116,8 +142,18 @@ function getSchoolListings(email, school, callback) {
 
 
     connection.on('connect', function (err) {
-        console.log("/getListings SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/getListings SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
     });
 }
 
@@ -157,7 +193,15 @@ function getUsersListings(email, school, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback(result, code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -167,8 +211,18 @@ function getUsersListings(email, school, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/getUsersListings SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("/getUsersListings Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/getUsersListings SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
     });
 }
 
@@ -205,13 +259,18 @@ function getUser(email, callback) {
     });
 
 
-    // connection.on('debug', (message) => {
-    //     console.log('getuser', message)
-    // })
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback(result, code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -222,58 +281,74 @@ function getUser(email, callback) {
 
     connection.on('connect', function (err) {
         if (err) {
-            console.error('Connection error', err);
-        } else {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
             console.log("/getUser SQL DB Connected Successfully");
             connection.execSql(request);
         }
     });
 }
 
-async function getListerID(listingID, callback) {
-    connection = await new Connection(config);
-    console.log("GET CHECK 1")
+function getListerID(listingID, callback) {
+    connection = new Connection(config);
     var result = "";
     var code = 200
 
-    sqlQuery = "select userID from listingTable where \
+    sqlQuery = "SELECT userID FROM listingTable WHERE \
             listingTable.listingID = @ListingID;"
 
-    request = await new Request(sqlQuery, function (err, rowCount) {
+    request = new Request(sqlQuery, function (err, rowCount) {
         if (err) {
             console.error(err);
             result = "Internal Server Error"
             code = 500;
         }
         if (rowCount == 0) {
-            console.error("userEmail associated with" + listingID)
+            console.error("User associated with " + listingID + " not Found")
             result = "User Not Found";
-            code = 500;
+            code = 404;
         }
     });
-    console.log("GET CHECK 2")
 
-    await request.addParameter('ListingID', TYPES.Int, listingID);
+    request.addParameter('ListingID', TYPES.Int, listingID);
 
-    await request.on('row', function (columns) {
+    request.on('row', function (columns) {
         result = columns['userID'].value;
     });
 
-    await request.on('requestCompleted', function () {
+    request.on('requestCompleted', function () {
         connection.close();
-        callback(result, code)
+        if (code == 404) {
+            callback(new Error("User Not Found"), { result, code })
+        }
+        else if (code == 500) {
+            callback(new Error("Internal Server Error"), { result, code })
+        }
+        callback(null, { result, code })
     });
 
-    await request.on('error', (err) => {
+    request.on('error', (err) => {
         console.error(err);
-        listingData = "Internal Server Error"
+        result = "Internal Server Error"
         code = 500;
     })
-    console.log("GET CHECK 3")
 
-    await connection.on('connect', function (err) {
-        console.log("/getListerID Connected Successfully");
-        connection.execSql(request);
+    connection.on('connect', function (err) {
+        if (err) {
+            console.error(err);
+            result = "Internal Server Error"
+            code = 500;
+        }
+        else {
+            console.log("/getListerID Connected Successfully");
+            connection.execSql(request);
+        }
     });
 
 }
@@ -296,9 +371,9 @@ function getListing(email, listing, school, callback) {
             code = 500;
         }
         if (rowCount === 0) {
-            result = "Internal Server Error"
-            code = 500;
-            console.error(email + " attempted access for listingID=" + listing + " with school=" + school);
+            result = "Listing Not Found"
+            code = 404;
+            console.error(email + " attempted access for listingID=" + listing + " with school=" + school + " but Listing not found");
         }
     });
 
@@ -316,7 +391,16 @@ function getListing(email, listing, school, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback(result, code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
+
     });
 
     request.on('error', (err) => {
@@ -326,8 +410,17 @@ function getListing(email, listing, school, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/getListing SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            console.err(err);
+            connection.close();
+            result = "DB Connection Error"
+            code = 500
+            callback(new Error("Connection Error"), { result, code })
+        }
+        else {
+            console.log("/getListing SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
     });
 }
 
@@ -384,7 +477,15 @@ function createListing(listingInfo, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback(result, code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
 
@@ -395,8 +496,19 @@ function createListing(listingInfo, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/createListing SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/createListing SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
+
     });
 }
 
@@ -424,7 +536,8 @@ function createListingHandler(email, listingInfo, callback) {
 
 function updateUser(userInfo, callback) {
     connection = new Connection(config);
-    code = 200;
+    var result = "";
+    var code = 200;
 
 
     sqlQuery =
@@ -463,7 +576,15 @@ function updateUser(userInfo, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback("Success", code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -473,8 +594,19 @@ function updateUser(userInfo, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/updateUser SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/updateUser SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
+
     });
 
 }
@@ -482,6 +614,7 @@ function updateUser(userInfo, callback) {
 
 function createUser(userInfo, callback) {
     connection = new Connection(config);
+    var result = ""
     code = 200;
 
     sqlQuery =
@@ -517,7 +650,15 @@ function createUser(userInfo, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback("Success", code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -527,8 +668,19 @@ function createUser(userInfo, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/createUser SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/createUser SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
+
     });
 }
 
@@ -536,6 +688,7 @@ function createUser(userInfo, callback) {
 function disableListing(listingID, userEmail, callback) {
     connection = new Connection(config);
     code = 200;
+    var result = ""
 
     sqlQuery =
         "UPDATE listingTable \
@@ -559,7 +712,15 @@ function disableListing(listingID, userEmail, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback("Success", code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -569,8 +730,18 @@ function disableListing(listingID, userEmail, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/disableListing SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/disableListing SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
     });
 }
 
@@ -600,7 +771,15 @@ function enableListing(listingID, userEmail, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback("Success", code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -610,14 +789,25 @@ function enableListing(listingID, userEmail, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/enableListing SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/enableListing SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
     });
 }
 
 function deleteListing(listingID, userEmail, callback) {
     connection = new Connection(config);
     code = 200;
+    var result = ""
 
     sqlQuery =
         "DELETE FROM listingTable \
@@ -641,7 +831,15 @@ function deleteListing(listingID, userEmail, callback) {
 
     request.on('requestCompleted', function () {
         connection.close();
-        callback("Success", code)
+        if (code == 200) {
+            callback(null, { result, code })
+        }
+        else if (code == 404) {
+            callback(new Error("404 User not Found"), { result, code })
+        }
+        else {
+            callback(new Error("500 Internal Server Error"), { result, code })
+        }
     });
 
     request.on('error', (err) => {
@@ -651,8 +849,18 @@ function deleteListing(listingID, userEmail, callback) {
     })
 
     connection.on('connect', function (err) {
-        console.log("/deleteListing SQL DB Connected Successfully");
-        connection.execSql(request);
+        if (err) {
+            connection.close();
+            console.error("Error Connecting to DB")
+            console.error(err)
+            result = "Internal Server Error"
+            code = 500
+            callback(new Error("500 DB Connection Error"), { result, code })
+        }
+        else {
+            console.log("/deleteListing SQL DB Connected Successfully");
+            connection.execSql(request);
+        }
     });
 }
 
